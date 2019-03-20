@@ -10,9 +10,7 @@ class Accordion extends Component {
 
   constructor(props) {
     super(props);
-
     const openSections = {};
-
     this.state = { openSections };
   }
 
