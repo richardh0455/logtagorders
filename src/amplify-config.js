@@ -28,8 +28,8 @@ const awsConfig = {
                 region: 'ap-southeast-2' // example: 'us-east-2'
             },
 			{
-                name: 'VariantAPI',
-                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/dev/variants', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
+                name: 'VariantsAPI',
+                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/dev/variations', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
                 region: 'ap-southeast-2' // example: 'us-east-2'
             }
         ]

@@ -12,9 +12,9 @@ class OrderItem extends Component {
     super(props);
 	var order_item = null; /*JSON.parse(localStorage.getItem(this.props.item.key));*/
     this.state = {
-		variant: order_item ? order_item.variant : this.props.item.variant, 
-		variant_id: order_item ? order_item.variant_id : this.props.item.variant_id, 
-		quantity: order_item ? order_item.quantity : this.props.item.quantity, 
+		variant: order_item ? order_item.variant : this.props.item.variant,
+		variant_id: order_item ? order_item.variant_id : this.props.item.variant_id,
+		quantity: order_item ? order_item.quantity : this.props.item.quantity,
 		price: order_item ? order_item.price : this.props.item.price,
 		variants: []
 	};
@@ -25,25 +25,31 @@ class OrderItem extends Component {
     this.handlePriceChange = this.handlePriceChange.bind(this);
     this.removeItem = this.removeItem.bind(this);
     this.onKeyPress = this.onKeyPress.bind(this);
-  }	
-  
+  }
+
   async componentDidMount() {
     const session = await Auth.currentSession();
     this.setState({ authToken: session.accessToken.jwtToken });
     this.setState({ idToken: session.idToken.jwtToken });
 
-    
+
   }
-  
+
   handleProductChange(event) {
-    this.setState({currentlySelectedProduct: event})
+    this.setState({currentlySelectedProduct: event}, () =>
+    {
+      if(this.state.currentlySelectedProduct && this.props.customer)
+      {
+        this.getVariants();
+      }
+    })
   }
-  
-  
+
+
   handleVariantChange(event) {
-	this.setState({currentlySelectedVariant: event});  
+	this.setState({currentlySelectedVariant: event, price:event.price});
   }
-  
+
   async getVariants() {
 	  var productID = this.state.currentlySelectedProduct.value;
 	  var customerID = this.props.customer.value;
@@ -51,47 +57,41 @@ class OrderItem extends Component {
         headers: {
           'Authorization': this.state.idToken,
           'Content-Type': 'application/json'
-        }, 
-		body: {"CustomerID": customerID, "ProductID": productID}
+        },
+		    queryStringParameters: {"CustomerID": customerID, "ProductID": productID}
       };
 	  API.get(variantsAPI, getAllPath, apiRequest).then(response => {
-		this.setState({variants: response.body});
+        var variants = JSON.parse(response.body).map(
+          function(variant, index){
+            return {"value":index, "label":variant.Description, "price":variant.Price};
+          }
+        );
+		    this.setState({variants: variants});
 	  }).catch(error => {
-		console.log(error.response)
+		    console.log(error)
 	});
   }
-  
+
   handleQuantityChange(event) {
-	this.saveState({quantity: event.target.value});  
+	this.setState({quantity: event.target.value});
   }
-  
-  handlePriceChange(event) {  
-	this.saveState({price: event.target.value});  
+
+  handlePriceChange(event) {
+	this.setState({price: event.target.value});
   }
-  
+
   removeItem(event) {
 	event.preventDefault();
 	this.props.update_item_handler(this.props.item.key, null)
   }
-  
+
   onKeyPress(event) {
     if (event.which === 13 /* Enter */) {
 	  event.preventDefault()
     }
   }
-  
 
-  
-  saveState(state) {
-	this.setState(state)   
-	var order_item  = {variant: this.state.variant,variant_id: this.state.variant_id, quantity: this.state.quantity, price: this.state.price}
-	for(var key in state){
-      order_item[key] = state[key];
-	} 
-	this.props.update_item_handler(this.props.item.key, order_item)
-   }
-	
-  render() { 
+  render() {
     return (
       <div className onKeyPress={this.onKeyPress}>
         <div data-row-span="6">
@@ -105,11 +105,11 @@ class OrderItem extends Component {
 			</div>
 			<div data-field-span="1">
 				<label>Quantity</label>
-				<input type="text" defaultValue={this.state.quantity} onChange={this.handleQuantityChange} />
+				<input type="text" value={this.state.quantity} onChange={this.handleQuantityChange} />
 			</div>
 			<div data-field-span="1">
 				<label>Pricing</label>
-				<input type="text" defaultValue={this.state.price} onChange={this.handlePriceChange} />
+				<input type="text" value={this.state.price} onChange={this.handlePriceChange} />
 			</div>
 			<div data-field-span="1">
 				<label>Subtotal</label>
@@ -118,7 +118,7 @@ class OrderItem extends Component {
 			<div data-field-span="1">
 				<button onClick={this.removeItem}  >Remove Item</button>
 			</div>
-			
+
 		</div>
 	  </div>
     );
