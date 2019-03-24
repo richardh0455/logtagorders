@@ -39,5 +39,6 @@ const awsConfig = {
         region: '' // example: 'us-east-2'
     }
 }
-
+console.log('Build Environment:');
+console.log(process.env.BUILD_ENV);
 export default awsConfig;
