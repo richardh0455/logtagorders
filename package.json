@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build:$BUILD_ENV",
+    "build": "REACT_APP_BUILD_ENV=$BUILD_ENV react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }

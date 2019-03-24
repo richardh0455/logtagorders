@@ -40,5 +40,5 @@ const awsConfig = {
     }
 }
 console.log('Build Environment:');
-console.log(process.env.BUILD_ENV);
+console.log(process.env.REACT_APP_BUILD_ENV);
 export default awsConfig;
