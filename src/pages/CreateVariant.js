@@ -9,59 +9,59 @@ const createPath = '/create';
 const variantsAPI = 'VariantsAPI';
 
 class CreateVariant extends React.Component{
-  
+
   constructor(props) {
     super(props);
-    
+
     this.state = {
       currentlySelectedCustomer: null,
 	  currentlySelectedProduct: null,
       description: '',
-      cost_price: '0'
+      price: '0'
     };
 	this.handleCustomerChange = this.handleCustomerChange.bind(this);
 	this.handleProductChange = this.handleProductChange.bind(this);
 	this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
 	this.handlePriceChange = this.handlePriceChange.bind(this);
-	
+
   }
-  
+
   async componentDidMount() {
     const session = await Auth.currentSession();
     this.setState({ authToken: session.accessToken.jwtToken });
     this.setState({ idToken: session.idToken.jwtToken });
 
-    
+
   }
-  
+
   async handleCustomerChange(event) {
-  
-    this.setState({currentlySelectedCustomer: event})  
+
+    this.setState({currentlySelectedCustomer: event})
 
   }
   async handleProductChange(event) {
-  
-    this.setState({currentlySelectedProduct: event})  
+
+    this.setState({currentlySelectedProduct: event})
 
   }
-  
+
   async handleDescriptionChange(event) {
-  
-    this.setState({description: event.target.value})  
+
+    this.setState({description: event.target.value})
 
   }
   async handlePriceChange(event) {
-  
-    this.setState({cost_price: event.target.value})  
+
+    this.setState({price: event.target.value})
 
   }
-  
-  async createVariantHandler(e) { 
+
+  async createVariantHandler(e) {
 	e.preventDefault();
-	this.createVariant({customerID:this.state.currentlySelectedCustomer.value, productID:this.state.currentlySelectedProduct.value, description:this.state.description, price:this.state.price  }); 
+	this.createVariant({customerID:this.state.currentlySelectedCustomer.value, productID:this.state.currentlySelectedProduct.value, description:this.state.description, price:this.state.price  });
 
   }
-  
+
   async createVariant(variant) {
     const apiRequest = {
         headers: {
@@ -72,22 +72,21 @@ class CreateVariant extends React.Component{
       };
       API.post(variantsAPI, createPath, apiRequest)
 	  .then(response => {
-		NotificationManager.success('', 'Variant Successfully Created'); 
+		NotificationManager.success('', 'Variant Successfully Created');
 		this.setState({
 			name:'',
 			description:'',
-			cost_price:'0'
+			price:'0'
 		})
-		this.props.get_all_products();
 	  })
 	  .catch(err => {
 		NotificationManager.error('Variant creation Failed', 'Error', 5000, () => {});
 	  })
-	  
+
   }
-  
-  
-  
+
+
+
   render() {
     return (
       <div >
@@ -122,8 +121,8 @@ class CreateVariant extends React.Component{
         </form>
 		<NotificationContainer/>
       </section>
-	  
-	  
+
+
       </div>
     );
   }
