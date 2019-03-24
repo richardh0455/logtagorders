@@ -83,7 +83,7 @@ class MainApp extends React.Component {
     .catch(error =>
     {
         console.log(error.response)
-        if(error.response.status == 401){
+        if(!error.response || error.response.status == 401){
              alert('Please Sign In')
         }
     });
@@ -100,13 +100,6 @@ class MainApp extends React.Component {
     .then(response =>
     {
         this.setState({products: response.body});
-    })
-    .catch(error =>
-    {
-        console.log(error.response)
-        if(error.response.status == 401){
-             alert('Please Sign In')
-        }
     });
   }
 

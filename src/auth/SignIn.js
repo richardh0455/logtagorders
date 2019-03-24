@@ -30,39 +30,36 @@ class SignIn extends React.Component {
       email: '',
       password: '',
       code: '',
-      userObject: null
-	  
+      userObject: null,
+      register: false
+
     };
-	
+
   }
-  
+
   async componentDidMount() {
    // this.checkCookie();
-	
-	
-    
+
   }
-  
-  
+
   renderRedirect = () => {
     if (this.state.redirect) {
       return <Redirect to='/app' />
     }
   }
-  
+
   setRedirect = () => {
     this.setState({
       redirect: true
     })
   }
-  
 
 
   async onSubmitForm(e) {
     e.preventDefault();
     this.performSignIn();
   }
-  
+
   async performSignIn() {
 	try {
         const userObject = await Auth.signIn(
@@ -78,7 +75,7 @@ class SignIn extends React.Component {
           //console.log('Cognito User Access Token:', session.getAccessToken().getJwtToken());
           //console.log('Cognito User Identity Token:', session.getIdToken().getJwtToken());
           //console.log('Cognito User Refresh Token', session.getRefreshToken().getToken());
-		  
+
           this.setState({ stage: 0, email: '', password: '', code: '' });
           //this.props.history.replace('/app');
 		  this.setRedirect();
@@ -86,15 +83,15 @@ class SignIn extends React.Component {
     } catch (err) {
         alert(err.message);
         console.error('Auth.signIn(): ', err);
-    }  
-	  
+    }
+
   }
 
 
-  
 
-  
-  
+
+
+
 
   async onSubmitVerification(e) {
     e.preventDefault();
@@ -132,7 +129,7 @@ class SignIn extends React.Component {
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
   }
-  
+
 
 
   renderSignIn() {
@@ -154,7 +151,7 @@ class SignIn extends React.Component {
           </form>
 		  <div id="buttonContainer">
 			<p id="portal">Don't have an account?</p>
-			<a href="/register">Register Here</a>
+			<a href="/register" >Register Here</a>
 		  </div>
 		</section>
 
@@ -177,8 +174,8 @@ class SignIn extends React.Component {
             <input className={isValidEmail?'valid':'invalid'} type="email" placeholder="Email" value={this.state.email}/>
             <input className={isValidCode?'valid':'invalid'} type="text" placeholder="Verification Code" value={this.state.code} onChange={(e) => this.onCodeChanged(e)}/>
             <input disabled={!(isValidCode&&isValidEmail)} type="submit" value="Verify"/>
-			
-			
+
+
           </form>
         </section>
       </div>
@@ -197,4 +194,3 @@ class SignIn extends React.Component {
 }
 
 export default withRouter(SignIn);
-
