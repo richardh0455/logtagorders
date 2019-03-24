@@ -14,22 +14,22 @@ const awsConfig = {
         endpoints: [
             {
                 name: 'CustomersAPI',
-                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/dev/customers', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
+                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+process.env.REACT_APP_BUILD_ENV+'/customers', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
                 region: 'ap-southeast-2' // example: 'us-east-2'
             },
 			{
                 name: 'ProductsAPI',
-                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/dev/products', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
+                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+process.env.REACT_APP_BUILD_ENV+'/products', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
                 region: 'ap-southeast-2' // example: 'us-east-2'
             },
 			{
                 name: 'OrderAPI',
-                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/dev/orders', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
+                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+process.env.REACT_APP_BUILD_ENV+'/orders', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
                 region: 'ap-southeast-2' // example: 'us-east-2'
             },
 			{
                 name: 'VariantsAPI',
-                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/dev/variations', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
+                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+process.env.REACT_APP_BUILD_ENV+'/variations', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
                 region: 'ap-southeast-2' // example: 'us-east-2'
             }
         ]
