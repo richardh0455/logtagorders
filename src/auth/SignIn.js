@@ -35,11 +35,14 @@ class SignIn extends React.Component {
     };
 
   }
-
+  
   async componentDidMount() {
    // this.checkCookie();
 
+
+
   }
+
 
   renderRedirect = () => {
     if (this.state.redirect) {
@@ -52,6 +55,7 @@ class SignIn extends React.Component {
       redirect: true
     })
   }
+
 
 
 

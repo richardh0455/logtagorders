@@ -3,11 +3,6 @@
 // an aws-exports.js file is auto-generated and can be used instead of the below to automatically configure the Amplify library.
 // In this workshop, we are using the Amplify client libraries without the CLI toolchain so you should edit this file manually.
 
-var env = 'dev'
-if(process.env.REACT_APP_BUILD_ENV){
-	env = process.env.REACT_APP_BUILD_ENV;
-}
-
 const awsConfig = {
     Auth: {
         identityPoolId: 'ap-southeast-2:687f1ba1-1242-4f22-8adf-da49297c8005', // example: 'us-east-2:c85f3c18-05fd-4bb5-8fd1-e77e7627a99e'
@@ -19,22 +14,22 @@ const awsConfig = {
         endpoints: [
             {
                 name: 'CustomersAPI',
-                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+env+'/customers', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
+                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+process.env.REACT_APP_BUILD_ENV+'/customers', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
                 region: 'ap-southeast-2' // example: 'us-east-2'
             },
 			{
                 name: 'ProductsAPI',
-                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+env+'/products', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
+                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+process.env.REACT_APP_BUILD_ENV+'/products', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
                 region: 'ap-southeast-2' // example: 'us-east-2'
             },
 			{
                 name: 'OrderAPI',
-                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+env+'/orders', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
+                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+process.env.REACT_APP_BUILD_ENV+'/orders', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
                 region: 'ap-southeast-2' // example: 'us-east-2'
             },
 			{
                 name: 'VariantsAPI',
-                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+env+'/variations', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
+                endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+process.env.REACT_APP_BUILD_ENV+'/variations', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
                 region: 'ap-southeast-2' // example: 'us-east-2'
             }
         ]
@@ -45,5 +40,5 @@ const awsConfig = {
     }
 }
 console.log('Build Environment:');
-console.log(env);
+console.log(process.env.REACT_APP_BUILD_ENV);
 export default awsConfig;
