@@ -4,7 +4,8 @@ import { Auth, API } from 'aws-amplify';
 import logo from '../public/images/LTLogo.png';
 import { withRouter } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
-import ShippingAddress from './ShippingAddress'
+import ShippingAddress from './ShippingAddress';
+import Select from 'react-select';
 
 const customersAPI = 'CustomersAPI';
 const updatePath = '/update';
@@ -110,7 +111,7 @@ class UpdateCustomer extends React.Component{
     {
       var affectedRows = JSON.parse(JSON.parse(response.body))["AffectedRows"];
       //const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
-      if(int(affectedRows)==1)
+      if(parseInt(affectedRows, 10)==1)
       {
         NotificationManager.success('', 'Customer Successfully Updated');
         //Refresh Customer List
