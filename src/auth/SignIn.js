@@ -53,18 +53,6 @@ class SignIn extends React.Component {
     })
   }
 
-  renderRegister = () => {
-    if (this.state.register) {
-      return <Redirect to='/register' />
-    }
-  }
-
-  setRegister = () => {
-    console.log('Register clicked');
-    this.setState({
-      register: true
-    })
-  }
 
 
   async onSubmitForm(e) {
