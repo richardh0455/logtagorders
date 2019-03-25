@@ -15,7 +15,7 @@
 import React from 'react';
 import { Auth} from 'aws-amplify';
 import DynamicImage from '../components/DynamicImage';
-import { withRouter, Redirect } from 'react-router-dom';
+import { withRouter, Redirect, Link } from 'react-router-dom';
 import logo from '../public/images/LTLogo.png';
 import '../public/css/app.css';
 
@@ -163,9 +163,7 @@ class SignIn extends React.Component {
           </form>
 		  <div id="buttonContainer">
 			<p id="portal">Don't have an account?</p>
-      <button onClick={() => {this.setRegister()} } >Register Here</button>
-			<a href="" >Register Here</a>
-      {this.renderRegister()}
+        <Link to="/register">Register Here</Link>
 		  </div>
 		</section>
 
