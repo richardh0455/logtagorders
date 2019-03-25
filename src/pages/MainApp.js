@@ -154,6 +154,9 @@ class MainApp extends React.Component {
         <div label="Create Customer">
           <CreateCustomerPopup get_all_customers={this.getCustomers.bind(this)}/>
         </div>
+        <div label="Update Customer">
+          <UpdateCustomer customers={this.generateCustomerList()}/>
+        </div>
         <div label='Create Product'>
           <CreateProductPopup get_all_products={this.getProducts.bind(this)} />
         </div>
