@@ -15,7 +15,7 @@
 import React from 'react';
 import { Auth } from 'aws-amplify';
 import DynamicImage from '../components/DynamicImage';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import logo from '../public/images/LTLogo.png';
 import '../public/css/app.css';
 
@@ -38,14 +38,14 @@ class SignUp extends React.Component {
 			code: ''
 		});
 	}
-	
+
   }
 
   async onSubmitForm(e) {
     e.preventDefault();
 	if(this.state.password !== this.state.confirm) {
 		alert("Your passwords do not match.");
-		return 
+		return
 	}
     try {
       const params = {
@@ -132,7 +132,7 @@ class SignUp extends React.Component {
     const isValidEmail = this.isValidEmail(this.state.email);
     const isValidPassword = this.state.password.length > 6;
     const isValidConfirmation = isValidPassword && this.state.password === this.state.confirm;
-	
+
     return (
       <div className="app">
         <header>
@@ -148,11 +148,11 @@ class SignUp extends React.Component {
           </form>
 		  <div id="buttonContainer">
 			<p id="portal">Already have an account?</p>
-			<a href="/signin">Login</a>
+			<Link to="/signin">Login</Link>
 		  </div>
         </section>
-		
-		
+
+
       </div>
     );
   }
@@ -184,12 +184,12 @@ class SignUp extends React.Component {
         return this.renderConfirm();
     }
   }
-  
+
   setLocalStorage(jsonObj) {
 	  this.state=jsonObj;
 	  this.setState(jsonObj);
 	  //localStorage.setItem('SignUpState', JSON.stringify(this.state))
-	  
+
   }
 }
 
