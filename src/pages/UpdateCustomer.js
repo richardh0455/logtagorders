@@ -47,8 +47,6 @@ class UpdateCustomer extends React.Component{
      this.getCustomer(event.value).then(response => {
        var parsed_customer = JSON.parse(response.body);
        var contactInfo = parsed_customer.ContactInfo;
-
-       console.log(parsed_customer);
        this.setState({
          name: contactInfo.Name,
          currentlySelectedRegion: this.state.regions.find(region => region.value === contactInfo.Region),
@@ -57,7 +55,7 @@ class UpdateCustomer extends React.Component{
          shipping_addresses: parsed_customer.ShippingAddresses
        });
      })
-	   this.handleShippingAddressChange(null);
+	   //this.handleShippingAddressChange(null);
   }
 
   async handleRegionChange(event) {
@@ -87,7 +85,7 @@ class UpdateCustomer extends React.Component{
   async updateCustomerEventHandler(e)
   {
     e.preventDefault();
-    this.updateCustomer({customer_id:this.state.currentlySelectedCustomer.value, name:this.state.name, email:this.state.email, billing_address:this.state.billing_address, region:this.state.region, shipping_addresses:this.state.shipping_addresses  });
+    this.updateCustomer({customer_id:this.state.currentlySelectedCustomer.value, name:this.state.name, email:this.state.email, billing_address:this.state.billing_address, region:this.state.currentlySelectedRegion.value, shipping_addresses:this.state.shipping_addresses  });
   }
 
   async getCustomer(id) {
@@ -112,7 +110,7 @@ class UpdateCustomer extends React.Component{
     API.post(customersAPI, '/'+customer.customer_id+updatePath, apiRequest)
     .then(response =>
     {
-      var affectedRows = JSON.parse(JSON.parse(response.body))["AffectedRows"];
+      var affectedRows = response.body["AffectedRows"];
       //const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
       if(parseInt(affectedRows, 10)==1)
       {
