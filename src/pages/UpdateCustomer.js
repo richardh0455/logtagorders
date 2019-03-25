@@ -21,8 +21,10 @@ class UpdateCustomer extends React.Component{
       email: '',
       billing_address: '',
       shipping_addresses:[],
-      counter:'0'
+      counter:'0',
+      regions: [{value:"NZ", label: "New Zealand"},{value:"SA", label: "South America"},{value:"NA", label: "North America"},{value:"EU", label: "Europe"},{value:"AP", label: "Asia Pacific"},{value:"ME", label: "Middle East"}]
     };
+
     this.handleCustomerChange = this.handleCustomerChange.bind(this);
     this.handleRegionChange = this.handleRegionChange.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -39,6 +41,7 @@ class UpdateCustomer extends React.Component{
     this.setState({ idToken: session.idToken.jwtToken });
   }
 
+
   async handleCustomerChange(event) {
 	   this.setState({currentlySelectedCustomer: event})
      this.getCustomer(event.value).then(response => {
@@ -48,7 +51,7 @@ class UpdateCustomer extends React.Component{
        console.log(parsed_customer);
        this.setState({
          name: contactInfo.Name,
-         region: contactInfo.Region,
+         currentlySelectedRegion: this.state.regions.find(region => region.value === contactInfo.Region),
          email: contactInfo.Contact_Email,
          billing_address: contactInfo.Billing_Address,
          shipping_addresses: parsed_customer.ShippingAddresses
@@ -58,7 +61,7 @@ class UpdateCustomer extends React.Component{
   }
 
   async handleRegionChange(event) {
-    this.setState({region: event.target.value})
+    this.setState({currentlySelectedRegion: event})
   }
 
   async handleNameChange(event) {
@@ -220,14 +223,7 @@ class UpdateCustomer extends React.Component{
                </div>
                <div data-field-span="1">
                  <label>Region</label>
-                 <select value={this.state.region} onChange={this.handleRegionChange.bind(this)}>
-                    <option key='1' value="NZ">Select a Region</option>
-                    <option key='2' value="SA">South America</option>
-                    <option key='3' value="NA">North America</option>
-                    <option key='4' value="EU">Europe</option>
-                    <option key='5' value="AP">Asia Pacific</option>
-                    <option key='6' value="ME">Middle East</option>
-                 </select>
+                 <Select value={this.state.currentlySelectedRegion} onChange={this.handleRegionChange.bind(this)} options={this.state.regions} placeholder="Select a region"/>
                </div>
              </div>
            </fieldset>
