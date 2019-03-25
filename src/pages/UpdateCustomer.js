@@ -30,7 +30,7 @@ class UpdateCustomer extends React.Component{
     this.handleBillingAddressChange = this.handleBillingAddressChange.bind(this);
     this.shippingAddressUpdated = this.shippingAddressUpdated.bind(this);
     this.addShippingAddress = this.addShippingAddress.bind(this);
-    this.createCustomer = this.createCustomer.bind(this);
+    this.updateCustomer = this.updateCustomer.bind(this);
   }
 
   async componentDidMount() {
