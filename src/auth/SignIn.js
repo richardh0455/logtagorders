@@ -54,6 +54,19 @@ class SignIn extends React.Component {
     })
   }
 
+  renderRegister = () => {
+    if (this.state.register) {
+      return <Redirect to='/register' />
+    }
+  }
+
+  setRegister = () => {
+    console.log('Register clicked');
+    this.setState({
+      register: true
+    })
+  }
+
 
   async onSubmitForm(e) {
     e.preventDefault();
@@ -151,7 +164,8 @@ class SignIn extends React.Component {
           </form>
 		  <div id="buttonContainer">
 			<p id="portal">Don't have an account?</p>
-			<a href="/register" >Register Here</a>
+			<a href="" onclick="setRegister()" >Register Here</a>
+      {this.renderRegister()}
 		  </div>
 		</section>
 
