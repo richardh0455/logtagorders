@@ -20,6 +20,7 @@ import '../public/css/app.css';
 import '../public/css/gridforms.css';
 import logo from '../public/images/LTLogo.png';
 import CreateCustomerPopup  from './CreateCustomerPopup';
+import UpdateCustomer  from './UpdateCustomer';
 import CreateProductPopup  from './CreateProductPopup';
 import CreateOrder  from './CreateOrder';
 import CreateVariant  from './CreateVariant';
