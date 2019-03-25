@@ -163,7 +163,8 @@ class SignIn extends React.Component {
           </form>
 		  <div id="buttonContainer">
 			<p id="portal">Don't have an account?</p>
-			<a href="" onclick="setRegister()" >Register Here</a>
+      <button onClick={() => {this.setRegister()} } >Register Here</button>
+			<a href="" >Register Here</a>
       {this.renderRegister()}
 		  </div>
 		</section>
