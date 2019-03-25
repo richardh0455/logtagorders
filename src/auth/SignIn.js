@@ -30,8 +30,7 @@ class SignIn extends React.Component {
       email: '',
       password: '',
       code: '',
-      userObject: null,
-      register: false
+      userObject: null
 
     };
 
