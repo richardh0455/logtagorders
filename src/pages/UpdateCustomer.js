@@ -17,7 +17,7 @@ class UpdateCustomer extends React.Component{
     this.state = {
       currentlySelectedCustomer:{},
       name: '',
-      region: '',
+      currentlySelectedRegion: {},
       email: '',
       billing_address: '',
       shipping_addresses:[],
