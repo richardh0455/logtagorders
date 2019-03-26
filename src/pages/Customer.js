@@ -19,7 +19,7 @@ class Customer extends React.Component{
       isUpdate:false,
       currentlySelectedCustomer:{},
       name: '',
-      currentlySelectedRegion: {},
+      currentlySelectedRegion: {value:""},
       email: '',
       billing_address: '',
       shipping_addresses:[],
@@ -52,9 +52,13 @@ class Customer extends React.Component{
      this.getCustomer(event.value).then(response => {
        var parsed_customer = JSON.parse(response.body);
        var contactInfo = parsed_customer.ContactInfo;
+       var region =this.state.regions.find(region => region.value === contactInfo.Region);
+       if(!region){
+         region = {value:""}
+       }
        this.setState({
          name: contactInfo.Name,
-         currentlySelectedRegion: this.state.regions.find(region => region.value === contactInfo.Region),
+         currentlySelectedRegion: region,
          email: contactInfo.Contact_Email,
          billing_address: contactInfo.Billing_Address,
          shipping_addresses: parsed_customer.ShippingAddresses
@@ -122,8 +126,8 @@ class Customer extends React.Component{
     .then(response =>
     {
       var affectedRows = response.body["AffectedRows"];
-      //const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
-      if(parseInt(affectedRows, 10)==1)
+      const shippingAddressSuccess = this.updateCustomerShippingAddresses(customer.customer_id, customer.shipping_addresses);
+      if(parseInt(affectedRows, 10)==1 && shippingAddressSuccess)
       {
         NotificationManager.success('', 'Customer Successfully Updated');
         //Refresh Customer List
@@ -162,7 +166,7 @@ class Customer extends React.Component{
           email:'',
           name:'',
           region:'',
-          shipping_addresses:[{key:'0',  value:''}],
+          shipping_addresses:[],
           counter:'0'
         })
         //Refresh Customer List
@@ -182,13 +186,37 @@ class Customer extends React.Component{
   async createShippingAddresses(customerID, shipping_addresses)
   {
     for(var index = 0; index < shipping_addresses.length; index++) {
-      var result = await this.createShippingAddress(customerID, shipping_addresses[index].value);
+      var result = await this.createShippingAddress(customerID, shipping_addresses[index].ShippingAddress);
       if(!result)
       {
         return false;
       }
     }
     return true;
+  }
+
+  async updateCustomerShippingAddresses(customerID, shipping_addresses)
+  {
+    for(var index = 0; index < shipping_addresses.length; index++) {
+      if(shipping_addresses[index].created)
+      {
+        var result = await this.createShippingAddress(customerID, shipping_addresses[index].ShippingAddress);
+        if(!result)
+        {
+          return false;
+        }
+      } else {
+        var result = await this.updateShippingAddress(customerID,shipping_addresses[index].ID, shipping_addresses[index].ShippingAddress);
+        if(!result)
+        {
+          return false;
+        }
+
+      }
+
+    }
+    return true;
+
   }
 
   async createShippingAddress(customerID, shipping_address)
@@ -213,16 +241,38 @@ class Customer extends React.Component{
     return success;
   }
 
+  async updateShippingAddress(customerID, shipping_address_id, shipping_address)
+  {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body:{"ShippingAddress": shipping_address}
+    };
+    const success = API.post(customersAPI, "/"+customerID+"/shipping-addresses/"+shipping_address_id+"/update", apiRequest)
+    .then(response =>
+    {
+      return true;
+    })
+    .catch(err =>
+    {
+      NotificationManager.error('Address updating Failed', 'Error', 5000, () => {});
+      return false;
+    })
+    return success;
+  }
+
   shippingAddressUpdated(key, item)
   {
      var addresses = this.state.shipping_addresses;
      for(var i = 0; i < addresses.length; i++) {
-       if(addresses[i].key === key) {
+       if(addresses[i].ID === key) {
          if(item == null){
            addresses.splice(i, 1);
          }
          else {
-           addresses[i].value = item
+           addresses[i].ShippingAddress = item
          }
        }
      }
@@ -232,9 +282,9 @@ class Customer extends React.Component{
   addShippingAddress(event) {
     event.preventDefault();
     var key = Number(this.state.counter) + 1;
-    var default_item = {key:'0', value:''};
+    var default_item = {ID:'0', ShippingAddress:'', created:true};
     var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
-    cloneOfDefault.key = key;
+    cloneOfDefault.ID = key;
     var shipping_addresses = this.state.shipping_addresses;
     shipping_addresses.push(cloneOfDefault);
     this.setState({counter: key, shipping_addresses: shipping_addresses });
