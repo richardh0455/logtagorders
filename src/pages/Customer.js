@@ -129,7 +129,7 @@ class Customer extends React.Component{
       const shippingAddressSuccess = this.updateCustomerShippingAddresses(customer.customer_id, customer.shipping_addresses);
       if(parseInt(affectedRows, 10)==1 && shippingAddressSuccess)
       {
-        NotificationManager.success('', 'Customer Successfully Updated');
+        NotificationManager.success('', 'Customer Successfully Updated', 5000);
         //Refresh Customer List
         //this.props.get_all_customers();
       }
@@ -160,7 +160,7 @@ class Customer extends React.Component{
       const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
       if(success)
       {
-        NotificationManager.success('', 'Customer Successfully Created');
+        NotificationManager.success('', 'Customer Successfully Created', 5000);
         this.setState({
           billing_address:'',
           email:'',

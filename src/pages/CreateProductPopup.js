@@ -62,7 +62,7 @@ class CreateProductPopup extends React.Component{
       };
       API.post(productsAPI, createPath, apiRequest)
 	  .then(response => {
-		NotificationManager.success('', 'Product Successfully Created');
+		NotificationManager.success('', 'Product Successfully Created', 5000);
 		this.setState({
 			name:'',
 			description:'',
