@@ -20,7 +20,7 @@ import '../public/css/app.css';
 import '../public/css/gridforms.css';
 import logo from '../public/images/LTLogo.png';
 import CreateCustomerPopup  from './CreateCustomerPopup';
-import UpdateCustomer  from './UpdateCustomer';
+import Customer  from './Customer';
 import CreateProductPopup  from './CreateProductPopup';
 import CreateOrder  from './CreateOrder';
 import CreateVariant  from './CreateVariant';
@@ -152,11 +152,8 @@ class MainApp extends React.Component {
         <div label="Create Order">
           <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} />
         </div>
-        <div label="Create Customer">
-          <CreateCustomerPopup get_all_customers={this.getCustomers.bind(this)}/>
-        </div>
-        <div label="Update Customer">
-          <UpdateCustomer customers={this.generateCustomerList()}/>
+        <div label="Create or Update Customer">
+          <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
         </div>
         <div label='Create Product'>
           <CreateProductPopup get_all_products={this.getProducts.bind(this)} />

@@ -9,12 +9,14 @@ import Select from 'react-select';
 
 const customersAPI = 'CustomersAPI';
 const updatePath = '/update';
+const createPath = '/create';
 
-class UpdateCustomer extends React.Component{
+class Customer extends React.Component{
   constructor(props) {
     super(props);
 
     this.state = {
+      isUpdate:false,
       currentlySelectedCustomer:{},
       name: '',
       currentlySelectedRegion: {},
@@ -33,6 +35,9 @@ class UpdateCustomer extends React.Component{
     this.shippingAddressUpdated = this.shippingAddressUpdated.bind(this);
     this.addShippingAddress = this.addShippingAddress.bind(this);
     this.updateCustomer = this.updateCustomer.bind(this);
+    this.createCustomer = this.createCustomer.bind(this);
+    this.updateCustomerChangeHandler = this.updateCustomerChangeHandler.bind(this);
+    this.createCustomerChangeHandler = this.createCustomerChangeHandler.bind(this);
   }
 
   async componentDidMount() {
@@ -88,6 +93,12 @@ class UpdateCustomer extends React.Component{
     this.updateCustomer({customer_id:this.state.currentlySelectedCustomer.value, name:this.state.name, email:this.state.email, billing_address:this.state.billing_address, region:this.state.currentlySelectedRegion.value, shipping_addresses:this.state.shipping_addresses  });
   }
 
+  async createCustomerEventHandler(e)
+  {
+    e.preventDefault();
+    this.createCustomer({name:this.state.name, email:this.state.email, billing_address:this.state.billing_address, region:this.state.currentlySelectedRegion.value, shipping_addresses:this.state.shipping_addresses  });
+  }
+
   async getCustomer(id) {
     const apiRequest = {
       headers: {
@@ -126,6 +137,45 @@ class UpdateCustomer extends React.Component{
     {
       console.log(err);
       NotificationManager.error('Updating Customer Failed', 'Error', 5000, () => {});
+    })
+  }
+
+  async createCustomer(customer)
+  {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: {"Name": customer.name, "EmailAddress": customer.email, "BillingAddress": customer.billing_address, "Region": customer.region}
+    };
+    API.post(customersAPI, createPath, apiRequest)
+    .then(response =>
+    {
+      var customerID = JSON.parse(JSON.parse(response.body))["CustomerID"];
+      const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
+      if(success)
+      {
+        NotificationManager.success('', 'Customer Successfully Created');
+        this.setState({
+          billing_address:'',
+          email:'',
+          name:'',
+          region:'',
+          shipping_addresses:[{key:'0',  value:''}],
+          counter:'0'
+        })
+        //Refresh Customer List
+        this.props.get_all_customers();
+      }
+      else {
+        NotificationManager.error('Creating Customer Shipping Addresses Failed', 'Error', 5000, () => {});
+      }
+    })
+    .catch(err =>
+    {
+      console.log(err);
+      NotificationManager.error('Customer creation Failed', 'Error', 5000, () => {});
     })
   }
 
@@ -190,7 +240,51 @@ class UpdateCustomer extends React.Component{
     this.setState({counter: key, shipping_addresses: shipping_addresses });
   }
 
+  createOrUpdate() {
+    if(this.state.isUpdate){
+      return (
+        <div data-field-span="1" >
+          <label>Customer</label>
+          <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
+      </div>);
+    }
+  }
 
+  createCustomerChangeHandler() {
+    this.setState({
+      isUpdate:false,
+      currentlySelectedCustomer:{},
+      name: '',
+      currentlySelectedRegion: {},
+      email: '',
+      billing_address: '',
+      shipping_addresses:[]
+    });
+  }
+
+  updateCustomerChangeHandler() {
+    this.setState({
+      isUpdate:true,
+      currentlySelectedCustomer:{},
+      name: '',
+      currentlySelectedRegion: {},
+      email: '',
+      billing_address: '',
+      shipping_addresses:[]
+
+    });
+  }
+
+  getButtonText() {
+    if(this.state.isUpdate){
+      return (<button style={{marginTop: 50 + 'px'}} onClick={(e) => {this.updateCustomerEventHandler(e)} }>Update Customer</button>);
+    }
+    else {
+      return (<button style={{marginTop: 50 + 'px'}} onClick={(e) => {this.createCustomerEventHandler(e)} }>Create Customer</button>);
+
+    }
+
+  }
 
   render() {
     return (
@@ -199,10 +293,19 @@ class UpdateCustomer extends React.Component{
           <form className="grid-form">
             <fieldset>
               <div data-row-span="2">
-                <div data-field-span="1" >
-                  <label>Customer</label>
-                  <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
+                <div className="radio">
+                  <label>
+                    <input type="radio" checked={!this.state.isUpdate} onChange={this.createCustomerChangeHandler} />
+                    Create Customer
+                  </label>
+
+                  <label style={{marginLeft: 20 + 'px'}}>
+                    <input type="radio" checked={this.state.isUpdate} onChange={this.updateCustomerChangeHandler} />
+                    Update Customer
+                  </label>
                 </div>
+                {this.createOrUpdate()}
+
               </div>
               <div data-row-span="2">
                 <div data-field-span="1">
@@ -232,7 +335,7 @@ class UpdateCustomer extends React.Component{
              <button onClick={this.addShippingAddress}>Add Shipping Address</button>
            </fieldset>
            <div>
-             <button style={{marginTop: 50 + 'px'}}onClick={(e) => {this.updateCustomerEventHandler(e)} }>Update Customer</button>
+             {this.getButtonText()}
            </div>
          </form>
          <NotificationContainer/>
@@ -242,4 +345,4 @@ class UpdateCustomer extends React.Component{
   }
 }
 
-export default withRouter(UpdateCustomer);
+export default withRouter(Customer);
