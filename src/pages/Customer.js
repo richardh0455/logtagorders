@@ -131,7 +131,7 @@ class Customer extends React.Component{
       {
         NotificationManager.success('', 'Customer Successfully Updated', 5000);
         //Refresh Customer List
-        //this.props.get_all_customers();
+        this.props.get_all_customers();
       }
       else {
         NotificationManager.error('Creating Customer Shipping Addresses Failed', 'Error', 5000, () => {});
