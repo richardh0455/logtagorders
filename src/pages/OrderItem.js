@@ -36,6 +36,9 @@ class OrderItem extends Component {
   }
 
   handleProductChange(event) {
+    this.props.item.product_id = event.value;
+    this.props.item.product_name = event.label;
+    this.props.update_item_handler(this.props.item.key, this.props.item)
     this.setState({currentlySelectedProduct: event}, () =>
     {
       if(this.state.currentlySelectedProduct && this.props.customer)
@@ -47,7 +50,11 @@ class OrderItem extends Component {
 
 
   handleVariantChange(event) {
-	this.setState({currentlySelectedVariant: event, price:event.price});
+	  this.setState({currentlySelectedVariant: event});
+    this.handlePriceChange({target: {value: event.price}})
+    this.props.item.variant_id = event.value;
+    this.props.item.variant = event.label;
+    this.props.update_item_handler(this.props.item.key, this.props.item)
   }
 
   async getVariants() {
@@ -63,7 +70,7 @@ class OrderItem extends Component {
 	  API.get(variantsAPI, getAllPath, apiRequest).then(response => {
         var variants = JSON.parse(response.body).map(
           function(variant, index){
-            return {"value":index, "label":variant.Description, "price":variant.Price};
+            return {"value":variant.VariantID, "label":variant.Description, "price":variant.Price};
           }
         );
 		    this.setState({variants: variants});
@@ -74,10 +81,14 @@ class OrderItem extends Component {
 
   handleQuantityChange(event) {
 	this.setState({quantity: event.target.value});
+  this.props.item.quantity = event.target.value;
+  this.props.update_item_handler(this.props.item.key, this.props.item)
   }
 
   handlePriceChange(event) {
-	this.setState({price: event.target.value});
+	  this.setState({price: event.target.value});
+    this.props.item.price = event.target.value;
+    this.props.update_item_handler(this.props.item.key, this.props.item)
   }
 
   removeItem(event) {

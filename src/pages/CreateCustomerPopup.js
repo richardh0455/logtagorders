@@ -82,7 +82,7 @@ class CreateCustomerPopup extends React.Component{
       const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
       if(success)
       {
-        NotificationManager.success('', 'Customer Successfully Created');
+        NotificationManager.success('', 'Customer Successfully Created', 5000);
         this.setState({
           billing_address:'',
           email:'',

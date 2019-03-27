@@ -72,7 +72,7 @@ class CreateVariant extends React.Component{
       };
       API.post(variantsAPI, createPath, apiRequest)
 	  .then(response => {
-		NotificationManager.success('', 'Variant Successfully Created');
+		NotificationManager.success('', 'Variant Successfully Created',5000);
 		this.setState({
 			name:'',
 			description:'',
