@@ -119,16 +119,16 @@ class OrderList extends Component {
 	var items = this.state.order_items;
 	doc.text('Product', initX, initY);
 	doc.text('Variation', initX+44, initY);
-	doc.text('Price', initX+80, initY);
-	doc.text('Quantity', initX+108, initY);
+	doc.text('Price', initX+90, initY);
+	doc.text('Quantity', initX+120, initY);
 	doc.text('Subtotal', initX+144, initY);
 	doc.line(initX, initY+5, initX+180, initY+5);
 	initY += 20;
 	for(var i = 0; i < items.length; i++) {
-		doc.text(items[i].product_name, initX, initY);
-		doc.text(items[i].variant.replace(',',', \n'), initX+44, initY);
-		doc.text(items[i].price, initX+80, initY);
-		doc.text(items[i].quantity, initX+108, initY);
+		doc.text(doc.splitTextToSize(items[i].product_name, 40), initX, initY);
+		doc.text(doc.splitTextToSize(items[i].variant.replace(',',', \n'), 36), initX+44, initY);
+		doc.text(items[i].price, initX+90, initY);
+		doc.text(items[i].quantity, initX+120, initY);
 		doc.text(items[i].quantity*items[i].price+'', initX+144, initY);
 		doc.line(initX, initY+15, initX+180, initY+15);
 		initY += 25;
