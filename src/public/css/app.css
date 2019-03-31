@@ -128,7 +128,7 @@
     border-radius: 40px;
     cursor: pointer;
     display: block;
-	
+
     font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 24px;
     opacity: 1;
@@ -167,6 +167,10 @@
 
     -webkit-transition: background-color 0.2s ease-in-out;
     transition: background-color 0.2s ease-in-out;
+}
+
+.app button[id="signout"] {
+    float: right
 }
 .app p[id="portal"]{
 	display: inline-block;
@@ -368,4 +372,3 @@
        (min-resolution: 120dpi) {
     /* Style adjustments for high resolution devices */
 }
-

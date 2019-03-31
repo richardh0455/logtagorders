@@ -25,7 +25,7 @@ import CreateProductPopup  from './CreateProductPopup';
 import CreateOrder  from './CreateOrder';
 import CreateVariant  from './CreateVariant';
 import Accordian  from './Accordian';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 
 
@@ -44,10 +44,32 @@ class MainApp extends React.Component {
 
     Amplify.Logger.LOG_LEVEL = 'DEBUG';
 
+    this.signOut = this.signOut.bind(this);
+
     this.state = {
       authToken: null,
-      idToken: null
+      idToken: null,
+      redirect: false
     };
+  }
+
+  async signOut() {
+    console.log("Sign Out")
+    Auth.signOut()
+        .then(data => console.log(data))
+        .catch(err => console.log(err));
+    this.setState({
+          redirect: true
+        })
+
+  }
+
+  renderRedirect() {
+    console.log(this.state.redirect)
+    if(this.state.redirect) {
+      return <Redirect to='/signin' />;
+    }
+
   }
 
 
@@ -147,6 +169,8 @@ class MainApp extends React.Component {
     <div className="app">
       <header>
         <img src={logo}/>
+         <button type="button" id="signout" onClick={this.signOut}>Sign Out</button>
+         {this.renderRedirect()}
       </header>
       <Accordian>
         <div label="Create Order">
