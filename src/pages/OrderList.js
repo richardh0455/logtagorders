@@ -141,8 +141,10 @@ class OrderList extends Component {
 
    saveOrderAndGeneratePDF(event) {
 	   event.preventDefault();
-	   this.generatePDF();
-	   this.props.create_invoice_handler(this.buildInvoiceBody());
+		 if (window.confirm('Are you sure?')) {
+	     this.generatePDF();
+	     this.props.create_invoice_handler(this.buildInvoiceBody());
+	   }
    }
 
 
