@@ -10,6 +10,7 @@ import Select from 'react-select';
 const customersAPI = 'CustomersAPI';
 const updatePath = '/update';
 const createPath = '/create';
+const deletePath = '/delete';
 
 class Customer extends React.Component{
   constructor(props) {
@@ -263,13 +264,45 @@ class Customer extends React.Component{
     return success;
   }
 
+  async deleteShippingAddress(shipping_address_id) {
+    var customerID = this.state.currentlySelectedCustomer.value
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    API.del(customersAPI, "/"+customerID+"/shipping-addresses/"+shipping_address_id+deletePath, apiRequest)
+    .then(response =>
+    {
+      var affectedRows = response.body["AffectedRows"];
+      if(parseInt(affectedRows, 10)==1)
+      {
+        NotificationManager.success('', 'Shipping Address Deleted', 3000);
+
+      }
+      else {
+        NotificationManager.error('Deleting Shipping Address Failed', 'Error', 5000, () => {});
+      }
+    })
+    .catch(err =>
+    {
+      console.log(err);
+      NotificationManager.error('Deleting Shipping Addres', 'Error', 5000, () => {});
+    })
+  }
+
   shippingAddressUpdated(key, item)
   {
      var addresses = this.state.shipping_addresses;
      for(var i = 0; i < addresses.length; i++) {
-       if(addresses[i].ID === key) {
+
+       if(addresses[i] && addresses[i].ID === key) {
+         console.log('Found matching ID');
          if(item == null){
+           this.deleteShippingAddress(addresses[i].ID)
            addresses.splice(i, 1);
+
          }
          else {
            addresses[i].ShippingAddress = item
