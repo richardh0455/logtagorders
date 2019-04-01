@@ -7,23 +7,21 @@ class ShippingAddress extends Component {
   constructor(props) {
     super(props);
 	this.state = {
-      key: this.props.address.ID,
-	  address: this.props.address.ShippingAddress,
+	  address: this.props.address.ShippingAddress
     };
-	  console.log(this.state.address)
     this.handleAddressChange = this.handleAddressChange.bind(this);
     this.removeItem = this.removeItem.bind(this);
     this.onKeyPress = this.onKeyPress.bind(this);
   }
   handleAddressChange(event) {
-	this.props.update_address_handler(this.state.key, event.target.value)
+	this.props.update_address_handler(this.props.address.ID, event.target.value)
 	this.setState({address:event.target.value})
   }
 
 
   removeItem(event) {
 	event.preventDefault();
-	this.props.update_address_handler(this.state.key, null)
+	this.props.update_address_handler(this.props.address.ID, null)
   }
 
   onKeyPress(event) {
