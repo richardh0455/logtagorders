@@ -15,28 +15,28 @@ const createPath = '/create';
 const orderAPI = 'OrderAPI';
 
 class CreateOrder extends React.Component{
-  
+
   constructor(props) {
     super(props);
-	
+
 	this.handleCustomerChange = this.handleCustomerChange.bind(this);
 	this.handleShippingAddressChange = this.handleShippingAddressChange.bind(this);
-	
+
 	this.state = {
       currentlySelectedCustomer: null,
       currentlySelectedShippingAddress: null,
 	  customer: null
     };
   }
-  
+
   async componentDidMount() {
     const session = await Auth.currentSession();
     this.setState({ authToken: session.accessToken.jwtToken });
     this.setState({ idToken: session.idToken.jwtToken });
 
-    
+
   }
-    
+
 
   async getCustomer(id) {
     const apiRequest = {
@@ -47,42 +47,42 @@ class CreateOrder extends React.Component{
     };
     return await API.get(customersAPI, '/'+id, apiRequest)
   }
-   
-  
+
+
   async createInvoice(invoiceLines) {
         const apiRequest = {
         headers: {
           'Authorization': this.state.idToken,
           'Content-Type': 'application/json'
         },
-        body: {"customerID": JSON.parse(this.state.customer).ContactInfo.CustomerID, "invoiceLines": invoiceLines}
+        body: {"customerID": this.state.currentlySelectedCustomer.value, "invoiceLines": invoiceLines}
       };
       return await API.post(orderAPI, createPath, apiRequest)
   }
-  
-  async handleCustomerChange(event) { 
-	this.setState({currentlySelectedCustomer: event})  
+
+  async handleCustomerChange(event) {
+	this.setState({currentlySelectedCustomer: event})
     var customer = await this.getCustomer(event.value);
     this.setState({customer: customer.body})
 	this.handleShippingAddressChange(null);
   }
-  
+
   handleShippingAddressChange(event) {
 	this.setState({currentlySelectedShippingAddress: event})
   }
-   
+
    generateShippingAddressList(customer) {
-    let shippingAddresses = []; 
+    let shippingAddresses = [];
     if(customer && "ShippingAddresses" in customer){
-        shippingAddresses = customer.ShippingAddresses.map((address) => 
+        shippingAddresses = customer.ShippingAddresses.map((address) =>
 			{return {value:address.ShippingAddressID, label: address.ShippingAddress}}
         );
-    }  
-    return shippingAddresses;  
+    }
+    return shippingAddresses;
   }
-  
-  
-  
+
+
+
   render() {
     return (
       <div >
@@ -107,8 +107,8 @@ class CreateOrder extends React.Component{
         </fieldset>
         </form>
       </section>
-	  
-	  
+
+
       </div>
     );
   }

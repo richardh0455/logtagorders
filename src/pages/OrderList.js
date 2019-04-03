@@ -106,10 +106,10 @@ class OrderList extends Component {
    }
 
 
-  generatePDF() {
+  generatePDF(logtagInvoiceNumber) {
 	var doc = new jsPDF();
 	var initX = 15;
-	var initY = 50;
+	var initY = 70;
 
 	doc.setFillColor(6,46,112);
 	doc.rect(5, 5, 200, 20, 'F');
@@ -118,9 +118,9 @@ class OrderList extends Component {
 	var data = [];
 	var headers = [['Product','Variation','Price','Quantity','Subtotal']];
 
-
-
-	doc.text('Logtag Order #0569023', 15, 35);
+	var invoiceNumber = 'INVOICE NUMBER: '+logtagInvoiceNumber;
+	var invoiceNumberTextWidth = doc.getTextWidth(invoiceNumber);
+	doc.text(invoiceNumber, 200-invoiceNumberTextWidth, 35);
 	var items = this.state.order_items;
 	for(var i = 0; i < items.length; i++) {
 		var line = [ items[i].product_name, items[i].variant.replace(',',', \n'),items[i].price, items[i].quantity,items[i].quantity*items[i].price+'' ];
@@ -134,7 +134,7 @@ var footer = [['Total','','','',this.calculateTotal()]]
 		head: headers,
 		body: data,
 		foot: footer,
-		headerStyles: {
+		headStyles: {
 			fillColor: [6,46,112],
 			textColor: [255,255,255]
 		},
@@ -154,8 +154,14 @@ var footer = [['Total','','','',this.calculateTotal()]]
    saveOrderAndGeneratePDF(event) {
 	   event.preventDefault();
 		 if (window.confirm('Are you sure?')) {
-	     this.generatePDF();
-	     this.props.create_invoice_handler(this.buildInvoiceBody());
+
+	     this.props.create_invoice_handler(this.buildInvoiceBody())
+			 .then( response => {
+					var parsed_body = JSON.parse(JSON.parse(response.body))
+					var logtagInvoiceNumber = parsed_body["LogtagInvoiceNumber"]+'-'+parsed_body["InvoiceID"];
+					this.generatePDF(logtagInvoiceNumber);
+			}
+			)
 	   }
    }
 
