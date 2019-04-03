@@ -4,7 +4,7 @@ import '../public/css/gridforms.css';
 import * as jsPDF from 'jspdf';
 import * as Base64 from 'base-64';
 import logo from '../public/images/LTLogo.png';
-
+import 'jspdf-autotable';
 
 
 
@@ -115,26 +115,38 @@ class OrderList extends Component {
 	doc.rect(5, 5, 200, 20, 'F');
 	doc.addImage(logo , 'PNG', 7, 7, 100, 10);
 
+	var data = [];
+	var headers = [['Product','Variation','Price','Quantity','Subtotal']];
+
+
+
 	doc.text('Logtag Order #0569023', 15, 35);
 	var items = this.state.order_items;
-	doc.text('Product', initX, initY);
-	doc.text('Variation', initX+44, initY);
-	doc.text('Price', initX+90, initY);
-	doc.text('Quantity', initX+120, initY);
-	doc.text('Subtotal', initX+144, initY);
-	doc.line(initX, initY+5, initX+180, initY+5);
-	initY += 20;
 	for(var i = 0; i < items.length; i++) {
-		doc.text(doc.splitTextToSize(items[i].product_name, 40), initX, initY);
-		doc.text(doc.splitTextToSize(items[i].variant.replace(',',', \n'), 36), initX+44, initY);
-		doc.text(items[i].price, initX+90, initY);
-		doc.text(items[i].quantity, initX+120, initY);
-		doc.text(items[i].quantity*items[i].price+'', initX+144, initY);
-		doc.line(initX, initY+15, initX+180, initY+15);
-		initY += 25;
+		var line = [ items[i].product_name, items[i].variant.replace(',',', \n'),items[i].price, items[i].quantity,items[i].quantity*items[i].price+'' ];
+		data.push(line);
 
 	}
-	doc.text('Total: '+this.calculateTotal(), initX, initY);
+var footer = [['Total','','','',this.calculateTotal()]]
+
+	doc.autoTable({
+		startY: initY,
+		head: headers,
+		body: data,
+		foot: footer,
+		headerStyles: {
+			fillColor: [6,46,112],
+			textColor: [255,255,255]
+		},
+		footStyles: {
+			fillColor: [255,255,255],
+			textColor: [0,0,0]
+		},
+		styles:{
+			lineWidth:0.1,
+			lineColor:[0,0,0]
+		}
+	});
 	doc.save('Order.pdf')
 
    }
