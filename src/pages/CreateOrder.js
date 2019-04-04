@@ -102,7 +102,7 @@ class CreateOrder extends React.Component{
             </div>
             <div className="OrderList" style={{marginTop: 50 + 'px'}}>
 				<h2>Product</h2>
-                <OrderList create_invoice_handler={this.createInvoice.bind(this)} products={this.props.products} customer={this.state.currentlySelectedCustomer}/>
+                <OrderList create_invoice_handler={this.createInvoice.bind(this)} products={this.props.products} shippingAddress ={this.state.currentlySelectedShippingAddress} customer={this.state.currentlySelectedCustomer}/>
             </div>
         </fieldset>
         </form>
