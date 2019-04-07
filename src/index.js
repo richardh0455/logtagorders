@@ -42,7 +42,7 @@ class App extends React.Component {
         <Switch>
           <Route exact path="/" component={SignIn}/>
           <Route path="/register" component={SignUp} />
-	      <Route path="/signin" component={SignIn} />
+	        <Route path="/signin" component={SignIn} />
           <PrivateRoute path="/app" component={MainApp} />
         </Switch>
       </BrowserRouter>

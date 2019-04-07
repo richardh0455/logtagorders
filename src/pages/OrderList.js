@@ -3,7 +3,9 @@ import OrderItem from './OrderItem';
 import '../public/css/gridforms.css';
 import * as jsPDF from 'jspdf';
 import * as Base64 from 'base-64';
+import pdfEnd from '../public/images/ncombskhir.png';
 import logo from '../public/images/LTLogoInvoice.png';
+
 import 'jspdf-autotable';
 
 
@@ -113,7 +115,6 @@ class OrderList extends Component {
 	var initX = 15;
 
 
-
 	var imageWidth = 60;
 	var imageHeight = (imageWidth/5) * 2;
 	var img = new Image();
@@ -158,7 +159,11 @@ class OrderList extends Component {
 	var headers = [['Description','Qty','Unit Price','Subtotal']];
 	var items = this.state.order_items;
 	for(var i = 0; i < items.length; i++) {
-		var line = [ items[i].product_name+' - '+items[i].variant.replace(',',', \n'), items[i].quantity,items[i].price, items[i].quantity*items[i].price+'' ];
+		var variant = '';
+		if(items[i].variant.replace(',',', \n') != 'No Variant') {
+			variant = ' - '+items[i].variant.replace(',',', \n');
+		}
+		var line = [ items[i].product_name+variant, items[i].quantity,items[i].price, items[i].quantity*items[i].price+'' ];
 		data.push(line);
 
 	}
@@ -193,17 +198,32 @@ var initY = 100;
 	var paymentInfo = ['HS Code # 9025 1980 90 0000 0000 00 00 Country of Origin - Peoples Republic of China',
 'Make Payment in advance to LogTag Recorders (HK) Ltd. Bank Account:-']
 	doc.text(paymentInfo,  margin, postTableY +10);
+	doc.setFontStyle("bold");
 	var bankAccount = ['HSBC','No.1, Queen\'s Road', 'Central, Hong Kong']
 	doc.text(bankAccount,  margin, postTableY +20);
 	var accountNumberTitle = 'Account Number:'
-	doc.text(accountNumberTitle,  margin, postTableY +30);
+	doc.text(accountNumberTitle,  margin, postTableY +35);
 	doc.setTextColor(247,29,29)
 	var accountNumber ='652-144304-838'
-	doc.text(accountNumber,  margin+doc.getTextWidth(accountNumberTitle), postTableY +30);
+	doc.text(accountNumber,  margin+doc.getTextWidth(accountNumberTitle), postTableY +35);
 	doc.text('LogTag Recorders (HK) Limited',  margin, postTableY +40);
 	doc.setTextColor(0,0,0)
 	doc.text('SWIFT - HSBCHKHHHKH',  margin, postTableY +50);
-	doc.save('Order.pdf')
+
+	var footerImageWidth = 62;
+	var footerImageHeight = 18;
+	var footerImage = new Image();
+	footerImage.src = pdfEnd;
+	footerImage.onload = function() {
+		doc.addImage(footerImage , 'PNG', (pageWidth-footerImageWidth-margin), postTableY +60, footerImageWidth, footerImageHeight);
+		doc.save('Order.pdf')
+
+	}
+
+
+
+
+
 
    }
 
