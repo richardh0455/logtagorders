@@ -23,7 +23,7 @@ class Customer extends React.Component{
       currentlySelectedRegion: {value:""},
       email: '',
       billing_address: '',
-      shipping_addresses:[],
+      shipping_addresses:[{ID:'0', ShippingAddress:'', created:true}],
       counter:'0',
       regions: [{value:"NZ", label: "New Zealand"},{value:"SA", label: "South America"},{value:"NA", label: "North America"},{value:"EU", label: "Europe"},{value:"AP", label: "Asia Pacific"},{value:"ME", label: "Middle East"}]
     };
@@ -57,6 +57,11 @@ class Customer extends React.Component{
        if(!region){
          region = {value:""}
        }
+       var shippingAddresses = parsed_customer.ShippingAddresses
+       if ( shippingAddresses === undefined || parsed_customer.ShippingAddresses.length == 0) {
+         this.addShippingAddress();
+       }
+
        this.setState({
          name: contactInfo.Name,
          currentlySelectedRegion: region,
@@ -65,7 +70,6 @@ class Customer extends React.Component{
          shipping_addresses: parsed_customer.ShippingAddresses
        });
      })
-	   //this.handleShippingAddressChange(null);
   }
 
   async handleRegionChange(event) {
@@ -312,8 +316,7 @@ class Customer extends React.Component{
      this.setState({shipping_addresses: addresses});
   }
 
-  addShippingAddress(event) {
-    event.preventDefault();
+  addShippingAddress() {
     var key = Number(this.state.counter) + 1;
     var default_item = {ID:'0', ShippingAddress:'', created:true};
     var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
