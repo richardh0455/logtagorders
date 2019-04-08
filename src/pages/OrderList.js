@@ -196,7 +196,7 @@ var initY = 100;
 	var bankAccount = ['HSBC','No.1, Queen\'s Road', 'Central, Hong Kong']
 	doc.text(bankAccount,  margin, postTableY +20);
 	var accountNumberTitle = 'Account Number:'
-	doc.text(accountNumberTitle,  margin, postTableY +30);
+	doc.text(accountNumberTitle,  margin, postTableY +40);
 	doc.setTextColor(247,29,29)
 	var accountNumber ='652-144304-838'
 	doc.text(accountNumber,  margin+doc.getTextWidth(accountNumberTitle), postTableY +30);
