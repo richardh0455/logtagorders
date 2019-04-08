@@ -3,7 +3,9 @@ import OrderItem from './OrderItem';
 import '../public/css/gridforms.css';
 import * as jsPDF from 'jspdf';
 import * as Base64 from 'base-64';
+import pdfEnd from '../public/images/ncombskhir.png';
 import logo from '../public/images/LTLogoInvoice.png';
+
 import 'jspdf-autotable';
 
 
@@ -12,8 +14,8 @@ class OrderList extends Component {
 	constructor(props) {
     super(props);
 	this.state = {
-		counter: /*localStorage.getItem('counter') ? localStorage.getItem('counter') :*/ '5',
-		order_items: /*localStorage.getItem('order_items') ? JSON.parse(localStorage.getItem('order_items')) :*/ []
+		counter: '5',
+		order_items:  []
 
 	};
 
@@ -22,8 +24,6 @@ class OrderList extends Component {
     this.addItem = this.addItem.bind(this);
     this.generatePDF = this.generatePDF.bind(this);
     this.saveOrderAndGeneratePDF = this.saveOrderAndGeneratePDF.bind(this);
-
-
 	}
 
     async componentDidMount() {
@@ -107,6 +107,7 @@ class OrderList extends Component {
 
 
   generatePDF(logtagInvoiceNumber) {
+<<<<<<< HEAD
 	var pageWidth = 210;
 	var margin = 20;
 	var doc = new jsPDF({orientation:'p', unit:'mm', format:'a4'});
@@ -204,25 +205,166 @@ var initY = 100;
 	doc.setTextColor(0,0,0)
 	doc.text('SWIFT - HSBCHKHHHKH',  margin, postTableY +50);
 	doc.save('Order.pdf')
+=======
+		var pageWidth = 210;
+		var margin = 20;
+		var doc = new jsPDF({orientation:'p', unit:'mm', format:'a4'});
+		var initX = 15;
+		var initY = 0;
+		this.generateHeader(doc, pageWidth, margin, initY);
+		this.generateShippingAddress(doc, margin, initY);
+		this.generateInvoiceNumber(doc, pageWidth, margin, initY, logtagInvoiceNumber);
+		this.generateDate(doc, pageWidth, margin, initY);
+		this.generateShippingAccount(doc, margin, initY);
+		var postTableY = this.generateOrderTable(doc, margin, 110);
+		this.generateBankDetails(doc, margin, postTableY);
+		this.generateFooter(doc, pageWidth, margin, postTableY);
+		doc.save('Order.pdf')
+>>>>>>> 27179fd73a198053cc0af0852c06672bc9f00dc2
 
    }
 
-	 getPadding(textLength, width){
-		 return (width - textLength)/2;
+	 generateHeader(doc,pageWidth, margin, initY) {
+		var imageWidth = 60;
+	 	var imageHeight = (imageWidth/5) * 2;
+	 	var img = new Image();
+	 	img.src = logo;
+	 	doc.addImage(img , 'PNG', (pageWidth-imageWidth)/2, initY+20, imageWidth, imageHeight);
+
+	 	doc.setFontSize(11);
+	 	doc.setFontStyle("bold");
+	 	var addressLine1 = "LogTag Recorders (HK) Ltd. Room A, 12/F., Tak Lee Commercial Building"
+	 	var addressLine2 = "113-117 Wanchai Road, Wanchai, Hong Kong Tel +649 444 5881"
+	   doc.text([addressLine1,addressLine2], pageWidth/2, initY+50, {align:"center"});
+	 	doc.setLineWidth(1);
+	 	doc.line(margin, initY+56, pageWidth-margin, initY+56 );
+
+	 	doc.setFontSize(22);
+	 	var invoiceTitle = 'Commercial Invoice';
+	 	doc.text(invoiceTitle, pageWidth/2, initY+65, {align:"center"});
+	 	var underlineStart = ( pageWidth/2) - (doc.getTextWidth(invoiceTitle)/2);
+	 	doc.setLineWidth(1);
+	 	doc.line(underlineStart, initY+66, underlineStart + doc.getTextWidth(invoiceTitle), initY+66 )
+
+	 }
+
+	 generateShippingAddress(doc, margin, initY){
+		 doc.setFontSize(14);
+		 var addressTitle = 'TO:  ';
+		 doc.text(addressTitle, margin, initY+75);
+		 var addressArray = new Array(this.props.customer.label);
+		 var shippingLines = this.props.shippingAddress.label.split(',').map(s => s.trim());
+		 var addressText= addressArray.concat(shippingLines);
+		 doc.text(addressText, margin+doc.getTextWidth(addressTitle), initY+75);
+
+	 }
+
+	 generateInvoiceNumber(doc, pageWidth, margin, initY, logtagInvoiceNumber) {
+		 var invoiceNumberTitle = 'INVOICE NUMBER: ';
+		 var invoiceNumberTextWidth = doc.getTextWidth(invoiceNumberTitle+logtagInvoiceNumber);
+		 doc.text(invoiceNumberTitle+logtagInvoiceNumber,  pageWidth-margin-invoiceNumberTextWidth, initY+75);
+		 var underlineStart = pageWidth-margin-doc.getTextWidth(logtagInvoiceNumber);
+		 doc.setLineWidth(0.8);
+		 doc.line(underlineStart, initY+76, underlineStart + doc.getTextWidth(logtagInvoiceNumber), initY+76 )
+	 }
+
+	 generateDate(doc, pageWidth, margin, initY) {
+		var dateTitle = 'DATE: ';
+	 	var dateOptions = {  year: 'numeric', month: 'long', day: 'numeric' };
+	 	var date = new Date().toLocaleDateString("en-US", dateOptions)
+	 	var dateTextWidth = doc.getTextWidth(dateTitle+date);
+	 	doc.text(dateTitle+date,  pageWidth-margin-dateTextWidth, initY+85);
+
+	 }
+
+	 generateShippingAccount(doc, margin, initY) {
+		 doc.setFontSize(12);
+		 var shippingInfo = 'Ship Via:- DHL Express Account# 9648 16710';
+		 doc.text(shippingInfo,  margin, initY+109);
+	 }
+
+
+
+	 generateOrderTable(doc, margin,initY ) {
+		var data = [];
+	 	var headers = [['Description','Qty','Unit Price','Subtotal']];
+	 	var items = this.state.order_items;
+	 	for(var i = 0; i < items.length; i++) {
+	 		var variant = '';
+	 		if(items[i].variant.replace(',',', \n') != 'No Variant') {
+	 			variant = ' - '+items[i].variant.replace(',',', \n');
+	 		}
+	 		var line = [ items[i].product_name+variant, items[i].quantity,items[i].price, items[i].quantity*items[i].price+'' ];
+	 		data.push(line);
+
+	 	}
+	 	var footer = [['Total','','',this.calculateTotal()]]
+	 	var tableHeight = 0;
+	 	doc.autoTable({
+	 		startY: initY,
+	 		head: headers,
+	 		body: data,
+	 		foot: footer,
+	 		margin: {top:0, right:margin,bottom:0, left:margin},
+	 		headStyles: {
+	 			fillColor: [6,46,112],
+	 			textColor: [255,255,255]
+	 		},
+	 		footStyles: {
+	 			fillColor: [255,255,255],
+	 			textColor: [0,0,0]
+	 		},
+	 		styles:{
+	 			lineWidth:0.1,
+	 			lineColor:[0,0,0]
+	 		},
+	 		didDrawPage: function (HookData) {
+	         tableHeight = HookData.table.height
+	     },
+	 		});
+	 		return initY + tableHeight;
+	 }
+
+	 generateBankDetails(doc, margin, initY) {
+		doc.setFontStyle("");
+	 	doc.setFontSize(12);
+	 	var paymentInfo = ['HS Code # 9025 1980 90 0000 0000 00 00 Country of Origin - Peoples Republic of China',
+	 'Make Payment in advance to LogTag Recorders (HK) Ltd. Bank Account:-']
+	 	doc.text(paymentInfo,  margin, initY +10);
+	 	doc.setFontStyle("bold");
+	 	var bankAccount = ['HSBC','No.1, Queen\'s Road', 'Central, Hong Kong']
+	 	doc.text(bankAccount,  margin, initY +20);
+	 	var accountNumberTitle = 'Account Number:'
+	 	doc.text(accountNumberTitle,  margin, initY +35);
+	 	doc.setTextColor(247,29,29)
+	 	var accountNumber ='652-144304-838'
+	 	doc.text(accountNumber,  margin+doc.getTextWidth(accountNumberTitle), initY +35);
+	 	doc.text('LogTag Recorders (HK) Limited',  margin, initY +40);
+	 	doc.setTextColor(0,0,0)
+	 	doc.text('SWIFT - HSBCHKHHHKH',  margin, initY +50);
+
+	 }
+
+	 generateFooter(doc, pageWidth, margin, initY) {
+		 var footerImageWidth = 62;
+		 var footerImageHeight = 18;
+		 var footerImage = new Image();
+		 footerImage.src = pdfEnd;
+		 footerImage.onload = function() {
+		 	doc.addImage(footerImage , 'PNG', (pageWidth-footerImageWidth-margin), initY +60, footerImageWidth, footerImageHeight);
+	 	 }
 
 	 }
 
    saveOrderAndGeneratePDF(event) {
 	   event.preventDefault();
 		 if (window.confirm('Are you sure?')) {
-
 	     this.props.create_invoice_handler(this.buildInvoiceBody())
 			 .then( response => {
-					var parsed_body = JSON.parse(JSON.parse(response.body))
-					var logtagInvoiceNumber = parsed_body["LogtagInvoiceNumber"]+'-'+parsed_body["InvoiceID"];
-					this.generatePDF(logtagInvoiceNumber);
-			}
-			)
+						var parsed_body = JSON.parse(JSON.parse(response.body))
+						var logtagInvoiceNumber = parsed_body["LogtagInvoiceNumber"]+'-'+parsed_body["InvoiceID"];
+						this.generatePDF(logtagInvoiceNumber);
+					})
 	   }
    }
 
