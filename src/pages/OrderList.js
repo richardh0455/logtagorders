@@ -258,6 +258,10 @@ class OrderList extends Component {
 
    saveOrderAndGeneratePDF(event) {
 	   event.preventDefault();
+		 if(this.props.shippingAddress === null) {
+			 window.alert('Please Select a Shipping Address');
+			 return;
+		 }
 		 if (window.confirm('Are you sure?')) {
 	     this.props.create_invoice_handler(this.buildInvoiceBody())
 			 .then( response => {

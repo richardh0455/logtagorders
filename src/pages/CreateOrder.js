@@ -22,6 +22,7 @@ class CreateOrder extends React.Component{
 	this.handleCustomerChange = this.handleCustomerChange.bind(this);
 	this.handleShippingAddressChange = this.handleShippingAddressChange.bind(this);
 
+
 	this.state = {
       currentlySelectedCustomer: null,
       currentlySelectedShippingAddress: null,
@@ -81,7 +82,13 @@ class CreateOrder extends React.Component{
     return shippingAddresses;
   }
 
+ required(field) {
+   if(field  === null) {
+    return <span style={{'font-size': '12px', 'color':'#ba090c'}}>Please Select a Value</span>
 
+   }
+
+ }
 
   render() {
     return (
@@ -94,10 +101,12 @@ class CreateOrder extends React.Component{
               <div data-field-span="1" >
                 <label>Customer</label>
                 <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
+                {this.required(this.state.currentlySelectedCustomer)}
               </div>
               <div data-field-span="1" >
                 <label>Shipping Address</label>
                 <Select value={this.state.currentlySelectedShippingAddress} onChange={this.handleShippingAddressChange} options={this.generateShippingAddressList(JSON.parse(this.state.customer))} placeholder="Select a Shipping Address"/>
+                {this.required(this.state.currentlySelectedShippingAddress)}
               </div>
             </div>
             <div className="OrderList" style={{marginTop: 50 + 'px'}}>
