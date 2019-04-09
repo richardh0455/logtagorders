@@ -13,11 +13,7 @@
  *  permissions and limitations under the License.
  */
 import MainApp from './MainApp';
-import CreateCustomerPopup from './CreateCustomerPopup';
-import CreateProductPopup from './CreateProductPopup';
 
 export {
-    MainApp,
-	CreateCustomerPopup,
-	CreateProductPopup
+    MainApp
 };

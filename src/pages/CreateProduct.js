@@ -8,7 +8,7 @@ import { Auth, API } from 'aws-amplify';
 const createPath = '/create';
 const productsAPI = 'ProductsAPI';
 
-class CreateProductPopup extends React.Component{
+class CreateProduct extends React.Component{
 
   constructor(props) {
     super(props);
@@ -112,4 +112,4 @@ class CreateProductPopup extends React.Component{
   }
 }
 
-export default withRouter(CreateProductPopup);
+export default withRouter(CreateProduct);

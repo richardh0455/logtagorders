@@ -19,9 +19,8 @@ import awsConfig from '../amplify-config';
 import '../public/css/app.css';
 import '../public/css/gridforms.css';
 import logo from '../public/images/LTLogo.png';
-import CreateCustomerPopup  from './CreateCustomerPopup';
 import Customer  from './Customer';
-import CreateProductPopup  from './CreateProductPopup';
+import CreateProduct  from './CreateProduct';
 import CreateOrder  from './CreateOrder';
 import CreateVariant  from './CreateVariant';
 import Accordian  from './Accordian';
@@ -180,7 +179,7 @@ class MainApp extends React.Component {
           <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
         </div>
         <div label='Create Product'>
-          <CreateProductPopup get_all_products={this.getProducts.bind(this)} />
+          <CreateProduct get_all_products={this.getProducts.bind(this)} />
         </div>
         <div label='Create Variant'>
           <CreateVariant customers={this.generateCustomerList()} products={this.parseProducts()} />
