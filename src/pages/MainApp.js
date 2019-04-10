@@ -23,6 +23,7 @@ import Customer  from './Customer';
 import CreateProduct  from './CreateProduct';
 import CreateOrder  from './CreateOrder';
 import CreateVariant  from './CreateVariant';
+import ViewOrders  from './ViewOrders';
 import Accordian  from './Accordian';
 import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
@@ -35,7 +36,7 @@ const getAllPath = '/all';
 const productsAPI = 'ProductsAPI';
 
 const createPath = '/create';
-const orderAPI = 'OrderAPI';
+const orderAPI = 'OrdersAPI';
 
 class MainApp extends React.Component {
   constructor(props) {
@@ -183,6 +184,9 @@ class MainApp extends React.Component {
         </div>
         <div label='Create Variant'>
           <CreateVariant customers={this.generateCustomerList()} products={this.parseProducts()} />
+        </div>
+        <div label='View Orders'>
+          <ViewOrders customers={this.generateCustomerList()}  />
         </div>
       </Accordian>
     </div>

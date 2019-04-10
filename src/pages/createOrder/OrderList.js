@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import OrderItem from './OrderItem';
-import '../public/css/gridforms.css';
+import '../../public/css/gridforms.css';
 import * as jsPDF from 'jspdf';
 import * as Base64 from 'base-64';
-import pdfEnd from '../public/images/ncombskhir.png';
-import logo from '../public/images/LTLogoInvoice.png';
+import pdfEnd from '../../public/images/ncombskhir.png';
+import logo from '../../public/images/LTLogoInvoice.png';
 
 import 'jspdf-autotable';
 

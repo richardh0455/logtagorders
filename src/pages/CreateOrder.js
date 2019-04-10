@@ -3,7 +3,7 @@ import Amplify from 'aws-amplify';
 import { Auth, API } from 'aws-amplify';
 import { withRouter } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
-import OrderList from './OrderList';
+import OrderList from './createOrder/OrderList';
 import Select from 'react-select';
 
 const customersAPI = 'CustomersAPI';
@@ -12,7 +12,7 @@ const getAllPath = '/all';
 const productsAPI = 'ProductsAPI';
 
 const createPath = '/create';
-const orderAPI = 'OrderAPI';
+const orderAPI = 'OrdersAPI';
 
 class CreateOrder extends React.Component{
 

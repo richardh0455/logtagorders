@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import '../public/css/gridforms.css';
+import '../../public/css/gridforms.css';
 import Select from 'react-select';
 import { Auth, API } from 'aws-amplify';
 
