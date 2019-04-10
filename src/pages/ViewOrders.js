@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import Select from 'react-select';
 import { Auth, API } from 'aws-amplify';
+import Accordian  from './Accordian';
 
 
 const getAll = '/all';
@@ -13,10 +14,12 @@ class ViewOrders extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
-        currentlySelectedCustomer: null
+        currentlySelectedCustomer: null,
+        orders: []
       };
 
     this.handleCustomerChange = this.handleCustomerChange.bind(this);
+    this.getOrderDetails = this.getOrderDetails.bind(this);
   }
 
   async componentDidMount() {
@@ -26,7 +29,6 @@ class ViewOrders extends React.Component{
   }
 
   async handleCustomerChange(event) {
-    console.log(event)
     this.setState({currentlySelectedCustomerID: event.value})
     this.getOrders(event.value)
   }
@@ -41,7 +43,7 @@ class ViewOrders extends React.Component{
       };
       API.get(ordersAPI, '/'+customerID, apiRequest)
 	  .then(response => {
-      console.log(response);
+      this.setState({orders: JSON.parse(response.body)});
 	  })
 	  .catch(err => {
 
@@ -49,6 +51,10 @@ class ViewOrders extends React.Component{
 
   }
 
+  getOrderDetails(invoiceID) {
+    console.log(invoiceID);
+    //TODO: Call GetOrder API to retrieve a single order details
+  }
 
 
   render() {
@@ -59,12 +65,21 @@ class ViewOrders extends React.Component{
             <fieldset>
 			        <div data-row-span="2">
                 <div data-field-span="1">
-                  <label>Product</label>
+                  <label>Customer</label>
                   <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
                 </div>
               </div>
             </fieldset>
           </form>
+        </section>
+        <section>
+          <Accordian onClick={this.getOrderDetails}>
+            {this.state.orders.map((item) => (
+              <div label={item.InvoiceID} >
+                <span>Hello</span>
+              </div>
+            ))}
+          </Accordian>
         </section>
       </div>
     );

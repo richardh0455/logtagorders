@@ -26,6 +26,8 @@ class Accordion extends Component {
         [label]: !isOpen
       }
     });
+    if(this.props.onClick) {this.props.onClick(label);}
+
   };
 
   render() {
