@@ -21,6 +21,7 @@ class CreateOrder extends React.Component{
 
 	this.handleCustomerChange = this.handleCustomerChange.bind(this);
 	this.handleShippingAddressChange = this.handleShippingAddressChange.bind(this);
+  this.handlePurchaseOrderNumberChange = this.handlePurchaseOrderNumberChange.bind(this);
 
 
 	this.state = {
@@ -56,7 +57,7 @@ class CreateOrder extends React.Component{
           'Authorization': this.state.idToken,
           'Content-Type': 'application/json'
         },
-        body: {"customerID": this.state.currentlySelectedCustomer.value, "invoiceLines": invoiceLines}
+        body: {"customerID": this.state.currentlySelectedCustomer.value, "invoiceLines": invoiceLines, "purchaseOrderNumber":this.state.purchaseOrderNumber}
       };
       return await API.post(orderAPI, createPath, apiRequest)
   }
@@ -70,6 +71,10 @@ class CreateOrder extends React.Component{
 
   handleShippingAddressChange(event) {
 	this.setState({currentlySelectedShippingAddress: event})
+  }
+
+  async handlePurchaseOrderNumberChange(event) {
+    this.setState({purchaseOrderNumber: event.target.value})
   }
 
    generateShippingAddressList(customer) {
@@ -107,6 +112,13 @@ class CreateOrder extends React.Component{
                 <label>Shipping Address</label>
                 <Select value={this.state.currentlySelectedShippingAddress} onChange={this.handleShippingAddressChange} options={this.generateShippingAddressList(JSON.parse(this.state.customer))} placeholder="Select a Shipping Address"/>
                 {this.required(this.state.currentlySelectedShippingAddress)}
+              </div>
+
+            </div>
+            <div data-row-span="2">
+              <div data-field-span="1" >
+                <label>Purchase Order Number</label>
+                <input type="text" value={this.state.purchaseOrderNumber}  onChange={this.handlePurchaseOrderNumberChange} />
               </div>
             </div>
             <div className="OrderList" style={{marginTop: 50 + 'px'}}>
