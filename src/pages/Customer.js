@@ -25,7 +25,10 @@ class Customer extends React.Component{
       billing_address: '',
       shipping_addresses:[{ID:'0', ShippingAddress:'', created:true}],
       counter:'0',
-      regions: [{value:"NZ", label: "New Zealand"},{value:"SA", label: "South America"},{value:"NA", label: "North America"},{value:"EU", label: "Europe"},{value:"AP", label: "Asia Pacific"},{value:"ME", label: "Middle East"}]
+      regions: [{value:"NZ", label: "New Zealand"},{value:"SA", label: "South America"},{value:"NA", label: "North America"},{value:"EU", label: "Europe"},{value:"AP", label: "Asia Pacific"},{value:"ME", label: "Middle East"}],
+      primary_contact_name:'',
+      primary_contact_phone:'',
+      primary_contact_fax:'',
     };
 
     this.handleCustomerChange = this.handleCustomerChange.bind(this);
@@ -39,6 +42,9 @@ class Customer extends React.Component{
     this.createCustomer = this.createCustomer.bind(this);
     this.updateCustomerChangeHandler = this.updateCustomerChangeHandler.bind(this);
     this.createCustomerChangeHandler = this.createCustomerChangeHandler.bind(this);
+    this.handlePrimaryContactNameChange = this.handlePrimaryContactNameChange.bind(this);
+    this.handlePrimaryContactPhoneChange = this.handlePrimaryContactPhoneChange.bind(this);
+    this.handlePrimaryContactFaxChange = this.handlePrimaryContactFaxChange.bind(this);
   }
 
   async componentDidMount() {
@@ -88,6 +94,16 @@ class Customer extends React.Component{
     this.setState({billing_address: event.target.value})
   }
 
+  async handlePrimaryContactNameChange(event) {
+    this.setState({primary_contact_name: event.target.value})
+  }
+  async handlePrimaryContactPhoneChange(event) {
+    this.setState({primary_contact_phone: event.target.value})
+  }
+  async handlePrimaryContactFaxChange(event) {
+    this.setState({primary_contact_fax: event.target.value})
+  }
+
   async nameOnFocus() {
     if(this.state.name === 'Name' || this.state.name === '')
     {
@@ -99,13 +115,36 @@ class Customer extends React.Component{
   async updateCustomerEventHandler(e)
   {
     e.preventDefault();
-    this.updateCustomer({customer_id:this.state.currentlySelectedCustomer.value, name:this.state.name, email:this.state.email, billing_address:this.state.billing_address, region:this.state.currentlySelectedRegion.value, shipping_addresses:this.state.shipping_addresses  });
+    this.updateCustomer(
+      {
+        customer_id: this.state.currentlySelectedCustomer.value,
+        name: this.state.name,
+        email: this.state.email,
+        billing_address: this.state.billing_address,
+        region: this.state.currentlySelectedRegion.value,
+        shipping_addresses: this.state.shipping_addresses,
+        primary_contact_name: this.state.primary_contact_name,
+        primary_contact_phone: this.state.primary_contact_phone,
+        primary_contact_fax: this.state.primary_contact_fax
+      }
+    );
   }
 
   async createCustomerEventHandler(e)
   {
     e.preventDefault();
-    this.createCustomer({name:this.state.name, email:this.state.email, billing_address:this.state.billing_address, region:this.state.currentlySelectedRegion.value, shipping_addresses:this.state.shipping_addresses  });
+    this.createCustomer(
+      {
+        name: this.state.name,
+        email: this.state.email,
+        billing_address: this.state.billing_address,
+        region: this.state.currentlySelectedRegion.value,
+        shipping_addresses: this.state.shipping_addresses,
+        primary_contact_name: this.state.primary_contact_name,
+        primary_contact_phone: this.state.primary_contact_phone,
+        primary_contact_fax: this.state.primary_contact_fax
+      }
+    );
   }
 
   async getCustomer(id) {
@@ -125,7 +164,18 @@ class Customer extends React.Component{
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
-      body: {"Name": customer.name, "EmailAddress": customer.email, "BillingAddress": customer.billing_address, "Region": customer.region}
+      body: {
+        "Name": customer.name,
+        "EmailAddress": customer.email,
+        "BillingAddress": customer.billing_address,
+        "Region": customer.region,
+        "PrimaryContact":{
+            "Name":customer.primary_contact_name,
+            "Phone":customer.primary_contact_phone,
+            "Fax":customer.primary_contact_fax
+
+        }
+      }
     };
     API.post(customersAPI, '/'+customer.customer_id+updatePath, apiRequest)
     .then(response =>
@@ -156,7 +206,18 @@ class Customer extends React.Component{
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
-      body: {"Name": customer.name, "EmailAddress": customer.email, "BillingAddress": customer.billing_address, "Region": customer.region}
+      body: {
+        "Name": customer.name,
+        "EmailAddress": customer.email,
+        "BillingAddress": customer.billing_address,
+        "Region": customer.region,
+        "PrimaryContact":{
+            "Name":customer.primary_contact_name,
+            "Phone":customer.primary_contact_phone,
+            "Fax":customer.primary_contact_fax
+
+        }
+      }
     };
     API.post(customersAPI, createPath, apiRequest)
     .then(response =>
@@ -411,6 +472,20 @@ class Customer extends React.Component{
                <div data-field-span="1">
                  <label>Region</label>
                  <Select value={this.state.currentlySelectedRegion} onChange={this.handleRegionChange.bind(this)} options={this.state.regions} placeholder="Select a region"/>
+               </div>
+             </div>
+             <div data-row-span="3">
+               <div data-field-span="1">
+                 <label>Primary Contact Name</label>
+                 <input type="text" value={this.state.primary_contact_name}  onChange={this.handlePrimaryContactNameChange} />
+               </div>
+               <div data-field-span="1">
+                 <label>Phone Number</label>
+                 <input type="text" value={this.state.primary_contact_phone}  onChange={this.handlePrimaryContactPhoneChange} />
+               </div>
+               <div data-field-span="1">
+                 <label>Fax Number</label>
+                 <input type="text" value={this.state.primary_contact_fax}  onChange={this.handlePrimaryContactFaxChange} />
                </div>
              </div>
            </fieldset>
