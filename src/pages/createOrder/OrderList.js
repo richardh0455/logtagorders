@@ -116,11 +116,12 @@ class OrderList extends Component {
 		this.generateShippingAddress(doc, margin, initY);
 		this.generateInvoiceNumber(doc, pageWidth, margin, initY, logtagInvoiceNumber);
 		this.generateDate(doc, pageWidth, margin, initY);
+		this.generatePurchaseOrderNumber(doc,pageWidth, margin, initY);
 		this.generateShippingAccount(doc, margin, initY);
-		var postTableY = this.generateOrderTable(doc, margin, 110);
+		var postTableY = this.generateOrderTable(doc, margin, 125);
 		this.generateBankDetails(doc, margin, postTableY);
 		this.generateFooter(doc, pageWidth, margin, postTableY);
-		doc.save('Order.pdf')
+
 
    }
 
@@ -150,12 +151,17 @@ class OrderList extends Component {
 
 	 generateShippingAddress(doc, margin, initY){
 		 doc.setFontSize(14);
+		 var yCoord = initY + 75;
 		 var addressTitle = 'TO:  ';
-		 doc.text(addressTitle, margin, initY+75);
+		 doc.text(addressTitle, margin, yCoord);
 		 var addressArray = new Array(this.props.customer.label);
 		 var shippingLines = this.props.shippingAddress.label.split(',').map(s => s.trim());
 		 var addressText= addressArray.concat(shippingLines);
-		 doc.text(addressText, margin+doc.getTextWidth(addressTitle), initY+75);
+		 doc.text(addressText, margin+doc.getTextWidth(addressTitle), yCoord);
+		 yCoord += 25;
+		 doc.text("Tel: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Phone"], margin, yCoord);
+		 doc.text("Fax: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Fax"], margin, yCoord + 5);
+		 doc.text("Attn: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Name"], margin, yCoord + 15);
 
 	 }
 
@@ -177,10 +183,18 @@ class OrderList extends Component {
 
 	 }
 
+	 generatePurchaseOrderNumber(doc, pageWidth, margin, initY) {
+		var title = 'Ref:- Your PO #';
+	 	var purchaseOrderNumber= this.props.purchaseOrderNumber;
+	 	var textWidth = doc.getTextWidth(title+purchaseOrderNumber);
+	 	doc.text(title+purchaseOrderNumber,  pageWidth-margin-textWidth, initY+115);
+
+	 }
+
 	 generateShippingAccount(doc, margin, initY) {
 		 doc.setFontSize(12);
 		 var shippingInfo = 'Ship Via:- DHL Express Account# 9648 16710';
-		 doc.text(shippingInfo,  margin, initY+109);
+		 doc.text(shippingInfo,  margin, initY+124);
 	 }
 
 
@@ -252,6 +266,7 @@ class OrderList extends Component {
 		 footerImage.src = pdfEnd;
 		 footerImage.onload = function() {
 		 	doc.addImage(footerImage , 'PNG', (pageWidth-footerImageWidth-margin), initY +60, footerImageWidth, footerImageHeight);
+			doc.save('Order.pdf')
 	 	 }
 
 	 }
