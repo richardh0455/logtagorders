@@ -54,15 +54,15 @@ class ShippingAddress extends Component {
       <div data-row-span="6">
 			<div data-field-span="2">
 				<label>Address Line 1</label>
-				<input type="text" value={this.state.address} onChange={this.handleAddress1Change} />
+				<input type="text" value={this.state.address1} onChange={this.handleAddress1Change} />
 			</div>
       <div data-field-span="2">
 				<label>Address Line 2</label>
-				<input type="text" value={this.state.address} onChange={this.handleAddress2Change} />
+				<input type="text" value={this.state.address2} onChange={this.handleAddress2Change} />
 			</div>
       <div data-field-span="1">
 				<label>City</label>
-				<input type="text" value={this.state.address} onChange={this.handleAddress3Change} />
+				<input type="text" value={this.state.address3} onChange={this.handleAddress3Change} />
 			</div>
 			<div data-field-span="1">
 				<button onClick={this.removeItem}  >Remove Item</button>
