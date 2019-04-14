@@ -73,7 +73,10 @@ class Customer extends React.Component{
          currentlySelectedRegion: region,
          email: contactInfo.Contact_Email,
          billing_address: contactInfo.Billing_Address,
-         shipping_addresses: parsed_customer.ShippingAddresses
+         shipping_addresses: parsed_customer.ShippingAddresses,
+         primary_contact_name: contactInfo.PrimaryContact.Name,
+         primary_contact_phone: contactInfo.PrimaryContact.Phone,
+         primary_contact_fax: contactInfo.PrimaryContact.Fax,
        });
      })
   }
