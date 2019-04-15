@@ -29,7 +29,7 @@ class ViewOrders extends React.Component{
   }
 
   async handleCustomerChange(event) {
-    this.setState({currentlySelectedCustomerID: event.value})
+    this.setState({currentlySelectedCustomer: event.value})
     this.getOrders(event.value)
   }
 
@@ -48,12 +48,27 @@ class ViewOrders extends React.Component{
 	  .catch(err => {
 
 	  })
+  }
 
+  async getSingleOrder(customerID, orderID) {
+    const apiRequest = {
+        headers: {
+          'Authorization': this.state.idToken,
+          'Content-Type': 'application/json'
+        }
+      };
+      API.get(ordersAPI, '/'+customerID+'/'+orderID, apiRequest)
+	  .then(response => {
+      console.log(JSON.parse(response.body));
+	  })
+	  .catch(err => {
+
+	  })
   }
 
   getOrderDetails(invoiceID) {
     console.log(invoiceID);
-    //TODO: Call GetOrder API to retrieve a single order details
+    this.getSingleOrder(this.state.currentlySelectedCustomer,invoiceID )
   }
 
 
@@ -76,7 +91,7 @@ class ViewOrders extends React.Component{
           <Accordian onClick={this.getOrderDetails}>
             {this.state.orders.map((item) => (
               <div label={item.InvoiceID} >
-                <span>Hello</span>
+                {this.getOrderDetails}
               </div>
             ))}
           </Accordian>
