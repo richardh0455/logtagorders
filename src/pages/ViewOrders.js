@@ -15,6 +15,7 @@ class ViewOrders extends React.Component{
     super(props);
     this.state = {
         currentlySelectedCustomer: null,
+        currentlySelectedOrder: {Order:{}, OrderLines:[]},
         orders: []
       };
 
@@ -29,7 +30,7 @@ class ViewOrders extends React.Component{
   }
 
   async handleCustomerChange(event) {
-    this.setState({currentlySelectedCustomer: event.value})
+    this.setState({currentlySelectedCustomer: event})
     this.getOrders(event.value)
   }
 
@@ -57,18 +58,22 @@ class ViewOrders extends React.Component{
           'Content-Type': 'application/json'
         }
       };
-      API.get(ordersAPI, '/'+customerID+'/'+orderID, apiRequest)
+    API.get(ordersAPI, '/'+customerID+'/'+orderID, apiRequest)
 	  .then(response => {
-      console.log(JSON.parse(response.body));
+      console.log(JSON.parse(response.body))
+      this.setState({currentlySelectedOrder: JSON.parse(response.body)})
 	  })
 	  .catch(err => {
 
 	  })
   }
 
-  getOrderDetails(invoiceID) {
+  async getOrderDetails(invoiceID) {
+    //reset to default before retrieving new data
+    this.setState({currentlySelectedOrder: {Order:{}, OrderLines:[]}});
     console.log(invoiceID);
-    this.getSingleOrder(this.state.currentlySelectedCustomer,invoiceID )
+    this.getSingleOrder(this.state.currentlySelectedCustomer.value,invoiceID )
+
   }
 
 
@@ -91,7 +96,26 @@ class ViewOrders extends React.Component{
           <Accordian onClick={this.getOrderDetails}>
             {this.state.orders.map((item) => (
               <div label={item.InvoiceID} >
-                {this.getOrderDetails}
+                <span>Invoice Number: {this.state.currentlySelectedOrder["Order"]["LogtagInvoiceNumber"]}-{item.InvoiceID}</span>
+                <br/>
+                <span>Payment Date: {this.state.currentlySelectedOrder["Order"]["PaymentDate"]}</span>
+                <br/>
+                <span>Shipped Date: {this.state.currentlySelectedOrder["Order"]["ShippedDate"]}</span>
+                <br/>
+                <table>
+                  <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    </tr>
+                {this.state.currentlySelectedOrder["OrderLines"].map((line) => (
+                    <tr>
+                      <td>{line["ProductID"]}</td>
+                      <td>{line["Pricing"]}</td>
+                      <td>{line["Quantity"]}</td>
+                    </tr>
+                ))}
+                </table>
               </div>
             ))}
           </Accordian>
