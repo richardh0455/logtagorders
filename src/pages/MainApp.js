@@ -24,6 +24,7 @@ import CreateProduct  from './CreateProduct';
 import CreateOrder  from './CreateOrder';
 import CreateVariant  from './CreateVariant';
 import ViewOrders  from './ViewOrders';
+import ViewCustomers  from './ViewCustomers';
 import Accordian  from './Accordian';
 import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
@@ -173,20 +174,23 @@ class MainApp extends React.Component {
          {this.renderRedirect()}
       </header>
       <Accordian>
-        <div label="Create Order">
+        <div label="Create Order" id="1">
           <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} />
         </div>
-        <div label="Create or Update Customer">
+        <div label="Create or Update Customer" id="2">
           <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
         </div>
-        <div label='Create Product'>
+        <div label='Create Product' id="3">
           <CreateProduct get_all_products={this.getProducts.bind(this)} />
         </div>
-        <div label='Create Variant'>
+        <div label='Create Variant' id="4">
           <CreateVariant customers={this.generateCustomerList()} products={this.parseProducts()} />
         </div>
-        <div label='View Orders'>
+        <div label='View Orders' id="5">
           <ViewOrders customers={this.generateCustomerList()}  />
+        </div>
+        <div label='View Customers' id="6">
+          <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
         </div>
       </Accordian>
     </div>

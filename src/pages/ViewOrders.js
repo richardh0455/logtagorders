@@ -60,7 +60,6 @@ class ViewOrders extends React.Component{
       };
     API.get(ordersAPI, '/'+customerID+'/'+orderID, apiRequest)
 	  .then(response => {
-      console.log(JSON.parse(response.body))
       this.setState({currentlySelectedOrder: JSON.parse(response.body)})
 	  })
 	  .catch(err => {
@@ -95,7 +94,7 @@ class ViewOrders extends React.Component{
         <section>
           <Accordian onClick={this.getOrderDetails}>
             {this.state.orders.map((item) => (
-              <div label={item.InvoiceID} >
+              <div label={item.InvoiceID} id={item.InvoiceID}>
                 <span>Invoice Number: {this.state.currentlySelectedOrder["Order"]["LogtagInvoiceNumber"]}-{item.InvoiceID}</span>
                 <br/>
                 <span>Payment Date: {this.state.currentlySelectedOrder["Order"]["PaymentDate"]}</span>
