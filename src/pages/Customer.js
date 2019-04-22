@@ -65,7 +65,7 @@ class Customer extends React.Component{
        }
        var shippingAddresses = parsed_customer.ShippingAddresses
        if ( shippingAddresses === undefined || parsed_customer.ShippingAddresses.length == 0) {
-         this.addShippingAddress();
+         this.addShippingAddress(event);
        }
 
        this.setState({
@@ -380,7 +380,8 @@ class Customer extends React.Component{
      this.setState({shipping_addresses: addresses});
   }
 
-  addShippingAddress() {
+  addShippingAddress(e) {
+    e.preventDefault();
     var key = Number(this.state.counter) + 1;
     var default_item = {ID:'0', ShippingAddress:'', created:true};
     var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
