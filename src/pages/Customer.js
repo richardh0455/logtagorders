@@ -187,7 +187,7 @@ class Customer extends React.Component{
       const shippingAddressSuccess = this.updateCustomerShippingAddresses(customer.customer_id, customer.shipping_addresses);
       if(parseInt(affectedRows, 10)==1 && shippingAddressSuccess)
       {
-        NotificationManager.success('', 'Customer Successfully Updated', 5000);
+        NotificationManager.success('', 'Customer Successfully Updated', 3000);
         //Refresh Customer List
         this.props.get_all_customers();
       }
@@ -229,14 +229,17 @@ class Customer extends React.Component{
       const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
       if(success)
       {
-        NotificationManager.success('', 'Customer Successfully Created', 5000);
+        NotificationManager.success('', 'Customer Successfully Created', 3000);
         this.setState({
           billing_address:'',
           email:'',
           name:'',
           region:'',
           shipping_addresses:[],
-          counter:'0'
+          counter:'0',
+          primary_contact_name:'',
+          primary_contact_phone:'',
+          primary_contact_fax:''
         })
         //Refresh Customer List
         this.props.get_all_customers();
@@ -266,6 +269,8 @@ class Customer extends React.Component{
 
   async updateCustomerShippingAddresses(customerID, shipping_addresses)
   {
+    console.log("Updating Shipping Addresses");
+    console.log(shipping_addresses)
     for(var index = 0; index < shipping_addresses.length; index++) {
       if(shipping_addresses[index].created)
       {
@@ -333,7 +338,11 @@ class Customer extends React.Component{
   }
 
   async deleteShippingAddress(shipping_address_id) {
+
     var customerID = this.state.currentlySelectedCustomer.value
+    if(!customerID || !shipping_address_id) {
+      return ;
+    }
     const apiRequest = {
       headers: {
         'Authorization': this.state.idToken,
@@ -366,9 +375,11 @@ class Customer extends React.Component{
      for(var i = 0; i < addresses.length; i++) {
 
        if(addresses[i] && addresses[i].ID === key) {
-         console.log('Found matching ID');
          if(item == null){
-           this.deleteShippingAddress(addresses[i].ID)
+           if(!addresses[i].created){
+             this.deleteShippingAddress(addresses[i].ID)
+           }
+
            addresses.splice(i, 1);
 
          }
