@@ -28,7 +28,7 @@ import ViewCustomers  from './ViewCustomers';
 import Accordian  from './Accordian';
 import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
-
+import 'react-notifications/lib/notifications.css';
 
 
 const customersAPI = 'CustomersAPI';
@@ -173,6 +173,7 @@ class MainApp extends React.Component {
          <button type="button" id="signout" onClick={this.signOut}>Sign Out</button>
          {this.renderRedirect()}
       </header>
+      <NotificationContainer/>
       <Accordian>
         <div label="Create Order" id="1">
           <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} />

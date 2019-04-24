@@ -158,7 +158,7 @@ class OrderList extends Component {
 		 var shippingLines = this.props.shippingAddress.label.split(',').map(s => s.trim());
 		 var addressText= addressArray.concat(shippingLines);
 		 doc.text(addressText, margin+doc.getTextWidth(addressTitle), yCoord);
-		 yCoord += 25;
+		 yCoord += 28;
 		 doc.text("Tel: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Phone"], margin, yCoord);
 		 doc.text("Fax: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Fax"], margin, yCoord + 5);
 		 doc.text("Attn: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Name"], margin, yCoord + 15);

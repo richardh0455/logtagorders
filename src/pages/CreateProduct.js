@@ -105,7 +105,6 @@ class CreateProduct extends React.Component{
 			        <button onClick={(e) => {this.createProductHandler(e)} }>Create Product</button>
 		        </div>
           </form>
-		      <NotificationContainer/>
         </section>
       </div>
     );

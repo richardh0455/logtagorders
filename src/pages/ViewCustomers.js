@@ -107,7 +107,6 @@ class ViewCustomers extends React.Component{
                 }
 
                 <button onClick={this.deleteCustomer} >Delete Customer</button>
-                <NotificationContainer/>
               </div>
             ))}
           </Accordian>

@@ -514,7 +514,6 @@ class Customer extends React.Component{
              {this.getButtonText()}
            </div>
          </form>
-         <NotificationContainer/>
        </section>
      </div>
     );
