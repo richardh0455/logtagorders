@@ -19,15 +19,16 @@ import awsConfig from '../amplify-config';
 import '../public/css/app.css';
 import '../public/css/gridforms.css';
 import logo from '../public/images/LTLogo.png';
-import CreateCustomerPopup  from './CreateCustomerPopup';
 import Customer  from './Customer';
-import CreateProductPopup  from './CreateProductPopup';
+import CreateProduct  from './CreateProduct';
 import CreateOrder  from './CreateOrder';
 import CreateVariant  from './CreateVariant';
+import ViewOrders  from './ViewOrders';
+import ViewCustomers  from './ViewCustomers';
 import Accordian  from './Accordian';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
-
+import 'react-notifications/lib/notifications.css';
 
 
 const customersAPI = 'CustomersAPI';
@@ -36,7 +37,7 @@ const getAllPath = '/all';
 const productsAPI = 'ProductsAPI';
 
 const createPath = '/create';
-const orderAPI = 'OrderAPI';
+const orderAPI = 'OrdersAPI';
 
 class MainApp extends React.Component {
   constructor(props) {
@@ -44,10 +45,32 @@ class MainApp extends React.Component {
 
     Amplify.Logger.LOG_LEVEL = 'DEBUG';
 
+    this.signOut = this.signOut.bind(this);
+
     this.state = {
       authToken: null,
-      idToken: null
+      idToken: null,
+      redirect: false
     };
+  }
+
+  async signOut() {
+    console.log("Sign Out")
+    Auth.signOut()
+        .then(data => console.log(data))
+        .catch(err => console.log(err));
+    this.setState({
+          redirect: true
+        })
+
+  }
+
+  renderRedirect() {
+    console.log(this.state.redirect)
+    if(this.state.redirect) {
+      return <Redirect to='/signin' />;
+    }
+
   }
 
 
@@ -147,19 +170,28 @@ class MainApp extends React.Component {
     <div className="app">
       <header>
         <img src={logo}/>
+         <button type="button" id="signout" onClick={this.signOut}>Sign Out</button>
+         {this.renderRedirect()}
       </header>
+      <NotificationContainer/>
       <Accordian>
-        <div label="Create Order">
+        <div label="Create Order" id="1">
           <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} />
         </div>
-        <div label="Create or Update Customer">
+        <div label="Create or Update Customer" id="2">
           <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
         </div>
-        <div label='Create Product'>
-          <CreateProductPopup get_all_products={this.getProducts.bind(this)} />
+        <div label='Create Product' id="3">
+          <CreateProduct get_all_products={this.getProducts.bind(this)} />
         </div>
-        <div label='Create Variant'>
+        <div label='Create Variant' id="4">
           <CreateVariant customers={this.generateCustomerList()} products={this.parseProducts()} />
+        </div>
+        <div label='View Orders' id="5">
+          <ViewOrders customers={this.generateCustomerList()}  />
+        </div>
+        <div label='View Customers' id="6">
+          <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
         </div>
       </Accordian>
     </div>

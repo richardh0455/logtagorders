@@ -8,7 +8,7 @@ import { Auth, API } from 'aws-amplify';
 const createPath = '/create';
 const productsAPI = 'ProductsAPI';
 
-class CreateProductPopup extends React.Component{
+class CreateProduct extends React.Component{
 
   constructor(props) {
     super(props);
@@ -105,11 +105,10 @@ class CreateProductPopup extends React.Component{
 			        <button onClick={(e) => {this.createProductHandler(e)} }>Create Product</button>
 		        </div>
           </form>
-		      <NotificationContainer/>
         </section>
       </div>
     );
   }
 }
 
-export default withRouter(CreateProductPopup);
+export default withRouter(CreateProduct);

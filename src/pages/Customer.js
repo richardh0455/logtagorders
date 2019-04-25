@@ -10,6 +10,7 @@ import Select from 'react-select';
 const customersAPI = 'CustomersAPI';
 const updatePath = '/update';
 const createPath = '/create';
+const deletePath = '/delete';
 
 class Customer extends React.Component{
   constructor(props) {
@@ -22,9 +23,12 @@ class Customer extends React.Component{
       currentlySelectedRegion: {value:""},
       email: '',
       billing_address: '',
-      shipping_addresses:[],
+      shipping_addresses:[{ID:'0', ShippingAddress:'', created:true}],
       counter:'0',
-      regions: [{value:"NZ", label: "New Zealand"},{value:"SA", label: "South America"},{value:"NA", label: "North America"},{value:"EU", label: "Europe"},{value:"AP", label: "Asia Pacific"},{value:"ME", label: "Middle East"}]
+      regions: [{value:"NZ", label: "New Zealand"},{value:"SA", label: "South America"},{value:"NA", label: "North America"},{value:"EU", label: "Europe"},{value:"AP", label: "Asia Pacific"},{value:"ME", label: "Middle East"}],
+      primary_contact_name:'',
+      primary_contact_phone:'',
+      primary_contact_fax:'',
     };
 
     this.handleCustomerChange = this.handleCustomerChange.bind(this);
@@ -38,6 +42,9 @@ class Customer extends React.Component{
     this.createCustomer = this.createCustomer.bind(this);
     this.updateCustomerChangeHandler = this.updateCustomerChangeHandler.bind(this);
     this.createCustomerChangeHandler = this.createCustomerChangeHandler.bind(this);
+    this.handlePrimaryContactNameChange = this.handlePrimaryContactNameChange.bind(this);
+    this.handlePrimaryContactPhoneChange = this.handlePrimaryContactPhoneChange.bind(this);
+    this.handlePrimaryContactFaxChange = this.handlePrimaryContactFaxChange.bind(this);
   }
 
   async componentDidMount() {
@@ -56,15 +63,22 @@ class Customer extends React.Component{
        if(!region){
          region = {value:""}
        }
+       var shippingAddresses = parsed_customer.ShippingAddresses
+       if ( shippingAddresses === undefined || parsed_customer.ShippingAddresses.length == 0) {
+         this.addShippingAddress(event);
+       }
+
        this.setState({
          name: contactInfo.Name,
          currentlySelectedRegion: region,
          email: contactInfo.Contact_Email,
          billing_address: contactInfo.Billing_Address,
-         shipping_addresses: parsed_customer.ShippingAddresses
+         shipping_addresses: parsed_customer.ShippingAddresses,
+         primary_contact_name: contactInfo.PrimaryContact.Name,
+         primary_contact_phone: contactInfo.PrimaryContact.Phone,
+         primary_contact_fax: contactInfo.PrimaryContact.Fax,
        });
      })
-	   //this.handleShippingAddressChange(null);
   }
 
   async handleRegionChange(event) {
@@ -83,6 +97,16 @@ class Customer extends React.Component{
     this.setState({billing_address: event.target.value})
   }
 
+  async handlePrimaryContactNameChange(event) {
+    this.setState({primary_contact_name: event.target.value})
+  }
+  async handlePrimaryContactPhoneChange(event) {
+    this.setState({primary_contact_phone: event.target.value})
+  }
+  async handlePrimaryContactFaxChange(event) {
+    this.setState({primary_contact_fax: event.target.value})
+  }
+
   async nameOnFocus() {
     if(this.state.name === 'Name' || this.state.name === '')
     {
@@ -94,13 +118,36 @@ class Customer extends React.Component{
   async updateCustomerEventHandler(e)
   {
     e.preventDefault();
-    this.updateCustomer({customer_id:this.state.currentlySelectedCustomer.value, name:this.state.name, email:this.state.email, billing_address:this.state.billing_address, region:this.state.currentlySelectedRegion.value, shipping_addresses:this.state.shipping_addresses  });
+    this.updateCustomer(
+      {
+        customer_id: this.state.currentlySelectedCustomer.value,
+        name: this.state.name,
+        email: this.state.email,
+        billing_address: this.state.billing_address,
+        region: this.state.currentlySelectedRegion.value,
+        shipping_addresses: this.state.shipping_addresses,
+        primary_contact_name: this.state.primary_contact_name,
+        primary_contact_phone: this.state.primary_contact_phone,
+        primary_contact_fax: this.state.primary_contact_fax
+      }
+    );
   }
 
   async createCustomerEventHandler(e)
   {
     e.preventDefault();
-    this.createCustomer({name:this.state.name, email:this.state.email, billing_address:this.state.billing_address, region:this.state.currentlySelectedRegion.value, shipping_addresses:this.state.shipping_addresses  });
+    this.createCustomer(
+      {
+        name: this.state.name,
+        email: this.state.email,
+        billing_address: this.state.billing_address,
+        region: this.state.currentlySelectedRegion.value,
+        shipping_addresses: this.state.shipping_addresses,
+        primary_contact_name: this.state.primary_contact_name,
+        primary_contact_phone: this.state.primary_contact_phone,
+        primary_contact_fax: this.state.primary_contact_fax
+      }
+    );
   }
 
   async getCustomer(id) {
@@ -120,7 +167,18 @@ class Customer extends React.Component{
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
-      body: {"Name": customer.name, "EmailAddress": customer.email, "BillingAddress": customer.billing_address, "Region": customer.region}
+      body: {
+        "Name": customer.name,
+        "EmailAddress": customer.email,
+        "BillingAddress": customer.billing_address,
+        "Region": customer.region,
+        "PrimaryContact":{
+            "Name":customer.primary_contact_name,
+            "Phone":customer.primary_contact_phone,
+            "Fax":customer.primary_contact_fax
+
+        }
+      }
     };
     API.post(customersAPI, '/'+customer.customer_id+updatePath, apiRequest)
     .then(response =>
@@ -129,7 +187,7 @@ class Customer extends React.Component{
       const shippingAddressSuccess = this.updateCustomerShippingAddresses(customer.customer_id, customer.shipping_addresses);
       if(parseInt(affectedRows, 10)==1 && shippingAddressSuccess)
       {
-        NotificationManager.success('', 'Customer Successfully Updated', 5000);
+        NotificationManager.success('', 'Customer Successfully Updated', 3000);
         //Refresh Customer List
         this.props.get_all_customers();
       }
@@ -151,7 +209,18 @@ class Customer extends React.Component{
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
-      body: {"Name": customer.name, "EmailAddress": customer.email, "BillingAddress": customer.billing_address, "Region": customer.region}
+      body: {
+        "Name": customer.name,
+        "EmailAddress": customer.email,
+        "BillingAddress": customer.billing_address,
+        "Region": customer.region,
+        "PrimaryContact":{
+            "Name":customer.primary_contact_name,
+            "Phone":customer.primary_contact_phone,
+            "Fax":customer.primary_contact_fax
+
+        }
+      }
     };
     API.post(customersAPI, createPath, apiRequest)
     .then(response =>
@@ -160,14 +229,17 @@ class Customer extends React.Component{
       const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
       if(success)
       {
-        NotificationManager.success('', 'Customer Successfully Created', 5000);
+        NotificationManager.success('', 'Customer Successfully Created', 3000);
         this.setState({
           billing_address:'',
           email:'',
           name:'',
           region:'',
           shipping_addresses:[],
-          counter:'0'
+          counter:'0',
+          primary_contact_name:'',
+          primary_contact_phone:'',
+          primary_contact_fax:''
         })
         //Refresh Customer List
         this.props.get_all_customers();
@@ -197,6 +269,8 @@ class Customer extends React.Component{
 
   async updateCustomerShippingAddresses(customerID, shipping_addresses)
   {
+    console.log("Updating Shipping Addresses");
+    console.log(shipping_addresses)
     for(var index = 0; index < shipping_addresses.length; index++) {
       if(shipping_addresses[index].created)
       {
@@ -263,13 +337,51 @@ class Customer extends React.Component{
     return success;
   }
 
+  async deleteShippingAddress(shipping_address_id) {
+
+    var customerID = this.state.currentlySelectedCustomer.value
+    if(!customerID || !shipping_address_id) {
+      return ;
+    }
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    API.del(customersAPI, "/"+customerID+"/shipping-addresses/"+shipping_address_id+deletePath, apiRequest)
+    .then(response =>
+    {
+      var affectedRows = response.body["AffectedRows"];
+      if(parseInt(affectedRows, 10)==1)
+      {
+        NotificationManager.success('', 'Shipping Address Deleted', 3000);
+
+      }
+      else {
+        NotificationManager.error('Deleting Shipping Address Failed', 'Error', 5000, () => {});
+      }
+    })
+    .catch(err =>
+    {
+      console.log(err);
+      NotificationManager.error('Deleting Shipping Addres', 'Error', 5000, () => {});
+    })
+  }
+
   shippingAddressUpdated(key, item)
   {
      var addresses = this.state.shipping_addresses;
      for(var i = 0; i < addresses.length; i++) {
-       if(addresses[i].ID === key) {
+
+       if(addresses[i] && addresses[i].ID === key) {
          if(item == null){
+           if(!addresses[i].created){
+             this.deleteShippingAddress(addresses[i].ID)
+           }
+
            addresses.splice(i, 1);
+
          }
          else {
            addresses[i].ShippingAddress = item
@@ -279,8 +391,8 @@ class Customer extends React.Component{
      this.setState({shipping_addresses: addresses});
   }
 
-  addShippingAddress(event) {
-    event.preventDefault();
+  addShippingAddress(e) {
+    e.preventDefault();
     var key = Number(this.state.counter) + 1;
     var default_item = {ID:'0', ShippingAddress:'', created:true};
     var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
@@ -377,6 +489,20 @@ class Customer extends React.Component{
                  <Select value={this.state.currentlySelectedRegion} onChange={this.handleRegionChange.bind(this)} options={this.state.regions} placeholder="Select a region"/>
                </div>
              </div>
+             <div data-row-span="3">
+               <div data-field-span="1">
+                 <label>Primary Contact Name</label>
+                 <input type="text" value={this.state.primary_contact_name}  onChange={this.handlePrimaryContactNameChange} />
+               </div>
+               <div data-field-span="1">
+                 <label>Phone Number</label>
+                 <input type="text" value={this.state.primary_contact_phone}  onChange={this.handlePrimaryContactPhoneChange} />
+               </div>
+               <div data-field-span="1">
+                 <label>Fax Number</label>
+                 <input type="text" value={this.state.primary_contact_fax}  onChange={this.handlePrimaryContactFaxChange} />
+               </div>
+             </div>
            </fieldset>
            <fieldset>
              {this.state.shipping_addresses.map(address => (
@@ -388,7 +514,6 @@ class Customer extends React.Component{
              {this.getButtonText()}
            </div>
          </form>
-         <NotificationContainer/>
        </section>
      </div>
     );

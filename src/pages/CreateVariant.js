@@ -119,7 +119,6 @@ class CreateVariant extends React.Component{
 			<button onClick={(e) => {this.createVariantHandler(e)} }>Create Variant</button>
 		</div>
         </form>
-		<NotificationContainer/>
       </section>
 
 

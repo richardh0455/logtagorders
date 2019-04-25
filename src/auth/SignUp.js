@@ -14,7 +14,6 @@
  */
 import React from 'react';
 import { Auth } from 'aws-amplify';
-import DynamicImage from '../components/DynamicImage';
 import { withRouter, Link } from 'react-router-dom';
 import logo from '../public/images/LTLogo.png';
 import '../public/css/app.css';
@@ -62,15 +61,15 @@ class SignUp extends React.Component {
     } catch (err) {
       if (err === "No userPool") {
         // User pool not defined in Amplify config file
-        console.error("User Pool not defined");
-        alert("User Pool not defined. Amplify config must be updated with user pool config");
+        console.error("User Pool not defined. Amplify config must be updated with user pool config");
+        alert("Application Error - User Pool not defined");
       } else if (err.message === "User already exists") {
         // Setting state to allow user to proceed to enter verification code
+        alert("This User already exists");
         this.state.stage = 1;
-	  this.setLocalStorage(this.state);
+	      this.setLocalStorage(this.state);
       } else {
-        if (err.message.indexOf("phone number format") >= 0) {err.message = "Invalid phone number format. Must include country code. Example: +14252345678"}
-        alert(err.message);
+        alert("Novel Error: "+ err.message);
         console.error("Exception from Auth.signUp: ", err);
         this.setState({ stage: 0, email: '', password: '', confirm: '' });
 		this.state.email= '';

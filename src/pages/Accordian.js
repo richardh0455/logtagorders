@@ -26,6 +26,10 @@ class Accordion extends Component {
         [label]: !isOpen
       }
     });
+    if(this.props.onClick) {
+      this.props.onClick(label);
+    }
+
   };
 
   render() {
@@ -39,8 +43,9 @@ class Accordion extends Component {
       <div style={{ border: '2px solid', 'margin-top':'40px' }}>
         {children.map(child => (
           <AccordianSection
-            isOpen={!!openSections[child.props.label]}
+            isOpen={!!openSections[child.props.id]}
             label={child.props.label}
+            id={child.props.id}
             onClick={onClick}
           >
             {child.props.children}

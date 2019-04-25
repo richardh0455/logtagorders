@@ -6,11 +6,16 @@ class AccordionSection extends Component {
     children: PropTypes.instanceOf(Object).isRequired,
     isOpen: PropTypes.bool.isRequired,
     label: PropTypes.string.isRequired,
+    id: PropTypes.string,
     onClick: PropTypes.func.isRequired,
   };
 
   onClick = () => {
-    this.props.onClick(this.props.label);
+    if(this.props.id){
+      this.props.onClick(this.props.id);
+    }else {
+      this.props.onClick(this.props.label);
+    }
   };
 
   render() {
