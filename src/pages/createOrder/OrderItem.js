@@ -86,8 +86,9 @@ class OrderItem extends Component {
   }
 
   handlePriceChange(event) {
-	  this.setState({price: event.target.value});
-    this.props.item.price = event.target.value;
+    var price = event.target.value.replace('$', '').trim()
+	  this.setState({price: price});
+    this.props.item.price = price;
     this.props.update_item_handler(this.props.item.key, this.props.item)
   }
 

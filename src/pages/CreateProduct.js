@@ -53,25 +53,32 @@ class CreateProduct extends React.Component{
   }
 
   async createProduct(product) {
+    var cost_price = product.cost_price.replace('$', '').trim()
     const apiRequest = {
         headers: {
           'Authorization': this.state.idToken,
           'Content-Type': 'application/json'
         },
-        body: {"Name": product.name, "Description": product.description, "CostPrice":product.cost_price}
+        body: {"Name": product.name, "Description": product.description, "CostPrice":cost_price}
       };
       API.post(productsAPI, createPath, apiRequest)
 	  .then(response => {
-		NotificationManager.success('', 'Product Successfully Created', 5000);
-		this.setState({
-			name:'',
-			description:'',
-			cost_price:'0'
-		})
-		this.props.get_all_products();
+      if(response.statusCode === "200"){
+        NotificationManager.success('', 'Product Successfully Created', 3000);
+        this.setState({
+          name:'',
+          description:'',
+          cost_price:'0'
+        })
+        this.props.get_all_products();
+      } else {
+        NotificationManager.error('Product creation Failed', 'Error', 5000, () => {});
+      }
+
+      console.log(response);
 	  })
 	  .catch(err => {
-		NotificationManager.error('Product creation Failed', 'Error', 5000, () => {});
+		    NotificationManager.error('Product creation Failed', 'Error', 5000, () => {});
 	  })
 
   }

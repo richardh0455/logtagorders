@@ -63,21 +63,28 @@ class CreateVariant extends React.Component{
   }
 
   async createVariant(variant) {
+    var price = variant.price.replace('$', '').trim()
     const apiRequest = {
         headers: {
           'Authorization': this.state.idToken,
           'Content-Type': 'application/json'
         },
-        body: {"CustomerID": variant.customerID,"ProductID": variant.productID, "Description": variant.description, "Price":variant.price}
+        body: {"CustomerID": variant.customerID,"ProductID": variant.productID, "Description": variant.description, "Price":price}
       };
       API.post(variantsAPI, createPath, apiRequest)
 	  .then(response => {
-		NotificationManager.success('', 'Variant Successfully Created',5000);
-		this.setState({
-			name:'',
-			description:'',
-			price:'0'
-		})
+        if(response.statusCode === "200") {
+          NotificationManager.success('', 'Variant Successfully Created',3000);
+      		this.setState({
+      			name:'',
+      			description:'',
+      			price:'0'
+      		})
+
+        } else {
+          NotificationManager.error('Variant creation Failed', 'Error', 5000, () => {});
+        }
+
 	  })
 	  .catch(err => {
 		NotificationManager.error('Variant creation Failed', 'Error', 5000, () => {});
