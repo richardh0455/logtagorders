@@ -63,14 +63,14 @@ class Product extends React.Component{
   }
 
   async createProductHandler(e) {
-	e.preventDefault();
-	this.createProduct({name:this.state.name, description:this.state.description, cost_price:this.state.cost_price  });
+	  e.preventDefault();
+	  this.createProduct({name:this.state.name, description:this.state.description, cost_price:this.state.cost_price  });
 
   }
 
   async updateProductEventHandler(e) {
-	e.preventDefault();
-	this.updateProduct({ID: this.state.currentlySelectedProduct.value, name:this.state.name, description:this.state.description, cost_price:this.state.cost_price  });
+	  e.preventDefault();
+	  this.updateProduct({ID: this.state.currentlySelectedProduct.value, name:this.state.name, description:this.state.description, cost_price:this.state.cost_price  });
 
   }
 
