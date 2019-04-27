@@ -20,7 +20,7 @@ import '../public/css/app.css';
 import '../public/css/gridforms.css';
 import logo from '../public/images/LTLogo.png';
 import Customer  from './Customer';
-import CreateProduct  from './CreateProduct';
+import Product  from './Product';
 import CreateOrder  from './CreateOrder';
 import CreateVariant  from './CreateVariant';
 import ViewOrders  from './ViewOrders';
@@ -156,7 +156,7 @@ class MainApp extends React.Component {
       try{
         productOptions = products.map((product) =>
         {
-          return {value:product.ID, label: product.Name}
+          return {value:product.ID, label: product.Name, product:product}
         });
       } catch(err)
       {
@@ -164,6 +164,7 @@ class MainApp extends React.Component {
       }
       return productOptions;
   }
+
 
   render() {
     return (
@@ -181,8 +182,8 @@ class MainApp extends React.Component {
         <div label="Create or Update Customer" id="2">
           <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
         </div>
-        <div label='Create Product' id="3">
-          <CreateProduct get_all_products={this.getProducts.bind(this)} />
+        <div label='Create or Update Product' id="3">
+          <Product get_all_products={this.getProducts.bind(this)} products={this.parseProducts()}  />
         </div>
         <div label='Create Variant' id="4">
           <CreateVariant customers={this.generateCustomerList()} products={this.parseProducts()} />
