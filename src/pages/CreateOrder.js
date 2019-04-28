@@ -19,9 +19,6 @@ class CreateOrder extends React.Component{
   constructor(props) {
     super(props);
 
-	this.handleCustomerChange = this.handleCustomerChange.bind(this);
-	this.handleShippingAddressChange = this.handleShippingAddressChange.bind(this);
-  this.handlePurchaseOrderNumberChange = this.handlePurchaseOrderNumberChange.bind(this);
 
 
 	this.state = {
@@ -63,18 +60,22 @@ class CreateOrder extends React.Component{
       return await API.post(orderAPI, createPath, apiRequest)
   }
 
-  async handleCustomerChange(event) {
-	this.setState({currentlySelectedCustomer: event})
-    var customer = await this.getCustomer(event.value);
-    this.setState({customer: customer.body})
-	this.handleShippingAddressChange(null);
+  handleCustomerChange = (event) => {
+	   this.setState({currentlySelectedCustomer: event})
+     this.getCustomer(event.value)
+     .then(response => {
+       this.setState({customer: response.body})
+       this.handleShippingAddressChange(null);
+     });
+
+
   }
 
-  handleShippingAddressChange(event) {
-	this.setState({currentlySelectedShippingAddress: event})
+  handleShippingAddressChange = (event) => {
+	   this.setState({currentlySelectedShippingAddress: event})
   }
 
-  async handlePurchaseOrderNumberChange(event) {
+  handlePurchaseOrderNumberChange = (event) => {
     this.setState({purchaseOrderNumber: event.target.value})
   }
 

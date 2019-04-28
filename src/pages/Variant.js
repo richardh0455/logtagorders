@@ -24,16 +24,6 @@ class Variant extends React.Component{
       variants:[],
       isUpdate: false
     };
-	this.handleCustomerChange = this.handleCustomerChange.bind(this);
-	this.handleProductChange = this.handleProductChange.bind(this);
-	this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
-	this.handlePriceChange = this.handlePriceChange.bind(this);
-  this.handleVariantChange = this.handleVariantChange.bind(this);
-  this.createVariantChangeHandler = this.createVariantChangeHandler.bind(this);
-  this.updateVariantChangeHandler = this.updateVariantChangeHandler.bind(this);
-  this.renderProductSelect = this.renderProductSelect.bind(this);
-  this.renderCustomerSelect = this.renderCustomerSelect.bind(this);
-
   }
 
   async componentDidMount() {
@@ -44,8 +34,7 @@ class Variant extends React.Component{
 
   }
 
-  async handleCustomerChange(event) {
-
+  handleCustomerChange = (event) => {
     this.setState({currentlySelectedCustomer: event}, () =>
     {
       if(this.state.currentlySelectedProduct && this.state.currentlySelectedCustomer)
@@ -53,9 +42,9 @@ class Variant extends React.Component{
         this.getVariants();
       }
     })
-
   }
-  async handleProductChange(event) {
+
+  handleProductChange = (event) => {
 
     this.setState({currentlySelectedProduct: event}, () =>
     {
@@ -67,7 +56,7 @@ class Variant extends React.Component{
 
   }
 
-  async handleVariantChange(event) {
+  handleVariantChange = (event) => {
     console.log(event);
 	   this.setState({
        currentlySelectedVariant: event,
@@ -99,23 +88,20 @@ class Variant extends React.Component{
 	});
   }
 
-  async handleDescriptionChange(event) {
-
+  handleDescriptionChange = (event) => {
     this.setState({description: event.target.value})
-
   }
-  async handlePriceChange(event) {
 
+  handlePriceChange = (event) => {
     this.setState({price: event.target.value})
-
   }
 
-  async createVariantHandler(e) {
+  createVariantHandler = (e) => {
 	  e.preventDefault();
 	  this.createVariant({customerID:this.state.currentlySelectedCustomer.value, productID:this.state.currentlySelectedProduct.value, description:this.state.description, price:this.state.price  });
   }
 
-  async updateVariantHandler(e) {
+  updateVariantHandler = (e) => {
 	  e.preventDefault();
 	  this.updateVariant({ID: this.state.currentlySelectedVariant.value, customerID:this.state.currentlySelectedCustomer.value, productID:this.state.currentlySelectedProduct.value, description:this.state.description, price:this.state.price  });
   }
@@ -190,7 +176,7 @@ class Variant extends React.Component{
     }
   }
 
-  renderProductSelect() {
+  renderProductSelect = () => {
     return (
       <div data-field-span="1">
         <label>Product Name</label>
@@ -200,7 +186,7 @@ class Variant extends React.Component{
     );
   }
 
-  renderCustomerSelect() {
+  renderCustomerSelect = () => {
     return (
       <div data-field-span="1">
         <label>Customer Name</label>
@@ -234,16 +220,15 @@ class Variant extends React.Component{
 
     }
   }
-  createVariantChangeHandler(event) {
+  createVariantChangeHandler = (event) => {
     this.setState({
       isUpdate:false
     });
   }
 
-  updateVariantChangeHandler(event) {
+  updateVariantChangeHandler = (event) => {
     this.setState({
       isUpdate:true
-
     });
   }
 

@@ -18,9 +18,6 @@ class ViewOrders extends React.Component{
         currentlySelectedOrder: {Order:{}, OrderLines:[]},
         orders: []
       };
-
-    this.handleCustomerChange = this.handleCustomerChange.bind(this);
-    this.getOrderDetails = this.getOrderDetails.bind(this);
   }
 
   async componentDidMount() {
@@ -29,7 +26,7 @@ class ViewOrders extends React.Component{
     this.setState({ idToken: session.idToken.jwtToken });
   }
 
-  async handleCustomerChange(event) {
+  handleCustomerChange = (event) => {
     this.setState({currentlySelectedCustomer: event})
     this.getOrders(event.value)
   }
@@ -67,12 +64,10 @@ class ViewOrders extends React.Component{
 	  })
   }
 
-  async getOrderDetails(invoiceID) {
+  getOrderDetails = (invoiceID) => {
     //reset to default before retrieving new data
     this.setState({currentlySelectedOrder: {Order:{}, OrderLines:[]}});
-    console.log(invoiceID);
     this.getSingleOrder(this.state.currentlySelectedCustomer.value,invoiceID )
-
   }
 
 

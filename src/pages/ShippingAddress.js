@@ -13,28 +13,24 @@ class ShippingAddress extends Component {
     address3: shippingAddressLines[2],
     address4: shippingAddressLines[3]
     };
-    this.handleAddress1Change = this.handleAddress1Change.bind(this);
-    this.handleAddress2Change = this.handleAddress2Change.bind(this);
-    this.handleAddress3Change = this.handleAddress3Change.bind(this);
-    this.handleAddress4Change = this.handleAddress4Change.bind(this);
-    this.removeItem = this.removeItem.bind(this);
-    this.onKeyPress = this.onKeyPress.bind(this);
   }
-  handleAddress1Change(event) {
-	this.state.address1 = event.target.value
-  this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
+
+
+  handleAddress1Change = (event) => {
+	   this.state.address1 = event.target.value
+     this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
   }
-  handleAddress2Change(event) {
-	this.state.address2 = event.target.value
-  this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
+  handleAddress2Change = (event) => {
+	   this.state.address2 = event.target.value
+     this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
   }
-  handleAddress3Change(event) {
-  this.state.address3 = event.target.value
-  this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
+  handleAddress3Change = (event) => {
+    this.state.address3 = event.target.value
+    this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
   }
-  handleAddress4Change(event) {
-  this.state.address4 = event.target.value
-  this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
+  handleAddress4Change = (event) => {
+    this.state.address4 = event.target.value
+    this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
   }
 
   buildShippingAddress(){
@@ -42,12 +38,12 @@ class ShippingAddress extends Component {
 
   }
 
-  removeItem(event) {
+  removeItem = (event) => {
 	event.preventDefault();
 	this.props.update_address_handler(this.props.address.ID, null)
   }
 
-  onKeyPress(event) {
+  onKeyPress = (event) => {
     if (event.which === 13 /* Enter */) {
 	  event.preventDefault()
     }

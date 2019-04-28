@@ -31,20 +31,6 @@ class Customer extends React.Component{
       primary_contact_fax:'',
     };
 
-    this.handleCustomerChange = this.handleCustomerChange.bind(this);
-    this.handleRegionChange = this.handleRegionChange.bind(this);
-    this.handleNameChange = this.handleNameChange.bind(this);
-    this.handleEmailChange = this.handleEmailChange.bind(this);
-    this.handleBillingAddressChange = this.handleBillingAddressChange.bind(this);
-    this.shippingAddressUpdated = this.shippingAddressUpdated.bind(this);
-    this.addShippingAddress = this.addShippingAddress.bind(this);
-    this.updateCustomer = this.updateCustomer.bind(this);
-    this.createCustomer = this.createCustomer.bind(this);
-    this.updateCustomerChangeHandler = this.updateCustomerChangeHandler.bind(this);
-    this.createCustomerChangeHandler = this.createCustomerChangeHandler.bind(this);
-    this.handlePrimaryContactNameChange = this.handlePrimaryContactNameChange.bind(this);
-    this.handlePrimaryContactPhoneChange = this.handlePrimaryContactPhoneChange.bind(this);
-    this.handlePrimaryContactFaxChange = this.handlePrimaryContactFaxChange.bind(this);
   }
 
   async componentDidMount() {
@@ -54,7 +40,7 @@ class Customer extends React.Component{
   }
 
 
-  async handleCustomerChange(event) {
+  handleCustomerChange = (event) => {
 	   this.setState({currentlySelectedCustomer: event})
      this.getCustomer(event.value).then(response => {
        var parsed_customer = JSON.parse(response.body);
@@ -81,29 +67,31 @@ class Customer extends React.Component{
      })
   }
 
-  async handleRegionChange(event) {
+  handleRegionChange = (event) => {
     this.setState({currentlySelectedRegion: event})
   }
 
-  async handleNameChange(event) {
+  handleNameChange = (event) => {
     this.setState({name: event.target.value})
   }
 
-  async handleEmailChange(event) {
+  handleEmailChange = (event) => {
     this.setState({email: event.target.value})
   }
 
-  async handleBillingAddressChange(event) {
+  handleBillingAddressChange = (event) => {
     this.setState({billing_address: event.target.value})
   }
 
-  async handlePrimaryContactNameChange(event) {
+  handlePrimaryContactNameChange = (event) => {
     this.setState({primary_contact_name: event.target.value})
   }
-  async handlePrimaryContactPhoneChange(event) {
+
+  handlePrimaryContactPhoneChange = (event) => {
     this.setState({primary_contact_phone: event.target.value})
   }
-  async handlePrimaryContactFaxChange(event) {
+
+  handlePrimaryContactFaxChange = (event) => {
     this.setState({primary_contact_fax: event.target.value})
   }
 
@@ -160,7 +148,7 @@ class Customer extends React.Component{
     return await API.get(customersAPI, '/'+id, apiRequest)
   }
 
-  async updateCustomer(customer)
+  updateCustomer = (customer) =>
   {
     const apiRequest = {
       headers: {
@@ -202,7 +190,7 @@ class Customer extends React.Component{
     })
   }
 
-  async createCustomer(customer)
+  createCustomer = (customer) =>
   {
     const apiRequest = {
       headers: {
@@ -269,8 +257,6 @@ class Customer extends React.Component{
 
   async updateCustomerShippingAddresses(customerID, shipping_addresses)
   {
-    console.log("Updating Shipping Addresses");
-    console.log(shipping_addresses)
     for(var index = 0; index < shipping_addresses.length; index++) {
       if(shipping_addresses[index].created)
       {
@@ -369,7 +355,7 @@ class Customer extends React.Component{
     })
   }
 
-  shippingAddressUpdated(key, item)
+  shippingAddressUpdated = (key, item) =>
   {
      var addresses = this.state.shipping_addresses;
      for(var i = 0; i < addresses.length; i++) {
@@ -391,7 +377,7 @@ class Customer extends React.Component{
      this.setState({shipping_addresses: addresses});
   }
 
-  addShippingAddress(e) {
+  addShippingAddress = (e) => {
     e.preventDefault();
     var key = Number(this.state.counter) + 1;
     var default_item = {ID:'0', ShippingAddress:'', created:true};
@@ -412,7 +398,7 @@ class Customer extends React.Component{
     }
   }
 
-  createCustomerChangeHandler() {
+  createCustomerChangeHandler = () => {
     this.setState({
       isUpdate:false,
       currentlySelectedCustomer:{},
@@ -424,7 +410,7 @@ class Customer extends React.Component{
     });
   }
 
-  updateCustomerChangeHandler() {
+  updateCustomerChangeHandler = () => {
     this.setState({
       isUpdate:true,
       currentlySelectedCustomer:{},

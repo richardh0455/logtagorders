@@ -20,13 +20,6 @@ class Product extends React.Component{
       cost_price: '0',
       isUpdate: false
     };
-  this.handleProductChange = this.handleProductChange.bind(this);
-	this.handleNameChange = this.handleNameChange.bind(this);
-	this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
-	this.handlePriceChange = this.handlePriceChange.bind(this);
-  this.createProductChangeHandler = this.createProductChangeHandler.bind(this);
-  this.updateProductChangeHandler = this.updateProductChangeHandler.bind(this);
-
   }
 
   async componentDidMount() {
@@ -35,24 +28,19 @@ class Product extends React.Component{
     this.setState({ idToken: session.idToken.jwtToken });
   }
 
-  async handleNameChange(event) {
-
+  handleNameChange = (event) => {
     this.setState({name: event.target.value})
-
   }
-  async handleDescriptionChange(event) {
 
+  handleDescriptionChange = (event) => {
     this.setState({description: event.target.value})
-
   }
-  async handlePriceChange(event) {
 
+  handlePriceChange = (event) => {
     this.setState({cost_price: event.target.value})
-
   }
 
-  async handleProductChange(event) {
-    console.log(event);
+  handleProductChange = (event) => {
 	   this.setState({
        currentlySelectedProduct: event,
        name: event.product.Name,
@@ -144,13 +132,13 @@ class Product extends React.Component{
       </div>);
     }
   }
-  createProductChangeHandler(event) {
+  createProductChangeHandler = (event) => {
     this.setState({
       isUpdate:false
     });
   }
 
-  updateProductChangeHandler(event) {
+  updateProductChangeHandler = (event) => {
     this.setState({
       isUpdate:true
 

@@ -21,9 +21,6 @@ class ViewCustomers extends React.Component{
         },
         currentlySelectedCustomerID:""
       };
-
-    this.getCustomer = this.getCustomer.bind(this);
-    this.deleteCustomer = this.deleteCustomer.bind(this);
   }
 
   async componentDidMount() {
@@ -32,7 +29,7 @@ class ViewCustomers extends React.Component{
     this.setState({ idToken: session.idToken.jwtToken });
   }
 
-  async getCustomer(id) {
+  getCustomer = (id) => {
     const apiRequest = {
       headers: {
         'Authorization': this.state.idToken,
@@ -42,12 +39,11 @@ class ViewCustomers extends React.Component{
     this.setState({currentlySelectedCustomerID:id})
     API.get(customersAPI, '/'+id, apiRequest)
     .then(response => {
-      console.log(JSON.parse(response.body))
       this.setState({currentlySelectedCustomer: JSON.parse(response.body)})
     })
   }
 
-  async deleteCustomer() {
+  deleteCustomer = () => {
     var id = this.state.currentlySelectedCustomerID
     if (window.confirm('Are you sure?')) {
       const apiRequest = {
