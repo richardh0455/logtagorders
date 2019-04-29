@@ -10,7 +10,7 @@ const getAllPath = '/all';
 class OrderItem extends Component {
   constructor(props) {
     super(props);
-	var order_item = null; /*JSON.parse(localStorage.getItem(this.props.item.key));*/
+	var order_item = null;
     this.state = {
 		variant: order_item ? order_item.variant : this.props.item.variant,
 		variant_id: order_item ? order_item.variant_id : this.props.item.variant_id,
@@ -19,12 +19,6 @@ class OrderItem extends Component {
 		variants: []
 	};
 
-    this.handleProductChange = this.handleProductChange.bind(this);
-    this.handleVariantChange = this.handleVariantChange.bind(this);
-    this.handleQuantityChange = this.handleQuantityChange.bind(this);
-    this.handlePriceChange = this.handlePriceChange.bind(this);
-    this.removeItem = this.removeItem.bind(this);
-    this.onKeyPress = this.onKeyPress.bind(this);
   }
 
   async componentDidMount() {
@@ -35,7 +29,7 @@ class OrderItem extends Component {
 
   }
 
-  handleProductChange(event) {
+  handleProductChange = (event) => {
     this.props.item.product_id = event.value;
     this.props.item.product_name = event.label;
     this.props.update_item_handler(this.props.item.key, this.props.item)
@@ -49,7 +43,7 @@ class OrderItem extends Component {
   }
 
 
-  handleVariantChange(event) {
+  handleVariantChange = (event) => {
 	  this.setState({currentlySelectedVariant: event});
     this.handlePriceChange({target: {value: event.price}})
     this.props.item.variant_id = event.value;
@@ -79,25 +73,27 @@ class OrderItem extends Component {
 	});
   }
 
-  handleQuantityChange(event) {
+  handleQuantityChange = (event) => {
 	this.setState({quantity: event.target.value});
   this.props.item.quantity = event.target.value;
   this.props.update_item_handler(this.props.item.key, this.props.item)
   }
 
-  handlePriceChange(event) {
+  handlePriceChange = (event) => {
     var price = event.target.value.replace('$', '').trim()
 	  this.setState({price: price});
     this.props.item.price = price;
     this.props.update_item_handler(this.props.item.key, this.props.item)
   }
 
-  removeItem(event) {
+
+
+  removeItem = (event) => {
 	event.preventDefault();
 	this.props.update_item_handler(this.props.item.key, null)
   }
 
-  onKeyPress(event) {
+  onKeyPress = (event) => {
     if (event.which === 13 /* Enter */) {
 	  event.preventDefault()
     }
@@ -123,6 +119,7 @@ class OrderItem extends Component {
 				<label>Pricing</label>
 				<input type="text" value={this.state.price} onChange={this.handlePriceChange} />
 			</div>
+
 			<div data-field-span="1">
 				<label>Subtotal</label>
 				{this.state.quantity * this.state.price}

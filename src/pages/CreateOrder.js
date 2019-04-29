@@ -55,7 +55,7 @@ class CreateOrder extends React.Component{
           'Authorization': this.state.idToken,
           'Content-Type': 'application/json'
         },
-        body: {"customerID": this.state.currentlySelectedCustomer.value, "invoiceLines": invoiceLines, "purchaseOrderNumber":this.state.purchaseOrderNumber}
+        body: {"customerID": this.state.currentlySelectedCustomer.value, "invoiceLines": invoiceLines, "purchaseOrderNumber":this.state.purchaseOrderNumber, "currency":this.state.currentlySelectedCurrency.label}
       };
       return await API.post(orderAPI, createPath, apiRequest)
   }
@@ -77,6 +77,10 @@ class CreateOrder extends React.Component{
 
   handlePurchaseOrderNumberChange = (event) => {
     this.setState({purchaseOrderNumber: event.target.value})
+  }
+
+  handleCurrencyChange = (event) => {
+    this.setState({currentlySelectedCurrency: event})
   }
 
    generateShippingAddressList(customer) {
@@ -122,10 +126,21 @@ class CreateOrder extends React.Component{
                 <label>Purchase Order Number</label>
                 <input type="text" value={this.state.purchaseOrderNumber}  onChange={this.handlePurchaseOrderNumberChange} />
               </div>
+              <div data-field-span="1">
+        				<label>Currency</label>
+        				<Select value={this.state.currentlySelectedCurrency} onChange={this.handleCurrencyChange} options={this.props.currencies} isSearchable="true" placeholder="Select a Currency"/>
+        			</div>
             </div>
             <div className="OrderList" style={{marginTop: 50 + 'px'}}>
-				<h2>Product</h2>
-                <OrderList create_invoice_handler={this.createInvoice.bind(this)} products={this.props.products} shippingAddress ={this.state.currentlySelectedShippingAddress} purchaseOrderNumber={this.state.purchaseOrderNumber} customer={{...this.state.currentlySelectedCustomer,...JSON.parse(this.state.customer)}}/>
+				      <h2>Product</h2>
+                <OrderList
+                  create_invoice_handler={this.createInvoice.bind(this)}
+                  products={this.props.products}
+                  shippingAddress ={this.state.currentlySelectedShippingAddress}
+                  purchaseOrderNumber={this.state.purchaseOrderNumber}
+                  customer={{...this.state.currentlySelectedCustomer,...JSON.parse(this.state.customer)}}
+                  currency = {this.state.currentlySelectedCurrency}
+                  />
             </div>
         </fieldset>
         </form>

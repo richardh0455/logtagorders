@@ -36,6 +36,8 @@ const getAllPath = '/all';
 
 const productsAPI = 'ProductsAPI';
 
+const currenciesAPI = 'CurrencyAPI';
+
 const createPath = '/create';
 const orderAPI = 'OrdersAPI';
 
@@ -70,16 +72,15 @@ class MainApp extends React.Component {
     if(this.state.redirect) {
       return <Redirect to='/signin' />;
     }
-
   }
 
 
   async componentDidMount() {
     const session = await Auth.currentSession();
-    this.setState({ authToken: session.accessToken.jwtToken });
-    this.setState({ idToken: session.idToken.jwtToken });
+    this.setState({ authToken: session.accessToken.jwtToken, idToken: session.idToken.jwtToken });
     this.getCustomers();
     this.getProducts();
+    this.getCurrencies();
   }
 
   async getProductConfig(id) {
@@ -127,6 +128,21 @@ class MainApp extends React.Component {
     });
   }
 
+  async getCurrencies() {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    API.get(currenciesAPI, getAllPath, apiRequest)
+    .then(response =>
+    {
+        this.setState({currencies: response.body});
+    });
+  }
+
+
   generateCustomerList() {
     var customers = [];
     if(this.state.customers){
@@ -165,6 +181,26 @@ class MainApp extends React.Component {
       return productOptions;
   }
 
+  parseCurrencies() {
+    var unParsedCurrencies = [];
+    if(this.state.currencies) {
+      unParsedCurrencies = JSON.parse(this.state.currencies);
+    }
+
+     var parsedCurrencies = [];
+     try{
+       parsedCurrencies = unParsedCurrencies.map((currency) =>
+       {
+         return {value:currency.ID, label: currency.ShortName}
+       });
+     } catch(err)
+     {
+
+     }
+     return parsedCurrencies;
+
+  }
+
 
   render() {
     return (
@@ -177,7 +213,7 @@ class MainApp extends React.Component {
       <NotificationContainer/>
       <Accordian>
         <div label="Create Order" id="1">
-          <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} />
+          <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} currencies = {this.parseCurrencies()} />
         </div>
         <div label="Create or Update Customer" id="2">
           <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
