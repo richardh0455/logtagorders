@@ -94,7 +94,7 @@ class ViewOrders extends React.Component{
         <section>
           <Accordian onClick={this.getOrderDetails}>
             {this.state.orders.map((item) => (
-              <div label={'ID: '+item.InvoiceID + ' Date: '+ item.CreatedDate} id={item.InvoiceID}>
+              <div label={'ID: '+item.InvoiceID + ' Date: '+ item.CreatedDate} id={item.InvoiceID} key={item.InvoiceID}>
                 <span>Invoice Number: {this.state.currentlySelectedOrder["Order"]["LogtagInvoiceNumber"]}-{item.InvoiceID}</span>
                 <br/>
                 <span>Payment Date: {this.state.currentlySelectedOrder["Order"]["PaymentDate"]}</span>
@@ -109,7 +109,7 @@ class ViewOrders extends React.Component{
                     <th>Quantity</th>
                     </tr>
                 {this.state.currentlySelectedOrder["OrderLines"].map((line) => (
-                    <tr>
+                    <tr key={line["ProductID"]}>
                       <td>{this.getProductName(line["ProductID"])}</td>
                       <td>{line["Pricing"]}</td>
                       <td>{line["Quantity"]}</td>
