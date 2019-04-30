@@ -70,6 +70,11 @@ class ViewOrders extends React.Component{
     this.getSingleOrder(this.state.currentlySelectedCustomer.value,invoiceID )
   }
 
+  getProductName = (id) => {
+    return this.props.products.find(product => product.value === id).label
+
+  }
+
 
   render() {
     return (
@@ -89,7 +94,7 @@ class ViewOrders extends React.Component{
         <section>
           <Accordian onClick={this.getOrderDetails}>
             {this.state.orders.map((item) => (
-              <div label={item.InvoiceID} id={item.InvoiceID}>
+              <div label={'ID: '+item.InvoiceID + ' Date: '+ item.CreatedDate} id={item.InvoiceID}>
                 <span>Invoice Number: {this.state.currentlySelectedOrder["Order"]["LogtagInvoiceNumber"]}-{item.InvoiceID}</span>
                 <br/>
                 <span>Payment Date: {this.state.currentlySelectedOrder["Order"]["PaymentDate"]}</span>
@@ -97,6 +102,7 @@ class ViewOrders extends React.Component{
                 <span>Shipped Date: {this.state.currentlySelectedOrder["Order"]["ShippedDate"]}</span>
                 <br/>
                 <table>
+                  <tbody>
                   <tr>
                     <th>Product</th>
                     <th>Price</th>
@@ -104,11 +110,12 @@ class ViewOrders extends React.Component{
                     </tr>
                 {this.state.currentlySelectedOrder["OrderLines"].map((line) => (
                     <tr>
-                      <td>{line["ProductID"]}</td>
+                      <td>{this.getProductName(line["ProductID"])}</td>
                       <td>{line["Pricing"]}</td>
                       <td>{line["Quantity"]}</td>
                     </tr>
                 ))}
+                </tbody>
                 </table>
               </div>
             ))}

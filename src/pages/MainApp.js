@@ -225,7 +225,7 @@ class MainApp extends React.Component {
           <Variant customers={this.generateCustomerList()} products={this.parseProducts()} />
         </div>
         <div label='View Orders' id="5">
-          <ViewOrders customers={this.generateCustomerList()}  />
+          <ViewOrders customers={this.generateCustomerList()} products={this.parseProducts()}   />
         </div>
         <div label='View Customers' id="6">
           <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
