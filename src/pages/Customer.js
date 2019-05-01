@@ -41,7 +41,7 @@ class Customer extends React.Component{
 
 
   handleCustomerChange = (event) => {
-	   this.setState({currentlySelectedCustomer: event})
+	   this.setState({currentlySelectedCustomer: event, customerDataRetrieved: false})
      this.getCustomer(event.value).then(response => {
        var parsed_customer = JSON.parse(response.body);
        var contactInfo = parsed_customer.ContactInfo;
@@ -53,7 +53,6 @@ class Customer extends React.Component{
        if ( shippingAddresses === undefined || parsed_customer.ShippingAddresses.length == 0) {
          this.addShippingAddress(event);
        }
-
        this.setState({
          name: contactInfo.Name,
          currentlySelectedRegion: region,
@@ -64,7 +63,13 @@ class Customer extends React.Component{
          primary_contact_phone: contactInfo.PrimaryContact.Phone,
          primary_contact_fax: contactInfo.PrimaryContact.Fax,
        });
+       this.setState({customerDataRetrieved: true})
+     }).catch(err =>
+     {
+       console.log(err);
+
      })
+
   }
 
   handleRegionChange = (event) => {
@@ -378,7 +383,11 @@ class Customer extends React.Component{
   }
 
   addShippingAddress = (e) => {
-    e.preventDefault();
+    try{
+      e.preventDefault();
+    } catch (error) {
+      //Some events have no default. Expected behavior
+    }
     var key = Number(this.state.counter) + 1;
     var default_item = {ID:'0', ShippingAddress:'', created:true};
     var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
@@ -398,29 +407,32 @@ class Customer extends React.Component{
     }
   }
 
-  createCustomerChangeHandler = () => {
+  resetInputFields() {
     this.setState({
-      isUpdate:false,
+      customerDataRetrieved: false,
       currentlySelectedCustomer:{},
       name: '',
       currentlySelectedRegion: {},
       email: '',
       billing_address: '',
-      shipping_addresses:[]
+      shipping_addresses:[],
+      primary_contact_name:'',
+      primary_contact_phone:'',
+      primary_contact_fax:'',
+
     });
+
+  }
+
+  createCustomerChangeHandler = () => {
+    this.setState({isUpdate:false})
+    this.resetInputFields();
   }
 
   updateCustomerChangeHandler = () => {
-    this.setState({
-      isUpdate:true,
-      currentlySelectedCustomer:{},
-      name: '',
-      currentlySelectedRegion: {},
-      email: '',
-      billing_address: '',
-      shipping_addresses:[]
+    this.setState({isUpdate:true})
+    this.resetInputFields();
 
-    });
   }
 
   getButtonText() {
@@ -434,71 +446,118 @@ class Customer extends React.Component{
 
   }
 
+  renderDetailFields() {
+    return (
+      <fieldset>
+      <div data-row-span="2">
+        <div className="radio">
+          <label>
+            <input type="radio" checked={!this.state.isUpdate} onChange={this.createCustomerChangeHandler} />
+            Create Customer
+          </label>
+
+          <label style={{marginLeft: 20 + 'px'}}>
+            <input type="radio" checked={this.state.isUpdate} onChange={this.updateCustomerChangeHandler} />
+            Update Customer
+          </label>
+        </div>
+        {this.createOrUpdate()}
+      </div>
+      <div data-row-span="2">
+        <div data-field-span="1">
+          <label>Name</label>
+          <input type="text" value={this.state.name}  onChange={this.handleNameChange} />
+        </div>
+       <div data-field-span="1">
+         <label>Email</label>
+         <input type="text" value={this.state.email}  onChange={this.handleEmailChange} />
+       </div>
+     </div>
+     <div data-row-span="2">
+       <div data-field-span="1">
+         <label>Billing Address</label>
+         <input type="text" value={this.state.billing_address}  onChange={this.handleBillingAddressChange} />
+       </div>
+       <div data-field-span="1">
+         <label>Region</label>
+         <Select value={this.state.currentlySelectedRegion} onChange={this.handleRegionChange.bind(this)} options={this.state.regions} placeholder="Select a region"/>
+       </div>
+     </div>
+     <div data-row-span="3">
+       <div data-field-span="1">
+         <label>Primary Contact Name</label>
+         <input type="text" value={this.state.primary_contact_name}  onChange={this.handlePrimaryContactNameChange} />
+       </div>
+       <div data-field-span="1">
+         <label>Phone Number</label>
+         <input type="text" value={this.state.primary_contact_phone}  onChange={this.handlePrimaryContactPhoneChange} />
+       </div>
+       <div data-field-span="1">
+         <label>Fax Number</label>
+         <input type="text" value={this.state.primary_contact_fax}  onChange={this.handlePrimaryContactFaxChange} />
+       </div>
+     </div>
+     <fieldset>
+       {this.state.shipping_addresses.map(address => (
+       <ShippingAddress address={address} update_address_handler={this.shippingAddressUpdated} />
+       ))}
+       <button onClick={this.addShippingAddress}>Add Shipping Address</button>
+     </fieldset>
+     <div>
+       {this.getButtonText()}
+     </div>
+     </fieldset>
+
+    )
+
+  }
+  createCustomerChoice = () => {
+    this.setState({firstChoiceMade: true})
+  }
+
+  updateCustomerChoice = () => {
+    this.setState({firstChoiceMade: true, isUpdate: true})
+  }
+
+
+
+  renderOperationChoices() {
+    if(!this.state.firstChoiceMade){
+      return (
+        <div>
+          <button onClick={this.createCustomerChoice}>Create Customer</button>
+          <button onClick={this.updateCustomerChoice}>Update Customer</button>
+        </div>
+        )
+    } else if(!this.state.isUpdate) {
+      return (
+        <div>
+          {this.renderDetailFields()}
+        </div>
+      )
+    } else if(!this.state.customerDataRetrieved) {
+      return (
+        <div>
+          {this.createOrUpdate()}
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          {this.renderDetailFields()}
+        </div>
+      )
+
+    }
+
+  }
+
   render() {
     return (
       <div>
         <section>
           <form className="grid-form">
-            <fieldset>
-              <div data-row-span="2">
-                <div className="radio">
-                  <label>
-                    <input type="radio" checked={!this.state.isUpdate} onChange={this.createCustomerChangeHandler} />
-                    Create Customer
-                  </label>
-
-                  <label style={{marginLeft: 20 + 'px'}}>
-                    <input type="radio" checked={this.state.isUpdate} onChange={this.updateCustomerChangeHandler} />
-                    Update Customer
-                  </label>
-                </div>
-                {this.createOrUpdate()}
-
-              </div>
-              <div data-row-span="2">
-                <div data-field-span="1">
-                  <label>Name</label>
-                  <input type="text" value={this.state.name}  onChange={this.handleNameChange} />
-                </div>
-               <div data-field-span="1">
-                 <label>Email</label>
-                 <input type="text" value={this.state.email}  onChange={this.handleEmailChange} />
-               </div>
-             </div>
-             <div data-row-span="2">
-               <div data-field-span="1">
-                 <label>Billing Address</label>
-                 <input type="text" value={this.state.billing_address}  onChange={this.handleBillingAddressChange} />
-               </div>
-               <div data-field-span="1">
-                 <label>Region</label>
-                 <Select value={this.state.currentlySelectedRegion} onChange={this.handleRegionChange.bind(this)} options={this.state.regions} placeholder="Select a region"/>
-               </div>
-             </div>
-             <div data-row-span="3">
-               <div data-field-span="1">
-                 <label>Primary Contact Name</label>
-                 <input type="text" value={this.state.primary_contact_name}  onChange={this.handlePrimaryContactNameChange} />
-               </div>
-               <div data-field-span="1">
-                 <label>Phone Number</label>
-                 <input type="text" value={this.state.primary_contact_phone}  onChange={this.handlePrimaryContactPhoneChange} />
-               </div>
-               <div data-field-span="1">
-                 <label>Fax Number</label>
-                 <input type="text" value={this.state.primary_contact_fax}  onChange={this.handlePrimaryContactFaxChange} />
-               </div>
-             </div>
-           </fieldset>
-           <fieldset>
-             {this.state.shipping_addresses.map(address => (
-             <ShippingAddress address={address} update_address_handler={this.shippingAddressUpdated} />
-             ))}
-             <button onClick={this.addShippingAddress}>Add Shipping Address</button>
-           </fieldset>
-           <div>
-             {this.getButtonText()}
-           </div>
+              {this.renderOperationChoices()}
          </form>
        </section>
      </div>
