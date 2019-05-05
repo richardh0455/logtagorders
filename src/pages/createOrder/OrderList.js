@@ -277,7 +277,7 @@ class OrderList extends Component {
 	     this.props.create_invoice_handler(this.buildInvoiceBody())
 			 .then( response => {
 						var parsed_body = JSON.parse(JSON.parse(response.body))
-						var logtagInvoiceNumber = parsed_body["LogtagInvoiceNumber"]+'-'+parsed_body["InvoiceID"];
+						var logtagInvoiceNumber = parsed_body["LogtagInvoiceNumber"];
 						this.generatePDF(logtagInvoiceNumber);
 					})
 	   }
