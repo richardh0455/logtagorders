@@ -18,9 +18,6 @@ class ViewOrders extends React.Component{
         currentlySelectedOrder: {Order:{}, OrderLines:[]},
         orders: []
       };
-
-    this.handleCustomerChange = this.handleCustomerChange.bind(this);
-    this.getOrderDetails = this.getOrderDetails.bind(this);
   }
 
   async componentDidMount() {
@@ -29,7 +26,7 @@ class ViewOrders extends React.Component{
     this.setState({ idToken: session.idToken.jwtToken });
   }
 
-  async handleCustomerChange(event) {
+  handleCustomerChange = (event) => {
     this.setState({currentlySelectedCustomer: event})
     this.getOrders(event.value)
   }
@@ -67,11 +64,14 @@ class ViewOrders extends React.Component{
 	  })
   }
 
-  async getOrderDetails(invoiceID) {
+  getOrderDetails = (invoiceID) => {
     //reset to default before retrieving new data
     this.setState({currentlySelectedOrder: {Order:{}, OrderLines:[]}});
-    console.log(invoiceID);
     this.getSingleOrder(this.state.currentlySelectedCustomer.value,invoiceID )
+  }
+
+  getProductName = (id) => {
+    return this.props.products.find(product => product.value === id).label
 
   }
 
@@ -94,26 +94,28 @@ class ViewOrders extends React.Component{
         <section>
           <Accordian onClick={this.getOrderDetails}>
             {this.state.orders.map((item) => (
-              <div label={item.InvoiceID} id={item.InvoiceID}>
-                <span>Invoice Number: {this.state.currentlySelectedOrder["Order"]["LogtagInvoiceNumber"]}-{item.InvoiceID}</span>
+              <div label={'ID: '+item.InvoiceID + ' Date: '+ item.CreatedDate} id={item.InvoiceID} key={item.InvoiceID}>
+                <span>Invoice Number: {this.state.currentlySelectedOrder["Order"]["LogtagInvoiceNumber"]}</span>
                 <br/>
                 <span>Payment Date: {this.state.currentlySelectedOrder["Order"]["PaymentDate"]}</span>
                 <br/>
                 <span>Shipped Date: {this.state.currentlySelectedOrder["Order"]["ShippedDate"]}</span>
                 <br/>
                 <table>
+                  <tbody>
                   <tr>
                     <th>Product</th>
                     <th>Price</th>
                     <th>Quantity</th>
                     </tr>
                 {this.state.currentlySelectedOrder["OrderLines"].map((line) => (
-                    <tr>
-                      <td>{line["ProductID"]}</td>
+                    <tr key={line["ProductID"]}>
+                      <td>{this.getProductName(line["ProductID"])}</td>
                       <td>{line["Pricing"]}</td>
                       <td>{line["Quantity"]}</td>
                     </tr>
                 ))}
+                </tbody>
                 </table>
               </div>
             ))}

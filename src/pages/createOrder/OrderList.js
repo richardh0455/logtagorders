@@ -13,25 +13,18 @@ import 'jspdf-autotable';
 class OrderList extends Component {
 	constructor(props) {
     super(props);
-	this.state = {
-		counter: '5',
-		order_items:  []
-
-	};
-
-    this.removeItem = this.removeItem.bind(this);
-    this.orderItemUpdated = this.orderItemUpdated.bind(this);
-    this.addItem = this.addItem.bind(this);
-    this.generatePDF = this.generatePDF.bind(this);
-    this.saveOrderAndGeneratePDF = this.saveOrderAndGeneratePDF.bind(this);
+		this.state = {
+			counter: '5',
+			order_items:  []
+		};
 	}
 
-    async componentDidMount() {
+  async componentDidMount() {
 	  if (this.state.order_items === undefined || this.state.order_items.length == 0)
 	  {
-		this.addOrderLine()
+			this.addOrderLine()
 	  }
-    }
+  }
 
 
 
@@ -51,7 +44,7 @@ class OrderList extends Component {
 		return lines;
 	}
 
-   removeItem(key) {
+   removeItem = (key) => {
 	  var items = this.state.order_items;
 	  for(var i = 0; i < items.length; i++) {
 		if(items[i].key === key) {
@@ -61,11 +54,10 @@ class OrderList extends Component {
 	  this.saveState({order_items: items});
    }
 
-   addItem(event) {
-	event.preventDefault();
-	this.addOrderLine();
-
-   }
+  addItem = (event) => {
+		event.preventDefault();
+		this.addOrderLine();
+  }
 
   addOrderLine() {
 	  var key = Number(this.state.counter) + 1;
@@ -91,7 +83,7 @@ class OrderList extends Component {
 	  return total;
    }
 
-   orderItemUpdated(key, item) {
+   orderItemUpdated = (key, item) => {
 	   var items = this.state.order_items;
 	   for(var i = 0; i < items.length; i++) {
 		if(items[i].key === key) {
@@ -106,7 +98,7 @@ class OrderList extends Component {
    }
 
 
-  generatePDF(logtagInvoiceNumber) {
+  generatePDF = (logtagInvoiceNumber) => {
 		var pageWidth = 210;
 		var margin = 20;
 		var doc = new jsPDF({orientation:'p', unit:'mm', format:'a4'});
@@ -201,14 +193,18 @@ class OrderList extends Component {
 
 	 generateOrderTable(doc, margin,initY ) {
 		var data = [];
-	 	var headers = [['Description','Qty','Unit Price','Subtotal']];
+	 	var headers = [['Description','Qty','Unit Price','Currency','Subtotal']];
 	 	var items = this.state.order_items;
+		var currency = 'Not Specified';
+		if(this.props.currency && this.props.currency.label) {
+			currency = this.props.currency.label;
+		}
 	 	for(var i = 0; i < items.length; i++) {
 	 		var variant = '';
 	 		if(items[i].variant.replace(',',', \n') != 'No Variant') {
 	 			variant = ' - '+items[i].variant.replace(',',', \n');
 	 		}
-	 		var line = [ items[i].product_name+variant, items[i].quantity,items[i].price, items[i].quantity*items[i].price+'' ];
+	 		var line = [ items[i].product_name+variant, items[i].quantity,items[i].price, currency, items[i].quantity*items[i].price+'' ];
 	 		data.push(line);
 
 	 	}
@@ -271,7 +267,7 @@ class OrderList extends Component {
 
 	 }
 
-   saveOrderAndGeneratePDF(event) {
+   saveOrderAndGeneratePDF = (event) => {
 	   event.preventDefault();
 		 if(this.props.shippingAddress === null) {
 			 window.alert('Please Select a Shipping Address');
@@ -281,7 +277,7 @@ class OrderList extends Component {
 	     this.props.create_invoice_handler(this.buildInvoiceBody())
 			 .then( response => {
 						var parsed_body = JSON.parse(JSON.parse(response.body))
-						var logtagInvoiceNumber = parsed_body["LogtagInvoiceNumber"]+'-'+parsed_body["InvoiceID"];
+						var logtagInvoiceNumber = parsed_body["LogtagInvoiceNumber"];
 						this.generatePDF(logtagInvoiceNumber);
 					})
 	   }
@@ -294,7 +290,13 @@ class OrderList extends Component {
 
       <fieldset>
 		{this.state.order_items.map(item => (
-			<OrderItem key={item.key} item={item} products={this.props.products} update_item_handler={this.orderItemUpdated} customer={this.props.customer}/>
+			<OrderItem
+				key={item.key}
+				item={item}
+				products={this.props.products}
+				update_item_handler={this.orderItemUpdated}
+				customer={this.props.customer}
+			/>
 		))}
 
 

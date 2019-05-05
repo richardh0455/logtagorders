@@ -20,9 +20,9 @@ import '../public/css/app.css';
 import '../public/css/gridforms.css';
 import logo from '../public/images/LTLogo.png';
 import Customer  from './Customer';
-import CreateProduct  from './CreateProduct';
+import Product  from './Product';
 import CreateOrder  from './CreateOrder';
-import CreateVariant  from './CreateVariant';
+import Variant  from './Variant';
 import ViewOrders  from './ViewOrders';
 import ViewCustomers  from './ViewCustomers';
 import Accordian  from './Accordian';
@@ -35,6 +35,8 @@ const customersAPI = 'CustomersAPI';
 const getAllPath = '/all';
 
 const productsAPI = 'ProductsAPI';
+
+const currenciesAPI = 'CurrencyAPI';
 
 const createPath = '/create';
 const orderAPI = 'OrdersAPI';
@@ -70,16 +72,15 @@ class MainApp extends React.Component {
     if(this.state.redirect) {
       return <Redirect to='/signin' />;
     }
-
   }
 
 
   async componentDidMount() {
     const session = await Auth.currentSession();
-    this.setState({ authToken: session.accessToken.jwtToken });
-    this.setState({ idToken: session.idToken.jwtToken });
+    this.setState({ authToken: session.accessToken.jwtToken, idToken: session.idToken.jwtToken });
     this.getCustomers();
     this.getProducts();
+    this.getCurrencies();
   }
 
   async getProductConfig(id) {
@@ -127,6 +128,21 @@ class MainApp extends React.Component {
     });
   }
 
+  async getCurrencies() {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    API.get(currenciesAPI, getAllPath, apiRequest)
+    .then(response =>
+    {
+        this.setState({currencies: response.body});
+    });
+  }
+
+
   generateCustomerList() {
     var customers = [];
     if(this.state.customers){
@@ -156,7 +172,7 @@ class MainApp extends React.Component {
       try{
         productOptions = products.map((product) =>
         {
-          return {value:product.ID, label: product.Name}
+          return {value:product.ID, label: product.Name, product:product}
         });
       } catch(err)
       {
@@ -164,6 +180,27 @@ class MainApp extends React.Component {
       }
       return productOptions;
   }
+
+  parseCurrencies() {
+    var unParsedCurrencies = [];
+    if(this.state.currencies) {
+      unParsedCurrencies = JSON.parse(this.state.currencies);
+    }
+
+     var parsedCurrencies = [];
+     try{
+       parsedCurrencies = unParsedCurrencies.map((currency) =>
+       {
+         return {value:currency.ID, label: currency.ShortName}
+       });
+     } catch(err)
+     {
+
+     }
+     return parsedCurrencies;
+
+  }
+
 
   render() {
     return (
@@ -176,19 +213,19 @@ class MainApp extends React.Component {
       <NotificationContainer/>
       <Accordian>
         <div label="Create Order" id="1">
-          <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} />
+          <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} currencies = {this.parseCurrencies()} />
         </div>
         <div label="Create or Update Customer" id="2">
           <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
         </div>
-        <div label='Create Product' id="3">
-          <CreateProduct get_all_products={this.getProducts.bind(this)} />
+        <div label='Create or Update Product' id="3">
+          <Product get_all_products={this.getProducts.bind(this)} products={this.parseProducts()}  />
         </div>
         <div label='Create Variant' id="4">
-          <CreateVariant customers={this.generateCustomerList()} products={this.parseProducts()} />
+          <Variant customers={this.generateCustomerList()} products={this.parseProducts()} />
         </div>
         <div label='View Orders' id="5">
-          <ViewOrders customers={this.generateCustomerList()}  />
+          <ViewOrders customers={this.generateCustomerList()} products={this.parseProducts()}   />
         </div>
         <div label='View Customers' id="6">
           <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
