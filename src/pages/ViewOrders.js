@@ -95,7 +95,7 @@ class ViewOrders extends React.Component{
           <Accordian onClick={this.getOrderDetails}>
             {this.state.orders.map((item) => (
               <div label={'ID: '+item.InvoiceID + ' Date: '+ item.CreatedDate} id={item.InvoiceID} key={item.InvoiceID}>
-                <span>Invoice Number: {this.state.currentlySelectedOrder["Order"]["LogtagInvoiceNumber"]}-{item.InvoiceID}</span>
+                <span>Invoice Number: {this.state.currentlySelectedOrder["Order"]["LogtagInvoiceNumber"]}</span>
                 <br/>
                 <span>Payment Date: {this.state.currentlySelectedOrder["Order"]["PaymentDate"]}</span>
                 <br/>
