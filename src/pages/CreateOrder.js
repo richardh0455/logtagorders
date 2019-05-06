@@ -129,7 +129,8 @@ class CreateOrder extends React.Component{
               <div data-field-span="1">
         				<label>Currency</label>
         				<Select value={this.state.currentlySelectedCurrency} onChange={this.handleCurrencyChange} options={this.props.currencies} isSearchable="true" placeholder="Select a Currency"/>
-        			</div>
+                {this.required(this.state.currentlySelectedCurrency)}
+              </div>
             </div>
             <div className="OrderList" style={{marginTop: 50 + 'px'}}>
 				      <h2>Product</h2>
