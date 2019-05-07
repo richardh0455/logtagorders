@@ -25,7 +25,7 @@ class Customer extends React.Component{
       billing_address: '',
       shipping_addresses:[{ID:'0', ShippingAddress:'', created:true}],
       counter:'0',
-      regions: [{value:"NZ", label: "New Zealand"},{value:"SA", label: "South America"},{value:"NA", label: "North America"},{value:"EU", label: "Europe"},{value:"AP", label: "Asia Pacific"},{value:"ME", label: "Middle East"}],
+      regions: [{value:"NA", label: "North America"},{value:"LATAM", label: "Latin America"},{value:"EMEA", label: "Europe, Middle East and Africa"},{value:"C", label: "Central"},{value:"A", label: "Asia"},{value:"OC", label: "Oceania"}],
       primary_contact_name:'',
       primary_contact_phone:'',
       primary_contact_fax:'',
