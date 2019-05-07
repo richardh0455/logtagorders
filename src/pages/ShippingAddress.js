@@ -34,7 +34,7 @@ class ShippingAddress extends Component {
   }
 
   buildShippingAddress(){
-    return this.state.address1+', '+this.state.address2+', '+this.state.address3+', '+this.state.address4;
+    return (this.state.address1 || '')+', '+(this.state.address2 || '')+', '+(this.state.address3|| '')+', '+(this.state.address4|| '');
 
   }
 

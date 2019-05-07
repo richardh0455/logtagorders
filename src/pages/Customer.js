@@ -22,7 +22,7 @@ class Customer extends React.Component{
       name: '',
       currentlySelectedRegion: {value:""},
       email: '',
-      billing_address: '',
+      billing_address:{ID:'0',ShippingAddress:''},
       shipping_addresses:[{ID:'0', ShippingAddress:'', created:true}],
       counter:'0',
       regions: [{value:"NA", label: "North America"},{value:"LATAM", label: "Latin America"},{value:"EMEA", label: "Europe, Middle East and Africa"},{value:"C", label: "Central"},{value:"A", label: "Asia"},{value:"OC", label: "Oceania"}],
@@ -57,7 +57,7 @@ class Customer extends React.Component{
          name: contactInfo.Name,
          currentlySelectedRegion: region,
          email: contactInfo.Contact_Email,
-         billing_address: contactInfo.Billing_Address,
+         billing_address: {ShippingAddress:contactInfo.Billing_Address},
          shipping_addresses: parsed_customer.ShippingAddresses,
          primary_contact_name: contactInfo.PrimaryContact.Name,
          primary_contact_phone: contactInfo.PrimaryContact.Phone,
@@ -84,8 +84,9 @@ class Customer extends React.Component{
     this.setState({email: event.target.value})
   }
 
-  handleBillingAddressChange = (event) => {
-    this.setState({billing_address: event.target.value})
+  handleBillingAddressChange = (key, item) => {
+    console.log(item)
+    this.setState({billing_address: {Address:item}})
   }
 
   handlePrimaryContactNameChange = (event) => {
@@ -128,12 +129,13 @@ class Customer extends React.Component{
 
   async createCustomerEventHandler(e)
   {
+
     e.preventDefault();
     this.createCustomer(
       {
         name: this.state.name,
         email: this.state.email,
-        billing_address: this.state.billing_address,
+        billing_address: this.state.billing_address.ShippingAddress,
         region: this.state.currentlySelectedRegion.value,
         shipping_addresses: this.state.shipping_addresses,
         primary_contact_name: this.state.primary_contact_name,
@@ -389,7 +391,7 @@ class Customer extends React.Component{
       //Some events have no default. Expected behavior
     }
     var key = Number(this.state.counter) + 1;
-    var default_item = {ID:'0', ShippingAddress:'', created:true};
+    var default_item = {ID:'0', Address:'', created:true};
     var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
     cloneOfDefault.ID = key;
     var shipping_addresses = this.state.shipping_addresses;
@@ -474,10 +476,7 @@ class Customer extends React.Component{
        </div>
      </div>
      <div data-row-span="2">
-       <div data-field-span="1">
-         <label>Billing Address</label>
-         <input type="text" value={this.state.billing_address}  onChange={this.handleBillingAddressChange} />
-       </div>
+
        <div data-field-span="1">
          <label>Region</label>
          <Select value={this.state.currentlySelectedRegion} onChange={this.handleRegionChange.bind(this)} options={this.state.regions} placeholder="Select a region"/>
@@ -498,6 +497,14 @@ class Customer extends React.Component{
        </div>
      </div>
      <fieldset>
+     <div data-row-span="1">
+        <label>Billing Address</label>
+        <ShippingAddress address={this.state.billing_address} update_address_handler={this.handleBillingAddressChange} />
+      </div>
+     </fieldset>
+
+     <fieldset>
+       <label>Shipping Addresses</label>
        {this.state.shipping_addresses.map(address => (
        <ShippingAddress address={address} update_address_handler={this.shippingAddressUpdated} />
        ))}
