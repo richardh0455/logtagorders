@@ -30,8 +30,8 @@ class Customer extends React.Component{
       primary_contact_name:'',
       primary_contact_phone:'',
       primary_contact_fax:'',
-      courier_accounts:[],
-      resetState: false,
+      courier_accounts:[{ID:'0', created:true}],
+      hs_codes:[]
     };
 
   }
@@ -56,16 +56,8 @@ class Customer extends React.Component{
        if ( shippingAddresses === undefined || parsed_customer.ShippingAddresses.length == 0) {
          this.addShippingAddress(event);
        }
-       this.getCourierAccounts(event.value).then(response => {
-         var parsedAccounts = JSON.parse(response.body);
-         var courierAccounts = parsedAccounts.map(
-           account => {return {AccountID:account.ID, AccountName : account.CourierAccount}}
-         )
-         this.setState({courier_accounts:courierAccounts})
+       var courierAccounts = parsed_customer.CourierAccounts.map(account => {return {AccountID:account.ID, AccountName : account.CourierAccount}})
 
-       }).catch(err => {
-         this.setState({courier_accounts:[]})
-       })
        this.setState({
          name: contactInfo.Name,
          currentlySelectedRegion: region,
@@ -74,7 +66,8 @@ class Customer extends React.Component{
          shipping_addresses: this.parseShippingAddresses(parsed_customer.ShippingAddresses),
          primary_contact_name: contactInfo.PrimaryContact.Name,
          primary_contact_phone: contactInfo.PrimaryContact.Phone,
-         primary_contact_fax: contactInfo.PrimaryContact.Fax
+         primary_contact_fax: contactInfo.PrimaryContact.Fax,
+         courier_accounts: courierAccounts
        });
        this.setState({customerDataRetrieved: true})
      }).catch(err =>
@@ -145,9 +138,6 @@ class Customer extends React.Component{
     this.setState({primary_contact_fax: event.target.value})
   }
 
-  handleCourierAccountChange = (event) => {
-    console.log(event)
-  }
 
   async nameOnFocus() {
     if(this.state.name === 'Name' || this.state.name === '')
@@ -203,15 +193,6 @@ class Customer extends React.Component{
     return await API.get(customersAPI, '/'+id, apiRequest)
   }
 
-  async getCourierAccounts(id) {
-    const apiRequest = {
-      headers: {
-        'Authorization': this.state.idToken,
-        'Content-Type': 'application/json'
-      }
-    };
-    return await API.get(customersAPI, '/'+id+'/courier-accounts', apiRequest)
-  }
 
   updateCustomer = (customer) =>
   {
@@ -565,7 +546,7 @@ class Customer extends React.Component{
       primary_contact_name:'',
       primary_contact_phone:'',
       primary_contact_fax:'',
-      courier_accounts:[]
+      courier_accounts:[{ID:'0', created:true}],
     });
 
   }
