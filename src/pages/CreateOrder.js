@@ -24,6 +24,7 @@ class CreateOrder extends React.Component{
 	this.state = {
       currentlySelectedCustomer: null,
       currentlySelectedShippingAddress: null,
+      currentlySelectedCourierAccount: null,
 	  customer: null,
     purchaseOrderNumber:''
     };
@@ -66,6 +67,7 @@ class CreateOrder extends React.Component{
      .then(response => {
        this.setState({customer: response.body})
        this.handleShippingAddressChange(null);
+       this.handleCourierAccountChange(null);
      });
 
 
@@ -73,6 +75,10 @@ class CreateOrder extends React.Component{
 
   handleShippingAddressChange = (event) => {
 	   this.setState({currentlySelectedShippingAddress: event})
+  }
+
+  handleCourierAccountChange = (event) => {
+	   this.setState({currentlySelectedCourierAccount: event})
   }
 
   handlePurchaseOrderNumberChange = (event) => {
@@ -92,6 +98,16 @@ class CreateOrder extends React.Component{
     }
     return shippingAddresses;
   }
+
+  generateCourierAccountList(customer) {
+   let courierAccounts = [];
+   if(customer && "CourierAccounts" in customer){
+       courierAccounts = customer.CourierAccounts.map((account) =>
+     {return {value:account.ID, label: account.CourierAccount}}
+       );
+   }
+   return courierAccounts;
+ }
 
  required(field) {
    if(field  === null) {
@@ -121,7 +137,7 @@ class CreateOrder extends React.Component{
               </div>
 
             </div>
-            <div data-row-span="2">
+            <div data-row-span="3">
               <div data-field-span="1" >
                 <label>Purchase Order Number</label>
                 <input type="text" value={this.state.purchaseOrderNumber}  onChange={this.handlePurchaseOrderNumberChange} />
@@ -131,6 +147,11 @@ class CreateOrder extends React.Component{
         				<Select value={this.state.currentlySelectedCurrency} onChange={this.handleCurrencyChange} options={this.props.currencies} isSearchable="true" placeholder="Select a Currency"/>
                 {this.required(this.state.currentlySelectedCurrency)}
               </div>
+              <div data-field-span="1" >
+                <label>Courier Account</label>
+                <Select value={this.state.currentlySelectedCourierAccount} onChange={this.handleCourierAccountChange} options={this.generateCourierAccountList(JSON.parse(this.state.customer))} placeholder="Select a Courier Account"/>
+                {this.required(this.state.currentlySelectedCourierAccount)}
+              </div>
             </div>
             <div className="OrderList" style={{marginTop: 50 + 'px'}}>
 				      <h2>Product</h2>
@@ -138,6 +159,7 @@ class CreateOrder extends React.Component{
                   create_invoice_handler={this.createInvoice.bind(this)}
                   products={this.props.products}
                   shippingAddress ={this.state.currentlySelectedShippingAddress}
+                  courierAccount ={this.state.currentlySelectedCourierAccount}
                   purchaseOrderNumber={this.state.purchaseOrderNumber}
                   customer={{...this.state.currentlySelectedCustomer,...JSON.parse(this.state.customer)}}
                   currency = {this.state.currentlySelectedCurrency}

@@ -185,7 +185,7 @@ class OrderList extends Component {
 
 	 generateShippingAccount(doc, margin, initY) {
 		 doc.setFontSize(12);
-		 var shippingInfo = 'Ship Via:- DHL Express Account# 9648 16710';
+		 var shippingInfo = 'Ship Via:- '+this.props.courierAccount.label;
 		 doc.text(shippingInfo,  margin, initY+124);
 	 }
 

@@ -5,6 +5,7 @@ import logo from '../public/images/LTLogo.png';
 import { withRouter } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import ShippingAddress from './ShippingAddress';
+import CourierAccount from './CourierAccount';
 import Select from 'react-select';
 
 const customersAPI = 'CustomersAPI';
@@ -22,13 +23,15 @@ class Customer extends React.Component{
       name: '',
       currentlySelectedRegion: {value:""},
       email: '',
-      billing_address: '',
-      shipping_addresses:[{ID:'0', ShippingAddress:'', created:true}],
+      billing_address:{ID:'0', address1:'',address2:'',address3:'',address4:'', created:true},
+      shipping_addresses:[{ID:'0', address1:'',address2:'',address3:'',address4:'', created:true}],
       counter:'0',
-      regions: [{value:"NZ", label: "New Zealand"},{value:"SA", label: "South America"},{value:"NA", label: "North America"},{value:"EU", label: "Europe"},{value:"AP", label: "Asia Pacific"},{value:"ME", label: "Middle East"}],
+      regions: [{value:"NA", label: "North America"},{value:"LATAM", label: "Latin America"},{value:"EMEA", label: "Europe, Middle East and Africa"},{value:"C", label: "Central"},{value:"A", label: "Asia"},{value:"OC", label: "Oceania"}],
       primary_contact_name:'',
       primary_contact_phone:'',
       primary_contact_fax:'',
+      courier_accounts:[{ID:'0', created:true}],
+      hs_codes:[]
     };
 
   }
@@ -53,15 +56,18 @@ class Customer extends React.Component{
        if ( shippingAddresses === undefined || parsed_customer.ShippingAddresses.length == 0) {
          this.addShippingAddress(event);
        }
+       var courierAccounts = parsed_customer.CourierAccounts.map(account => {return {AccountID:account.ID, AccountName : account.CourierAccount}})
+
        this.setState({
          name: contactInfo.Name,
          currentlySelectedRegion: region,
          email: contactInfo.Contact_Email,
-         billing_address: contactInfo.Billing_Address,
-         shipping_addresses: parsed_customer.ShippingAddresses,
+         billing_address: this.parseBillingAddress(contactInfo.Billing_Address),
+         shipping_addresses: this.parseShippingAddresses(parsed_customer.ShippingAddresses),
          primary_contact_name: contactInfo.PrimaryContact.Name,
          primary_contact_phone: contactInfo.PrimaryContact.Phone,
          primary_contact_fax: contactInfo.PrimaryContact.Fax,
+         courier_accounts: courierAccounts
        });
        this.setState({customerDataRetrieved: true})
      }).catch(err =>
@@ -69,6 +75,36 @@ class Customer extends React.Component{
        console.log(err);
 
      })
+
+  }
+
+  parseBillingAddress(rawBillingAddress){
+    var addressSections = rawBillingAddress.split(',').map(address => address.trim());
+    return {
+      address1: addressSections[0] || '',
+      address2: addressSections[1] || '',
+      address3: addressSections[2] || '',
+      address4: addressSections[3] || '',
+      ID: '1'
+    }
+  }
+
+  parseShippingAddresses(rawShippingAddresses){
+    return rawShippingAddresses.map(address => {
+        var addressSections = address.ShippingAddress.split(',').map(address => address.trim());
+        return {
+          address1: addressSections[0] || '',
+          address2: addressSections[1] || '',
+          address3: addressSections[2] || '',
+          address4: addressSections[3] || '',
+          ID: address.ID
+        }
+    })
+
+  }
+
+  buildAddress(addressObject){
+    return addressObject.address1+', '+addressObject.address2+', '+addressObject.address3+', '+addressObject.address4
 
   }
 
@@ -84,8 +120,10 @@ class Customer extends React.Component{
     this.setState({email: event.target.value})
   }
 
-  handleBillingAddressChange = (event) => {
-    this.setState({billing_address: event.target.value})
+  handleBillingAddressChange = (key, field, item) => {
+    var billing_address = this.state.billing_address;
+    billing_address[field] = item;
+    this.setState({billing_address: billing_address})
   }
 
   handlePrimaryContactNameChange = (event) => {
@@ -99,6 +137,7 @@ class Customer extends React.Component{
   handlePrimaryContactFaxChange = (event) => {
     this.setState({primary_contact_fax: event.target.value})
   }
+
 
   async nameOnFocus() {
     if(this.state.name === 'Name' || this.state.name === '')
@@ -116,7 +155,7 @@ class Customer extends React.Component{
         customer_id: this.state.currentlySelectedCustomer.value,
         name: this.state.name,
         email: this.state.email,
-        billing_address: this.state.billing_address,
+        billing_address: this.buildAddress(this.state.billing_address),
         region: this.state.currentlySelectedRegion.value,
         shipping_addresses: this.state.shipping_addresses,
         primary_contact_name: this.state.primary_contact_name,
@@ -128,12 +167,13 @@ class Customer extends React.Component{
 
   async createCustomerEventHandler(e)
   {
+
     e.preventDefault();
     this.createCustomer(
       {
         name: this.state.name,
         email: this.state.email,
-        billing_address: this.state.billing_address,
+        billing_address: this.buildAddress(this.state.billing_address),
         region: this.state.currentlySelectedRegion.value,
         shipping_addresses: this.state.shipping_addresses,
         primary_contact_name: this.state.primary_contact_name,
@@ -152,6 +192,7 @@ class Customer extends React.Component{
     };
     return await API.get(customersAPI, '/'+id, apiRequest)
   }
+
 
   updateCustomer = (customer) =>
   {
@@ -178,6 +219,20 @@ class Customer extends React.Component{
     {
       var affectedRows = response.body["AffectedRows"];
       const shippingAddressSuccess = this.updateCustomerShippingAddresses(customer.customer_id, customer.shipping_addresses);
+
+      this.state.courier_accounts.map(
+        account => {
+          var accountID = account.AccountID;
+          if(account.created) {
+            accountID = null;
+          }
+          console.log(account)
+          this.createUpdateCourierAccount(accountID, customer.customer_id, account.AccountName)
+        }
+      )
+
+
+
       if(parseInt(affectedRows, 10)==1 && shippingAddressSuccess)
       {
         NotificationManager.success('', 'Customer Successfully Updated', 3000);
@@ -220,6 +275,9 @@ class Customer extends React.Component{
     {
       var customerID = JSON.parse(JSON.parse(response.body))["CustomerID"];
       const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
+      this.state.courier_accounts.map(account => (
+        this.createUpdateCourierAccount(null, customerID, account.AccountName)
+      ))
       if(success)
       {
         NotificationManager.success('', 'Customer Successfully Created', 3000);
@@ -251,7 +309,7 @@ class Customer extends React.Component{
   async createShippingAddresses(customerID, shipping_addresses)
   {
     for(var index = 0; index < shipping_addresses.length; index++) {
-      var result = await this.createShippingAddress(customerID, shipping_addresses[index].ShippingAddress);
+      var result = await this.createShippingAddress(customerID, this.buildAddress(shipping_addresses[index]));
       if(!result)
       {
         return false;
@@ -265,13 +323,13 @@ class Customer extends React.Component{
     for(var index = 0; index < shipping_addresses.length; index++) {
       if(shipping_addresses[index].created)
       {
-        var result = await this.createShippingAddress(customerID, shipping_addresses[index].ShippingAddress);
+        var result = await this.createShippingAddress(customerID, this.buildAddress(shipping_addresses[index]));
         if(!result)
         {
           return false;
         }
       } else {
-        var result = await this.updateShippingAddress(customerID,shipping_addresses[index].ID, shipping_addresses[index].ShippingAddress);
+        var result = await this.updateShippingAddress(customerID,shipping_addresses[index].ID, this.buildAddress(shipping_addresses[index]));
         if(!result)
         {
           return false;
@@ -360,13 +418,12 @@ class Customer extends React.Component{
     })
   }
 
-  shippingAddressUpdated = (key, item) =>
+  shippingAddressUpdated = (id, field, value) =>
   {
      var addresses = this.state.shipping_addresses;
      for(var i = 0; i < addresses.length; i++) {
-
-       if(addresses[i] && addresses[i].ID === key) {
-         if(item == null){
+       if(addresses[i] && addresses[i].ID === id) {
+         if(field === 'deleted'){
            if(!addresses[i].created){
              this.deleteShippingAddress(addresses[i].ID)
            }
@@ -375,11 +432,60 @@ class Customer extends React.Component{
 
          }
          else {
-           addresses[i].ShippingAddress = item
+           addresses[i][field] = value
          }
        }
      }
      this.setState({shipping_addresses: addresses});
+  }
+
+  async createUpdateCourierAccount(accountID,customerID, accountName)
+  {
+    var body = {"CourierAccount": accountName}
+    if(accountID != null) {
+      body.AccountID= accountID
+    }
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: body
+    };
+    const success = API.post(customersAPI, "/"+customerID+"/courier-accounts", apiRequest)
+    .then(response =>
+    {
+      console.log(response)
+      return true;
+    })
+    .catch(err =>
+    {
+      NotificationManager.error('Address creation Failed', 'Error', 5000, () => {});
+      return false;
+    })
+    return success;
+  }
+
+  courierAccountUpdated = (key, item) =>
+  {
+     var accounts = this.state.courier_accounts;
+     for(var i = 0; i < accounts.length; i++) {
+
+       if(accounts[i] && accounts[i].AccountID === key) {
+         if(item == null){
+           if(!accounts[i].created){
+             //this.deleteShippingAddress(addresses[i].ID)
+           }
+
+           accounts.splice(i, 1);
+
+         }
+         else {
+           accounts[i].AccountName = item
+         }
+       }
+     }
+     this.setState({courier_accounts: accounts});
   }
 
   addShippingAddress = (e) => {
@@ -389,12 +495,33 @@ class Customer extends React.Component{
       //Some events have no default. Expected behavior
     }
     var key = Number(this.state.counter) + 1;
-    var default_item = {ID:'0', ShippingAddress:'', created:true};
+    var default_item = {ID:'0', address1:'',address2:'',address3:'',address4:'', created:true};
     var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
     cloneOfDefault.ID = key;
     var shipping_addresses = this.state.shipping_addresses;
     shipping_addresses.push(cloneOfDefault);
     this.setState({counter: key, shipping_addresses: shipping_addresses });
+  }
+
+  addCourierAccount = (e) => {
+    try{
+      e.preventDefault();
+    } catch (error) {
+      //Some events have no default. Expected behavior
+    }
+    var key = Number(this.state.counter) + 1;
+    var default_item = {AccountID:key, AccountName:'', created:true};
+    var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
+    cloneOfDefault.ID = key;
+    var courier_accounts = this.state.courier_accounts;
+    courier_accounts.push(cloneOfDefault);
+    this.setState({counter: key, courier_accounts: courier_accounts });
+  }
+
+  removeCourierAccount = (e) => {
+    e.preventDefault()
+    console.log(e.target)
+
   }
 
   createOrUpdate() {
@@ -414,26 +541,28 @@ class Customer extends React.Component{
       name: '',
       currentlySelectedRegion: {},
       email: '',
-      billing_address: '',
-      shipping_addresses:[],
+      billing_address:{ID:'0', address1:'',address2:'',address3:'',address4:'', created:true},
+      shipping_addresses:[{ID:'0', address1:'',address2:'',address3:'',address4:'', created:true}],
       primary_contact_name:'',
       primary_contact_phone:'',
       primary_contact_fax:'',
-
+      courier_accounts:[{ID:'0', created:true}],
     });
 
   }
 
   createCustomerChangeHandler = () => {
-    this.setState({isUpdate:false})
     this.resetInputFields();
+    this.setState({isUpdate:false})
   }
 
   updateCustomerChangeHandler = () => {
-    this.setState({isUpdate:true})
     this.resetInputFields();
+    this.setState({isUpdate:true})
 
   }
+
+
 
   getButtonText() {
     if(this.state.isUpdate){
@@ -474,10 +603,7 @@ class Customer extends React.Component{
        </div>
      </div>
      <div data-row-span="2">
-       <div data-field-span="1">
-         <label>Billing Address</label>
-         <input type="text" value={this.state.billing_address}  onChange={this.handleBillingAddressChange} />
-       </div>
+
        <div data-field-span="1">
          <label>Region</label>
          <Select value={this.state.currentlySelectedRegion} onChange={this.handleRegionChange.bind(this)} options={this.state.regions} placeholder="Select a region"/>
@@ -498,11 +624,28 @@ class Customer extends React.Component{
        </div>
      </div>
      <fieldset>
+     <div data-row-span="1">
+        <label>Billing Address</label>
+        <ShippingAddress address1={this.state.billing_address.address1} address2={this.state.billing_address.address2} address3={this.state.billing_address.address3} address4={this.state.billing_address.address4} id='1' update_address_handler={this.handleBillingAddressChange} />
+      </div>
+     </fieldset>
+
+     <fieldset>
+       <label>Shipping Addresses</label>
        {this.state.shipping_addresses.map(address => (
-       <ShippingAddress address={address} update_address_handler={this.shippingAddressUpdated} />
+       <ShippingAddress address1={address.address1} address2={address.address2} address3={address.address3} address4={address.address4} id={address.ID} update_address_handler={this.shippingAddressUpdated} />
        ))}
+
        <button onClick={this.addShippingAddress}>Add Shipping Address</button>
      </fieldset>
+     <fieldset>
+       <label>Courier Accounts</label>
+       {this.state.courier_accounts.map(account => (
+         <CourierAccount name={account.AccountName} id={account.AccountID} update_courier_account_handler={this.courierAccountUpdated}/>
+       ))}
+       <button onClick={this.addCourierAccount}>Add Courier Account</button>
+     </fieldset>
+
      <div>
        {this.getButtonText()}
      </div>

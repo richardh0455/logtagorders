@@ -6,41 +6,34 @@ import '../public/css/gridforms.css';
 class ShippingAddress extends Component {
   constructor(props) {
     super(props);
-  var shippingAddressLines = this.props.address.ShippingAddress.split(',').map(address => address.trim())
-	this.state = {
-	  address1: shippingAddressLines[0],
-    address2: shippingAddressLines[1],
-    address3: shippingAddressLines[2],
-    address4: shippingAddressLines[3]
-    };
+  //var shippingAddressLines = this.props.address.split(',').map(address => address.trim())
+
   }
 
 
   handleAddress1Change = (event) => {
-	   this.state.address1 = event.target.value
-     this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
+	   //this.props.address1 = event.target.value
+     this.props.update_address_handler(this.props.id, 'address1',event.target.value)
   }
   handleAddress2Change = (event) => {
-	   this.state.address2 = event.target.value
-     this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
+	   //this.props.address2 = event.target.value
+     this.props.update_address_handler(this.props.id, 'address2',event.target.value)
   }
   handleAddress3Change = (event) => {
-    this.state.address3 = event.target.value
-    this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
+    //this.props.address3 = event.target.value
+    this.props.update_address_handler(this.props.id, 'address3',event.target.value)
   }
   handleAddress4Change = (event) => {
-    this.state.address4 = event.target.value
-    this.props.update_address_handler(this.props.address.ID, this.buildShippingAddress())
+    //this.props.address3 = event.target.value
+    this.props.update_address_handler(this.props.id, 'address4',event.target.value)
   }
 
-  buildShippingAddress(){
-    return this.state.address1+', '+this.state.address2+', '+this.state.address3+', '+this.state.address4;
 
-  }
+  //}
 
   removeItem = (event) => {
 	event.preventDefault();
-	this.props.update_address_handler(this.props.address.ID, null)
+	this.props.update_address_handler(this.props.id, null)
   }
 
   onKeyPress = (event) => {
@@ -56,19 +49,19 @@ class ShippingAddress extends Component {
       <div data-row-span="7">
 			<div data-field-span="2">
 				<label>Address Line 1</label>
-				<input type="text" value={this.state.address1} onChange={this.handleAddress1Change} />
+				<input type="text" value={this.props.address1} onChange={this.handleAddress1Change} />
 			</div>
       <div data-field-span="2">
 				<label>Address Line 2</label>
-				<input type="text" value={this.state.address2} onChange={this.handleAddress2Change} />
+				<input type="text" value={this.props.address2}  onChange={this.handleAddress2Change}/>
 			</div>
       <div data-field-span="1">
 				<label>City</label>
-				<input type="text" value={this.state.address3} onChange={this.handleAddress3Change} />
+				<input type="text" value={this.props.address3}  onChange={this.handleAddress3Change}/>
 			</div>
       <div data-field-span="1">
 				<label>Postal Code</label>
-				<input type="text" value={this.state.address4} onChange={this.handleAddress4Change} />
+				<input type="text" value={this.props.address4} onChange={this.handleAddress4Change} />
 			</div>
 			<div data-field-span="1">
 				<button onClick={this.removeItem}  >Remove Item</button>
