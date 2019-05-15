@@ -224,15 +224,12 @@ class Customer extends React.Component{
         account => {
           var accountID = account.AccountID;
           if(account.created) {
-            accountID = null;
+            this.createCourierAccount(customer.customer_id, account.AccountName)
+          } else {
+            this.updateCourierAccount(accountID, customer.customer_id, account.AccountName)
           }
-          console.log(account)
-          this.createUpdateCourierAccount(accountID, customer.customer_id, account.AccountName)
         }
       )
-
-
-
       if(parseInt(affectedRows, 10)==1 && shippingAddressSuccess)
       {
         NotificationManager.success('', 'Customer Successfully Updated', 3000);
@@ -276,7 +273,7 @@ class Customer extends React.Component{
       var customerID = JSON.parse(JSON.parse(response.body))["CustomerID"];
       const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
       this.state.courier_accounts.map(account => (
-        this.createUpdateCourierAccount(null, customerID, account.AccountName)
+        this.createCourierAccount(customerID, account.AccountName)
       ))
       if(success)
       {
@@ -439,12 +436,9 @@ class Customer extends React.Component{
      this.setState({shipping_addresses: addresses});
   }
 
-  async createUpdateCourierAccount(accountID,customerID, accountName)
+  async createCourierAccount(customerID, accountName)
   {
     var body = {"CourierAccount": accountName}
-    if(accountID != null) {
-      body.AccountID= accountID
-    }
     const apiRequest = {
       headers: {
         'Authorization': this.state.idToken,
@@ -455,12 +449,65 @@ class Customer extends React.Component{
     const success = API.post(customersAPI, "/"+customerID+"/courier-accounts", apiRequest)
     .then(response =>
     {
-      console.log(response)
       return true;
     })
     .catch(err =>
     {
-      NotificationManager.error('Address creation Failed', 'Error', 5000, () => {});
+      NotificationManager.error('Courier Account creation Failed', 'Error', 5000, () => {});
+      return false;
+    })
+    return success;
+  }
+
+  async updateCourierAccount(accountID, customerID, accountName)
+  {
+    var body = {
+      "CourierAccount": accountName,
+      "AccountID": accountID
+    }
+
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: body
+    };
+    const success = API.put(customersAPI, "/"+customerID+"/courier-accounts", apiRequest)
+    .then(response =>
+    {
+      return true;
+    })
+    .catch(err =>
+    {
+      NotificationManager.error('Courier Account Updating Failed', 'Error', 5000, () => {});
+      return false;
+    })
+    return success;
+  }
+
+  async deleteCourierAccount(accountID, customerID)
+  {
+    var body = {
+      "AccountID": accountID
+    }
+
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: body
+    };
+    const success = API.del(customersAPI, "/"+customerID+"/courier-accounts", apiRequest)
+    .then(response =>
+    {
+      NotificationManager.success('', 'Courier Account Deleted', 3000);
+      return true;
+    })
+    .catch(err =>
+    {
+      NotificationManager.error('Courier Account Deleting Failed', 'Error', 5000, () => {});
       return false;
     })
     return success;
@@ -474,7 +521,7 @@ class Customer extends React.Component{
        if(accounts[i] && accounts[i].AccountID === key) {
          if(item == null){
            if(!accounts[i].created){
-             //this.deleteShippingAddress(addresses[i].ID)
+             this.deleteCourierAccount(accounts[i].AccountID, this.state.currentlySelectedCustomer.value)
            }
 
            accounts.splice(i, 1);
