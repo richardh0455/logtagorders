@@ -238,7 +238,7 @@ class OrderList extends Component {
 	 generateBankDetails(doc, margin, initY) {
 		doc.setFontStyle("");
 	 	doc.setFontSize(12);
-	 	var paymentInfo = ['HS Code # 9025 1980 90 0000 0000 00 00 Country of Origin - Peoples Republic of China',
+	 	var paymentInfo = ['HS Code # ' +this.props.hsCode.label,
 	 'Make Payment in advance to LogTag Recorders (HK) Ltd. Bank Account:-']
 	 	doc.text(paymentInfo,  margin, initY +10);
 	 	doc.setFontStyle("bold");
