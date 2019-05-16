@@ -6,6 +6,7 @@ import { withRouter } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import ShippingAddress from './ShippingAddress';
 import CourierAccount from './CourierAccount';
+import HSCode from './HSCode';
 import Select from 'react-select';
 
 const customersAPI = 'CustomersAPI';
@@ -31,7 +32,7 @@ class Customer extends React.Component{
       primary_contact_phone:'',
       primary_contact_fax:'',
       courier_accounts:[{ID:'0', created:true}],
-      hs_codes:[]
+      hs_codes:[{ID:'0', created:true}]
     };
 
   }
@@ -58,6 +59,7 @@ class Customer extends React.Component{
        }
        var courierAccounts = parsed_customer.CourierAccounts.map(account => {return {AccountID:account.ID, AccountName : account.CourierAccount}})
 
+       var hsCodes = parsed_customer.HSCodes.map(code => {return {ID: code.ID, HSCode : code.HSCode}})
        this.setState({
          name: contactInfo.Name,
          currentlySelectedRegion: region,
@@ -67,7 +69,8 @@ class Customer extends React.Component{
          primary_contact_name: contactInfo.PrimaryContact.Name,
          primary_contact_phone: contactInfo.PrimaryContact.Phone,
          primary_contact_fax: contactInfo.PrimaryContact.Fax,
-         courier_accounts: courierAccounts
+         courier_accounts: courierAccounts,
+         hs_codes: hsCodes
        });
        this.setState({customerDataRetrieved: true})
      }).catch(err =>
@@ -224,15 +227,22 @@ class Customer extends React.Component{
         account => {
           var accountID = account.AccountID;
           if(account.created) {
-            accountID = null;
+            this.createCourierAccount(customer.customer_id, account.AccountName)
+          } else {
+            this.updateCourierAccount(accountID, customer.customer_id, account.AccountName)
           }
-          console.log(account)
-          this.createUpdateCourierAccount(accountID, customer.customer_id, account.AccountName)
         }
       )
 
-
-
+      this.state.hs_codes.map(
+        code  => {
+          if(code.created) {
+            this.createHSCode(customer.customer_id, code.HSCode)
+          } else {
+            this.updateHSCode(code.ID, customer.customer_id, code.HSCode)
+          }
+        }
+      )
       if(parseInt(affectedRows, 10)==1 && shippingAddressSuccess)
       {
         NotificationManager.success('', 'Customer Successfully Updated', 3000);
@@ -276,22 +286,12 @@ class Customer extends React.Component{
       var customerID = JSON.parse(JSON.parse(response.body))["CustomerID"];
       const success = this.createShippingAddresses(customerID, customer.shipping_addresses);
       this.state.courier_accounts.map(account => (
-        this.createUpdateCourierAccount(null, customerID, account.AccountName)
+        this.createCourierAccount(customerID, account.AccountName)
       ))
       if(success)
       {
         NotificationManager.success('', 'Customer Successfully Created', 3000);
-        this.setState({
-          billing_address:'',
-          email:'',
-          name:'',
-          region:'',
-          shipping_addresses:[],
-          counter:'0',
-          primary_contact_name:'',
-          primary_contact_phone:'',
-          primary_contact_fax:''
-        })
+        this.resetInputFields()
         //Refresh Customer List
         this.props.get_all_customers();
       }
@@ -439,12 +439,9 @@ class Customer extends React.Component{
      this.setState({shipping_addresses: addresses});
   }
 
-  async createUpdateCourierAccount(accountID,customerID, accountName)
+  async createCourierAccount(customerID, accountName)
   {
     var body = {"CourierAccount": accountName}
-    if(accountID != null) {
-      body.AccountID= accountID
-    }
     const apiRequest = {
       headers: {
         'Authorization': this.state.idToken,
@@ -455,12 +452,65 @@ class Customer extends React.Component{
     const success = API.post(customersAPI, "/"+customerID+"/courier-accounts", apiRequest)
     .then(response =>
     {
-      console.log(response)
       return true;
     })
     .catch(err =>
     {
-      NotificationManager.error('Address creation Failed', 'Error', 5000, () => {});
+      NotificationManager.error('Courier Account creation Failed', 'Error', 5000, () => {});
+      return false;
+    })
+    return success;
+  }
+
+  async updateCourierAccount(accountID, customerID, accountName)
+  {
+    var body = {
+      "CourierAccount": accountName,
+      "AccountID": accountID
+    }
+
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: body
+    };
+    const success = API.put(customersAPI, "/"+customerID+"/courier-accounts", apiRequest)
+    .then(response =>
+    {
+      return true;
+    })
+    .catch(err =>
+    {
+      NotificationManager.error('Courier Account Updating Failed', 'Error', 5000, () => {});
+      return false;
+    })
+    return success;
+  }
+
+  async deleteCourierAccount(accountID, customerID)
+  {
+    var body = {
+      "AccountID": accountID
+    }
+
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: body
+    };
+    const success = API.del(customersAPI, "/"+customerID+"/courier-accounts", apiRequest)
+    .then(response =>
+    {
+      NotificationManager.success('', 'Courier Account Deleted', 3000);
+      return true;
+    })
+    .catch(err =>
+    {
+      NotificationManager.error('Courier Account Deleting Failed', 'Error', 5000, () => {});
       return false;
     })
     return success;
@@ -474,7 +524,7 @@ class Customer extends React.Component{
        if(accounts[i] && accounts[i].AccountID === key) {
          if(item == null){
            if(!accounts[i].created){
-             //this.deleteShippingAddress(addresses[i].ID)
+             this.deleteCourierAccount(accounts[i].AccountID, this.state.currentlySelectedCustomer.value)
            }
 
            accounts.splice(i, 1);
@@ -486,6 +536,105 @@ class Customer extends React.Component{
        }
      }
      this.setState({courier_accounts: accounts});
+  }
+
+  hsCodeUpdated = (key, item) =>
+  {
+     var codes = this.state.hs_codes;
+     for(var i = 0; i < codes.length; i++) {
+
+       if(codes[i] && codes[i].ID === key) {
+         if(item == null){
+           if(!codes[i].created){
+             this.deleteHSCode(codes[i].ID, this.state.currentlySelectedCustomer.value)
+           }
+
+           codes.splice(i, 1);
+
+         }
+         else {
+           codes[i].HSCode = item
+         }
+       }
+     }
+     this.setState({hs_codes: codes});
+  }
+
+  async createHSCode(customerID, hsCode)
+  {
+    var body = {"HSCode": hsCode}
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: body
+    };
+    const success = API.post(customersAPI, "/"+customerID+"/hs-codes", apiRequest)
+    .then(response =>
+    {
+      return true;
+    })
+    .catch(err =>
+    {
+      NotificationManager.error('HS Code creation Failed', 'Error', 5000, () => {});
+      return false;
+    })
+    return success;
+  }
+
+  async updateHSCode(id, customerID, hsCode)
+  {
+    var body = {
+      "HSCode": hsCode,
+      "ID": id
+    }
+
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: body
+    };
+    const success = API.put(customersAPI, "/"+customerID+"/hs-codes", apiRequest)
+    .then(response =>
+    {
+      return true;
+    })
+    .catch(err =>
+    {
+      NotificationManager.error('HS Codes Updating Failed', 'Error', 5000, () => {});
+      return false;
+    })
+    return success;
+  }
+
+  async deleteHSCode(id, customerID)
+  {
+    var body = {
+      "ID": id
+    }
+
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: body
+    };
+    const success = API.del(customersAPI, "/"+customerID+"/hs-codes", apiRequest)
+    .then(response =>
+    {
+      NotificationManager.success('', 'HS Code Deleted', 3000);
+      return true;
+    })
+    .catch(err =>
+    {
+      NotificationManager.error('HS Code Deleting Failed', 'Error', 5000, () => {});
+      return false;
+    })
+    return success;
   }
 
   addShippingAddress = (e) => {
@@ -518,6 +667,21 @@ class Customer extends React.Component{
     this.setState({counter: key, courier_accounts: courier_accounts });
   }
 
+  addHSCode = (e) => {
+    try{
+      e.preventDefault();
+    } catch (error) {
+      //Some events have no default. Expected behavior
+    }
+    var key = Number(this.state.counter) + 1;
+    var default_item = {ID:key, HsCode:'', created:true};
+    var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
+    cloneOfDefault.ID = key;
+    var hs_codes = this.state.hs_codes;
+    hs_codes.push(cloneOfDefault);
+    this.setState({counter: key, hs_codes: hs_codes });
+  }
+
   removeCourierAccount = (e) => {
     e.preventDefault()
     console.log(e.target)
@@ -546,7 +710,8 @@ class Customer extends React.Component{
       primary_contact_name:'',
       primary_contact_phone:'',
       primary_contact_fax:'',
-      courier_accounts:[{ID:'0', created:true}],
+      courier_accounts:[{ID:'0', AccountName:'', created:true}],
+      hs_codes:[{ID:'0', HSCode:'', created:true}],
     });
 
   }
@@ -644,6 +809,14 @@ class Customer extends React.Component{
          <CourierAccount name={account.AccountName} id={account.AccountID} update_courier_account_handler={this.courierAccountUpdated}/>
        ))}
        <button onClick={this.addCourierAccount}>Add Courier Account</button>
+     </fieldset>
+
+     <fieldset>
+       <label>HS Codes</label>
+       {this.state.hs_codes.map(code => (
+         <HSCode name={code.HSCode} id={code.ID} update_hs_code_handler={this.hsCodeUpdated}/>
+       ))}
+       <button onClick={this.addHSCode}>Add HS Code</button>
      </fieldset>
 
      <div>

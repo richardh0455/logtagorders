@@ -5,7 +5,7 @@ import * as jsPDF from 'jspdf';
 import * as Base64 from 'base-64';
 import pdfEnd from '../../public/images/ncombskhir.png';
 import logo from '../../public/images/LTLogoInvoice.png';
-
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'jspdf-autotable';
 
 
@@ -238,7 +238,7 @@ class OrderList extends Component {
 	 generateBankDetails(doc, margin, initY) {
 		doc.setFontStyle("");
 	 	doc.setFontSize(12);
-	 	var paymentInfo = ['HS Code # 9025 1980 90 0000 0000 00 00 Country of Origin - Peoples Republic of China',
+	 	var paymentInfo = ['HS Code # ' +this.props.hsCode.label,
 	 'Make Payment in advance to LogTag Recorders (HK) Ltd. Bank Account:-']
 	 	doc.text(paymentInfo,  margin, initY +10);
 	 	doc.setFontStyle("bold");
@@ -279,7 +279,13 @@ class OrderList extends Component {
 						var parsed_body = JSON.parse(JSON.parse(response.body))
 						var logtagInvoiceNumber = parsed_body["LogtagInvoiceNumber"];
 						this.generatePDF(logtagInvoiceNumber);
+						NotificationManager.success('', 'Order Successfully Created', 3000);
 					})
+					.catch(err =>
+		      {
+		        NotificationManager.error('Order Creation Failed', 'Error', 5000, () => {});
+		        return false;
+		      })
 	   }
    }
 

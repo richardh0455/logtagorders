@@ -25,6 +25,7 @@ class CreateOrder extends React.Component{
       currentlySelectedCustomer: null,
       currentlySelectedShippingAddress: null,
       currentlySelectedCourierAccount: null,
+      currentlySelectedHSCode: null,
 	  customer: null,
     purchaseOrderNumber:''
     };
@@ -81,6 +82,10 @@ class CreateOrder extends React.Component{
 	   this.setState({currentlySelectedCourierAccount: event})
   }
 
+  handleHSCodeChange = (event) => {
+	   this.setState({currentlySelectedHSCode: event})
+  }
+
   handlePurchaseOrderNumberChange = (event) => {
     this.setState({purchaseOrderNumber: event.target.value})
   }
@@ -108,6 +113,16 @@ class CreateOrder extends React.Component{
    }
    return courierAccounts;
  }
+
+ generateHSCodeList(customer) {
+  let hsCodes = [];
+  if(customer && "HSCodes" in customer){
+      hsCodes = customer.HSCodes.map((code) =>
+    {return {value:code.ID, label: code.HSCode}}
+      );
+  }
+  return hsCodes;
+}
 
  required(field) {
    if(field  === null) {
@@ -137,7 +152,7 @@ class CreateOrder extends React.Component{
               </div>
 
             </div>
-            <div data-row-span="3">
+            <div data-row-span="4">
               <div data-field-span="1" >
                 <label>Purchase Order Number</label>
                 <input type="text" value={this.state.purchaseOrderNumber}  onChange={this.handlePurchaseOrderNumberChange} />
@@ -152,6 +167,11 @@ class CreateOrder extends React.Component{
                 <Select value={this.state.currentlySelectedCourierAccount} onChange={this.handleCourierAccountChange} options={this.generateCourierAccountList(JSON.parse(this.state.customer))} placeholder="Select a Courier Account"/>
                 {this.required(this.state.currentlySelectedCourierAccount)}
               </div>
+              <div data-field-span="1" >
+                <label>HS Code</label>
+                <Select value={this.state.currentlySelectedHSCode} onChange={this.handleHSCodeChange} options={this.generateHSCodeList(JSON.parse(this.state.customer))} placeholder="Select a HS Code"/>
+                {this.required(this.state.currentlySelectedHSCode)}
+              </div>
             </div>
             <div className="OrderList" style={{marginTop: 50 + 'px'}}>
 				      <h2>Product</h2>
@@ -160,6 +180,7 @@ class CreateOrder extends React.Component{
                   products={this.props.products}
                   shippingAddress ={this.state.currentlySelectedShippingAddress}
                   courierAccount ={this.state.currentlySelectedCourierAccount}
+                  hsCode ={this.state.currentlySelectedHSCode}
                   purchaseOrderNumber={this.state.purchaseOrderNumber}
                   customer={{...this.state.currentlySelectedCustomer,...JSON.parse(this.state.customer)}}
                   currency = {this.state.currentlySelectedCurrency}
