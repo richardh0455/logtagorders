@@ -1,9 +1,16 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import {NotificationContainer, NotificationManager} from 'react-notifications';
+import {NotificationManager} from 'react-notifications';
 import Select from 'react-select';
 import { Auth, API } from 'aws-amplify';
 import Accordian  from './Accordian';
+import DayPickerInput  from 'react-day-picker/DayPickerInput';
+import 'react-day-picker/lib/style.css';
+
+import MomentLocaleUtils, {
+  formatDate,
+  parseDate,
+} from 'react-day-picker/moment';
 
 
 const getAll = '/all';
@@ -57,7 +64,10 @@ class ViewOrders extends React.Component{
       };
     API.get(ordersAPI, '/'+customerID+'/'+orderID, apiRequest)
 	  .then(response => {
-      this.setState({currentlySelectedOrder: JSON.parse(response.body)})
+      var responseBody = JSON.parse(response.body);
+      responseBody.ID = orderID;
+      this.setState({currentlySelectedOrder: responseBody})
+
 	  })
 	  .catch(err => {
 
@@ -71,8 +81,52 @@ class ViewOrders extends React.Component{
   }
 
   getProductName = (id) => {
-    return this.props.products.find(product => product.value === id).label
+    var product = this.props.products.find(product => product.value === id)
+    if(product) {
+      return product.label
+    }
 
+  }
+
+
+  paymentDateChanged = (selectedDay, modifiers, dayPickerInput) => {
+    var fieldName = "PurchaseDate";
+    var date = dayPickerInput.getInput().value;
+    this.updateDate(fieldName, date);
+  }
+
+  shipmentDateChanged = (selectedDay, modifiers, dayPickerInput) => {
+    var fieldName = "ShippingDate";
+    var date = dayPickerInput.getInput().value;
+    this.updateDate(fieldName, date);
+
+  }
+
+  updateDate = (fieldName, date) => {
+    var customerID = this.state.currentlySelectedCustomer.value;
+    var orderID = this.state.currentlySelectedOrder.ID;
+    this.updateOrder(customerID, orderID, fieldName, date);
+  }
+
+  async updateOrder(customerID, orderID, fieldName, fieldValue) {
+    var body ={};
+    body[fieldName] = fieldValue;
+
+    const apiRequest = {
+        headers: {
+          'Authorization': this.state.idToken,
+          'Content-Type': 'application/json'
+        },
+        body: body
+      };
+    API.post(ordersAPI, '/'+customerID+'/'+orderID+'/update', apiRequest)
+	  .then(response => {
+      NotificationManager.success('', 'Order Successfully Updated', 3000);
+      this.getSingleOrder(customerID, orderID)
+	  })
+	  .catch(err => {
+      NotificationManager.error('Order Updating Failed', 'Error', 5000, () => {});
+	  })
   }
 
 
@@ -94,12 +148,24 @@ class ViewOrders extends React.Component{
         <section>
           <Accordian onClick={this.getOrderDetails}>
             {this.state.orders.map((item) => (
-              <div label={'ID: '+item.InvoiceID + ' Date: '+ item.Created_At} id={item.InvoiceID} key={item.InvoiceID}>
+              <div label={'ID: '+item.LogtagInvoiceNumber} id={item.InvoiceID} key={item.InvoiceID}>
                 <span>Invoice Number: {this.state.currentlySelectedOrder["Order"]["LogtagInvoiceNumber"]}</span>
                 <br/>
-                <span>Payment Date: {this.state.currentlySelectedOrder["Order"]["PaymentDate"]}</span>
+                <span>Payment Date:</span>
+                <DayPickerInput
+                  formatDate={formatDate}
+                  parseDate={parseDate}
+                  placeholder={`${formatDate(this.state.currentlySelectedOrder["Order"]["PaymentDate"])}`}
+                  onDayChange ={this.paymentDateChanged}
+                />
                 <br/>
-                <span>Shipped Date: {this.state.currentlySelectedOrder["Order"]["ShippedDate"]}</span>
+                <span>Shipped Date: </span>
+                <DayPickerInput
+                  formatDate={formatDate}
+                  parseDate={parseDate}
+                  placeholder={`${formatDate(this.state.currentlySelectedOrder["Order"]["ShippedDate"])}`}
+                  onDayChange ={this.shipmentDateChanged}
+                />
                 <br/>
                 <table>
                   <tbody>
