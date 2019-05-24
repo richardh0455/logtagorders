@@ -30,7 +30,7 @@ import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import './quicksight-2018-04-01.min.json';
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
 const https = require('https');
 
 
@@ -77,7 +77,16 @@ class MainApp extends React.Component {
               if (err) console.log( err, err.stack); // an error occurred
               else {
                   console.log(data);
-                  this.quicksightRegisterUser()
+                  AWS.config.update({
+
+                    accessKeyId: data.Credentials.AccessKeyId,
+                    secretAccessKey: data.Credentials.SecretAccessKey ,
+                    sessionToken: data.Credentials.SessionToken,
+                    "region": "ap-southeast-2"
+                  });
+
+                  //this.quicksightRegisterUser(data)
+                  this.quicksightGetEmbedURL();
               }
             });
     });
@@ -88,10 +97,10 @@ class MainApp extends React.Component {
 
   }
 
-  quicksightRegisterUser() {
+  quicksightRegisterUser(data) {
     var params = {
                    AwsAccountId: '276219036989',
-                   Email: 'email',
+                   Email: 'richardheald335@gmail.com',
                    IdentityType: 'IAM' ,
                    Namespace: 'default',
                    UserRole: "READER",
@@ -102,6 +111,9 @@ class MainApp extends React.Component {
     var quicksight = new AWS.Service({
                apiConfig: require('./quicksight-2018-04-01.min.json'),
                region: 'ap-southeast-2',
+               accessKeyId: data.Credentials.AccessKeyId,
+               secretAccessKey: data.Credentials.SecretAccessKey ,
+               sessionToken: data.Credentials.SessionToken
     });
     quicksight.registerUser(params, function (err, data1) {
       if (err) {console.log("err register user");} // an error occurred
@@ -110,9 +122,33 @@ class MainApp extends React.Component {
           console.log(data1)
       }
     })
-
-
   }
+
+  quicksightGetEmbedURL() {
+    var quicksight = new AWS.Service({
+               apiConfig: require('./quicksight-2018-04-01.min.json'),
+               region: 'ap-southeast-2'
+    });
+    var params = {
+    AwsAccountId: "276219036989",
+    DashboardId: "d50c0576-71f2-4dc7-8f66-833091cb5584",
+    IdentityType: "IAM",
+                ResetDisabled: true,
+                SessionLifetimeInMinutes: 600,
+                UndoRedoDisabled: true
+    }
+    quicksight.getDashboardEmbedUrl(params,
+                             function (err, data) {
+                               if (!err) {
+                                 console.log( data);
+                               } else {
+                                 console.log(err);
+                               }
+                             }
+                           );
+  }
+
+
   async signOut() {
     console.log("Sign Out")
     Auth.signOut()
