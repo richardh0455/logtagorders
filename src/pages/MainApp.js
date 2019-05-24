@@ -29,6 +29,9 @@ import Accordian  from './Accordian';
 import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
+import './quicksight-2018-04-01.min.json';
+const AWS = require('aws-sdk');
+const https = require('https');
 
 
 const customersAPI = 'CustomersAPI';
@@ -54,8 +57,62 @@ class MainApp extends React.Component {
       idToken: null,
       redirect: false
     };
+    var currentSession = Auth.currentSession().then(data => {
+      console.log("Session")
+      console.log(data.accessToken);
+      AWS.config.region = 'ap-southeast-2';
+      AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+             IdentityPoolId:"ap-southeast-2:687f1ba1-1242-4f22-8adf-da49297c8005",
+             Logins: {
+                 "cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_3e18SkGuR": data.getIdToken().getJwtToken()
+             }
+         });
+
+      var params = {
+              RoleArn: "arn:aws:iam::276219036989:role/Cognito_logtag_identity_poolAuth_Role",
+              RoleSessionName: "LogtagQuicksightSession"
+          };
+      var sts = new AWS.STS();
+      sts.assumeRole(params, (err, data) => {
+              if (err) console.log( err, err.stack); // an error occurred
+              else {
+                  console.log(data);
+                  this.quicksightRegisterUser()
+              }
+            });
+    });
+
+
+
+
+
   }
 
+  quicksightRegisterUser() {
+    var params = {
+                   AwsAccountId: '276219036989',
+                   Email: 'email',
+                   IdentityType: 'IAM' ,
+                   Namespace: 'default',
+                   UserRole: "READER",
+                   IamArn: 'arn:aws:iam::276219036989:role/Cognito_logtag_identity_poolAuth_Role',
+                   SessionName: 'LogtagQuicksightSession'
+               };
+
+    var quicksight = new AWS.Service({
+               apiConfig: require('./quicksight-2018-04-01.min.json'),
+               region: 'ap-southeast-2',
+    });
+    quicksight.registerUser(params, function (err, data1) {
+      if (err) {console.log("err register user");} // an error occurred
+      else {
+          console.log("Register User1");
+          console.log(data1)
+      }
+    })
+
+
+  }
   async signOut() {
     console.log("Sign Out")
     Auth.signOut()
