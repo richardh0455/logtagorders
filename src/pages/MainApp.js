@@ -31,6 +31,7 @@ import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import './quicksight-2018-04-01.min.json';
 import AWS from 'aws-sdk';
+import * as QuickSight from "aws-sdk/clients/quicksight";
 const https = require('https');
 
 
@@ -82,11 +83,11 @@ class MainApp extends React.Component {
                     accessKeyId: data.Credentials.AccessKeyId,
                     secretAccessKey: data.Credentials.SecretAccessKey ,
                     sessionToken: data.Credentials.SessionToken,
-                    "region": "ap-southeast-2"
+                    region: "ap-southeast-2"
                   });
 
-                  //this.quicksightRegisterUser(data)
-                  this.quicksightGetEmbedURL();
+                  this.quicksightRegisterUser(data)
+                  //this.quicksightGetEmbedURL(data);
               }
             });
     });
@@ -108,13 +109,7 @@ class MainApp extends React.Component {
                    SessionName: 'LogtagQuicksightSession'
                };
 
-    var quicksight = new AWS.Service({
-               apiConfig: require('./quicksight-2018-04-01.min.json'),
-               region: 'ap-southeast-2',
-               accessKeyId: data.Credentials.AccessKeyId,
-               secretAccessKey: data.Credentials.SecretAccessKey ,
-               sessionToken: data.Credentials.SessionToken
-    });
+    var quicksight = new QuickSight();
     quicksight.registerUser(params, function (err, data1) {
       if (err) {console.log("err register user");} // an error occurred
       else {
@@ -124,11 +119,9 @@ class MainApp extends React.Component {
     })
   }
 
-  quicksightGetEmbedURL() {
-    var quicksight = new AWS.Service({
-               apiConfig: require('./quicksight-2018-04-01.min.json'),
-               region: 'ap-southeast-2'
-    });
+  quicksightGetEmbedURL(data) {
+    var quicksight = new QuickSight();
+
     var params = {
     AwsAccountId: "276219036989",
     DashboardId: "d50c0576-71f2-4dc7-8f66-833091cb5584",
