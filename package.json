@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "amazon-quicksight-embedding-sdk": "^1.0.3",
     "aws-amplify": "^1.0.0",
-    "aws-sdk": "^2.462.0",
     "aws-amplify-react": "^1.0.0",
+    "aws-sdk": "^2.462.0",
+    "aws4": "^1.8.0",
     "base-64": "^0.1.0",
     "esri-loader": "^2.2.0",
     "jspdf": "^1.5.3",
@@ -20,6 +22,8 @@
     "react-scripts": "1.1.1",
     "react-select": "^2.4.2",
     "react-test-renderer": "^16.8.6",
+    "request": "^2.88.0",
+    "url": "^0.11.0",
     "uuid": "^3.2.1"
   },
   "scripts": {

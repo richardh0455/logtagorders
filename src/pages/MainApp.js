@@ -33,6 +33,7 @@ import './quicksight-2018-04-01.min.json';
 import AWS from 'aws-sdk';
 import * as QuickSight from "aws-sdk/clients/quicksight";
 const https = require('https');
+ var QuickSightEmbedding = require("amazon-quicksight-embedding-sdk");
 
 
 const customersAPI = 'CustomersAPI';
@@ -71,7 +72,7 @@ class MainApp extends React.Component {
 
       var params = {
               RoleArn: "arn:aws:iam::276219036989:role/Cognito_logtag_identity_poolAuth_Role",
-              RoleSessionName: "LogtagQuicksightSession"
+              RoleSessionName: "richardheald335@gmail.com"
           };
       var sts = new AWS.STS();
       sts.assumeRole(params, (err, data) => {
@@ -79,21 +80,34 @@ class MainApp extends React.Component {
               else {
                   console.log(data);
                   AWS.config.update({
+                    credentials: new AWS.Credentials(data.Credentials.AccessKeyId, data.Credentials.SecretAccessKey, data.Credentials.SessionToken)});
 
-                    accessKeyId: data.Credentials.AccessKeyId,
-                    secretAccessKey: data.Credentials.SecretAccessKey ,
-                    sessionToken: data.Credentials.SessionToken,
-                    region: "ap-southeast-2"
-                  });
-
-                  this.quicksightRegisterUser(data)
-                  //this.quicksightGetEmbedURL(data);
+                  //this.quicksightRegisterUser()
+                  this.quicksightGetEmbedURL(data);
               }
             });
     });
 
 
 
+
+
+  }
+
+  quicksightListUser() {
+    var quicksight = new QuickSight();
+    quicksight.listUsers({
+    // Enter your actual AWS account ID
+    'AwsAccountId': '276219036989',
+    'Namespace': 'default',
+  }, function(err, data) {
+    console.log('---');
+    console.log('Errors: ');
+    console.log(err);
+    console.log('---');
+    console.log('Response: ');
+    console.log(data);
+  });
 
 
   }
@@ -106,12 +120,17 @@ class MainApp extends React.Component {
                    Namespace: 'default',
                    UserRole: "READER",
                    IamArn: 'arn:aws:iam::276219036989:role/Cognito_logtag_identity_poolAuth_Role',
-                   SessionName: 'LogtagQuicksightSession'
+                   SessionName: 'richardheald335@gmail.com',
+                   UserName:'richardheald335@gmail.com'
                };
 
-    var quicksight = new QuickSight();
+    console.log(AWS.config.credentials);
+    var quicksight = new QuickSight({credentials: AWS.config.credentials});
     quicksight.registerUser(params, function (err, data1) {
-      if (err) {console.log("err register user");} // an error occurred
+      if (err) {
+        console.log("err register user");
+        console.log(err);
+    } // an error occurred
       else {
           console.log("Register User1");
           console.log(data1)
@@ -119,8 +138,12 @@ class MainApp extends React.Component {
     })
   }
 
+
+
   quicksightGetEmbedURL(data) {
-    var quicksight = new QuickSight();
+    console.log('Embed credentials are:');
+    console.log(AWS.config.credentials);
+    var quicksight = new QuickSight({credentials: AWS.config.credentials, region:'ap-southeast-2'});
 
     var params = {
     AwsAccountId: "276219036989",
@@ -140,6 +163,8 @@ class MainApp extends React.Component {
                              }
                            );
   }
+
+
 
 
   async signOut() {
@@ -167,6 +192,7 @@ class MainApp extends React.Component {
     this.getCustomers();
     this.getProducts();
     this.getCurrencies();
+    //this.embedDashboard();
   }
 
   async getProductConfig(id) {
@@ -287,6 +313,20 @@ class MainApp extends React.Component {
 
   }
 
+  embedDashboard() {
+           var containerDiv = document.getElementById("dashboardContainer");
+           var params = {
+               url: "https://ap-southeast-2.quicksight.aws.amazon.com/embed/d0a4408507bc431d9b19adcbf934e31c/dashboards/d50c0576-71f2-4dc7-8f66-833091cb5584?isauthcode=true&identityprovider=quicksight&code=AYABeDJ3G35XgpzwcmS0-Wzm0mIAAAABAAdhd3Mta21zAFBhcm46YXdzOmttczphcC1zb3V0aGVhc3QtMjo4OTc4MjcyODg1NDM6a2V5LzZlZjA0ZTAyLTIyZmMtNDFmYS1iZGY1LTg0Y2Q3OWY0MmYxOQC4AQIBAHjBrDhHw_ETeeWTp2SAgpQYxdz7hv6a4_0dE90TaLLdlwEUbBR7TkEoENl-4sW7ww79AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMZZyQADT7BqbVaQTWAgEQgDuONWWsADY-G7xOqZqgUhhhk_xc-uGxWVnteo-IHuWTL_DUeT8r4JNb3yQeMya5I_bFRR65kPLwhRPvCwIAAAAADAAAEAAAAAAAAAAAAAAAAAAoxu5S0_d8ixO_mewTSzW5_____wAAAAEAAAAAAAAAAAAAAAEAAACbHmbsJpcItRMoAU37worh1QDo-S49pHT7m7A4SyyxT4Ggkjf_fR-xsE5sbumctpzpHWy4H5ZK22jyP-OfP4wq57ezm_q-jDLKCHQpXbsIyn4xNk-mj1D1p6Atj1r0osr67-HvDBMPKQcwV-gBvBetZiVxcCoGrBx9MliHiyFajjLkKiS9th94Uiw6CH_v-BDBmF4yFBx71ZNl7v1a4q70ODN58mZedJGYILSC",
+               container: containerDiv,
+
+               height: "700px",
+               width: "1000px"
+           };
+           var dashboard = QuickSightEmbedding.embedDashboard(params);
+           dashboard.on('error', function() {});
+           dashboard.on('load', function() {});
+       }
+
 
   render() {
     return (
@@ -317,6 +357,8 @@ class MainApp extends React.Component {
           <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
         </div>
       </Accordian>
+      <div id="dashboardContainer"></div>
+
     </div>
       );
   }
