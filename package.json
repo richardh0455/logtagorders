@@ -7,6 +7,7 @@
     "aws-amplify": "^1.0.0",
     "aws-amplify-react": "^1.0.0",
     "aws-sdk": "^2.462.0",
+    "aws-sign-web": "^1.4.0",
     "aws4": "^1.8.0",
     "base-64": "^0.1.0",
     "esri-loader": "^2.2.0",
