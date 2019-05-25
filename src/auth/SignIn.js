@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  */
 import React from 'react';
-import { Auth} from 'aws-amplify';
+import { Auth, API} from 'aws-amplify';
 import { withRouter, Redirect, Link } from 'react-router-dom';
 import logo from '../public/images/LTLogo.png';
 import '../public/css/app.css';
@@ -45,7 +45,7 @@ class SignIn extends React.Component {
 
   renderRedirect = () => {
     if (this.state.redirect) {
-      return <Redirect to='/app' />
+      return <Redirect to= {{pathname: '/app', state: { QuickSightEmbedURL: this.state.QuickSightEmbedURL }}} />
     }
   }
 
@@ -60,7 +60,33 @@ class SignIn extends React.Component {
 
   async onSubmitForm(e) {
     e.preventDefault();
-    this.performSignIn();
+    await this.performSignIn();
+    await this.getQuicksightURL();
+
+  }
+
+  async getQuicksightURL() {
+    let apiRequest = { // OPTIONAL
+      headers: {}, // OPTIONAL
+      response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
+      queryStringParameters: {  // OPTIONAL
+        dashboardId: '08f6dd3a-0b34-4a66-9564-df66b27be04b',
+        username: this.state.email,
+        password: this.state.password
+      }
+    }
+    API.get('EmbedURL', '', apiRequest)
+    .then(response =>
+    {
+        console.log(response);
+        this.setState({QuickSightEmbedURL: response.data.EmbedUrl});
+        this.setRedirect();
+    })
+    .catch(error =>
+    {
+        console.log(error.response)
+    });
+
   }
 
   async performSignIn() {
@@ -79,9 +105,8 @@ class SignIn extends React.Component {
           //console.log('Cognito User Identity Token:', session.getIdToken().getJwtToken());
           //console.log('Cognito User Refresh Token', session.getRefreshToken().getToken());
 
-          this.setState({ stage: 0, email: '', password: '', code: '' });
+          //this.setState({ stage: 0, email: '', password: '', code: '' });
           //this.props.history.replace('/app');
-		  this.setRedirect();
         }
     } catch (err) {
         alert(err.message);
@@ -109,7 +134,6 @@ class SignIn extends React.Component {
       //console.log('Cognito User Identity Token:', session.getIdToken().getJwtToken());
       //console.log('Cognito User Refresh Token', session.getRefreshToken().getToken());
       this.setState({ stage: 0, email: '', password: '', code: '' });
-      this.props.history.replace('/app');
     } catch (err) {
       alert(err.message);
       console.error('Auth.confirmSignIn(): ', err);

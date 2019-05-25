@@ -60,7 +60,7 @@ class MainApp extends React.Component {
       idToken: null,
       redirect: false
     };
-    var currentSession = Auth.currentSession().then(data => {
+    /*var currentSession = Auth.currentSession().then(data => {
       console.log("Session")
       console.log(data.accessToken);
       AWS.config.region = 'ap-southeast-2';
@@ -84,10 +84,10 @@ class MainApp extends React.Component {
                     credentials: new AWS.Credentials(data.Credentials.AccessKeyId, data.Credentials.SecretAccessKey, data.Credentials.SessionToken)});
 
                   //this.quicksightRegisterUser()
-                  this.quicksightEmbedURL3(data);
+                  this.quicksightEmbedURL();
               }
             });
-    });
+    });*/
 
 
 
@@ -118,20 +118,18 @@ class MainApp extends React.Component {
           SessionLifetimeInMinutes: 600,
           UndoRedoDisabled: true
         },
+
         data: null
     };
     var signed = signer.sign(requestHeader);
 
 
     var request = require('request');
-    var options = {
-      method: 'GET',
-      url: 'https://quicksight.ap-southeast-2.amazonaws.com/accounts/276219036989/dashboards/d50c0576-71f2-4dc7-8f66-833091cb5584/embed-url',
-      headers: signed
-    };
-    signed.url = 'https://quicksight.ap-southeast-2.amazonaws.com/accounts/276219036989/dashboards/d50c0576-71f2-4dc7-8f66-833091cb5584/embed-url'
-    console.log('Signed Request:')
 
+    signed.url = 'https://quicksight.ap-southeast-2.amazonaws.com/accounts/276219036989/dashboards/d50c0576-71f2-4dc7-8f66-833091cb5584/embed-url'
+    signed["Access-Control-Allow-Origin"] = 'localhost:3000'
+    console.log('Signed Request:')
+    console.log(signed)
     request(signed, function (error, response, body) {
       console.log('error:', error); // Print the error if one occurred
     console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
@@ -209,31 +207,30 @@ class MainApp extends React.Component {
 
 
 
-  quicksightGetEmbedURL(data) {
+  quicksightEmbedURL() {
     console.log('Embed credentials are:');
-    console.log(AWS.config.credentials);
-    //var quicksight = new QuickSight({accessKeyId:data.Credentials.AccessKeyId, secretAccessKey:data.Credentials.SecretAccessKey, sessionToken:data.Credentials.SessionToken, region:'ap-southeast-2'});
+    console.log(AWS.config.credentials.accessKeyId);
+    //
 
-    var quicksight = new AWS.Service({
+    var quicksight = new AWS.QuickSight({accessKeyId:AWS.config.credentials.accessKeyId, secretAccessKey:AWS.config.credentials.secretAccessKey, sessionToken:AWS.config.credentials.sessionToken, region:'ap-southeast-2'});
+
+    /*var quicksight = new AWS.Service({
       apiConfig: require('./quicksight-2018-04-01.min.json'),
       region: 'ap-southeast-2',
-      accessKeyId:data.Credentials.AccessKeyId,
-      secretAccessKey:data.Credentials.SecretAccessKey,
-      sessionToken:data.Credentials.SessionToken,
-    });
+      accessKeyId:AWS.config.credentials.accessKeyId,
+      secretAccessKey:AWS.config.credentials.secretAccessKey,
+      sessionToken:AWS.config.credentials.sessionToken,
+    });*/
     var params = {
     AwsAccountId: "276219036989",
     DashboardId: "d50c0576-71f2-4dc7-8f66-833091cb5584",
     IdentityType: "IAM",
     ResetDisabled: true,
     SessionLifetimeInMinutes: 600,
-    UndoRedoDisabled: true,
-    XAmzAlgorithm: "AWS4-HMAC-SHA256",
-    XAmzCredential: encodeURIComponent(data.Credentials.AccessKeyId+"/"+"20190524/ap-southeast-2/quicksight/aws4_request"),
-    XAmzSignedHeaders: "host;x-amz-content-sha256;x-amz-date;x-amz-security-token",
-    XAmzDate: "20190524"
+    UndoRedoDisabled: true
 
     }
+
     quicksight.getDashboardEmbedUrl(params,
                              function (err, data) {
                                if (!err) {
@@ -273,7 +270,11 @@ class MainApp extends React.Component {
     this.getCustomers();
     this.getProducts();
     this.getCurrencies();
-    //this.embedDashboard();
+
+    console.log('Embed URL:');
+    console.log(this.props.location.state.QuickSightEmbedURL);
+
+    this.embedDashboard(this.props.location.state.QuickSightEmbedURL);
   }
 
   async getProductConfig(id) {
@@ -394,10 +395,10 @@ class MainApp extends React.Component {
 
   }
 
-  embedDashboard() {
+  embedDashboard(url) {
            var containerDiv = document.getElementById("dashboardContainer");
            var params = {
-               url: "https://ap-southeast-2.quicksight.aws.amazon.com/embed/d0a4408507bc431d9b19adcbf934e31c/dashboards/d50c0576-71f2-4dc7-8f66-833091cb5584?isauthcode=true&identityprovider=quicksight&code=AYABeDJ3G35XgpzwcmS0-Wzm0mIAAAABAAdhd3Mta21zAFBhcm46YXdzOmttczphcC1zb3V0aGVhc3QtMjo4OTc4MjcyODg1NDM6a2V5LzZlZjA0ZTAyLTIyZmMtNDFmYS1iZGY1LTg0Y2Q3OWY0MmYxOQC4AQIBAHjBrDhHw_ETeeWTp2SAgpQYxdz7hv6a4_0dE90TaLLdlwEUbBR7TkEoENl-4sW7ww79AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMZZyQADT7BqbVaQTWAgEQgDuONWWsADY-G7xOqZqgUhhhk_xc-uGxWVnteo-IHuWTL_DUeT8r4JNb3yQeMya5I_bFRR65kPLwhRPvCwIAAAAADAAAEAAAAAAAAAAAAAAAAAAoxu5S0_d8ixO_mewTSzW5_____wAAAAEAAAAAAAAAAAAAAAEAAACbHmbsJpcItRMoAU37worh1QDo-S49pHT7m7A4SyyxT4Ggkjf_fR-xsE5sbumctpzpHWy4H5ZK22jyP-OfP4wq57ezm_q-jDLKCHQpXbsIyn4xNk-mj1D1p6Atj1r0osr67-HvDBMPKQcwV-gBvBetZiVxcCoGrBx9MliHiyFajjLkKiS9th94Uiw6CH_v-BDBmF4yFBx71ZNl7v1a4q70ODN58mZedJGYILSC",
+               url: url,
                container: containerDiv,
 
                height: "700px",

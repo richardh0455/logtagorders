@@ -41,7 +41,12 @@ const awsConfig = {
                 name: 'CurrencyAPI',
                 endpoint: 'https://j383ee0ls6.execute-api.ap-southeast-2.amazonaws.com/'+env+'/currencies', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
                 region: 'ap-southeast-2' // example: 'us-east-2'
-            }
+            },
+						{
+											name: 'EmbedURL',
+											endpoint: 'https://pk9z0oxr11.execute-api.ap-southeast-2.amazonaws.com/prod/getDashboardEmbedURL', // example: 'https://u8swuvl00f.execute-api.us-east-2.amazonaws.com/prod'
+											region: 'ap-southeast-2' // example: 'us-east-2'
+									}
         ]
     },
 
