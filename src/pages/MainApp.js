@@ -400,9 +400,12 @@ class MainApp extends React.Component {
            var params = {
                url: url,
                container: containerDiv,
-
+               scrolling: "yes",
                height: "700px",
-               width: "1000px"
+               width: "1000px",
+               parameters: {
+                        StartDate: "20190524"
+                    }
            };
            var dashboard = QuickSightEmbedding.embedDashboard(params);
            dashboard.on('error', function() {});
