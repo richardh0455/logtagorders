@@ -70,7 +70,7 @@ class SignIn extends React.Component {
       headers: {}, // OPTIONAL
       response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
       queryStringParameters: {  // OPTIONAL
-        dashboardId: '08f6dd3a-0b34-4a66-9564-df66b27be04b',
+        dashboardId: 'd50c0576-71f2-4dc7-8f66-833091cb5584',
         username: this.state.email,
         password: this.state.password
       }
