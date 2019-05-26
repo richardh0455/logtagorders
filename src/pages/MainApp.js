@@ -107,7 +107,7 @@ class MainApp extends React.Component {
         console.log('getDashboardURL returned successfully')
         console.log(response);
         //this.setState({QuickSightEmbedURL: response.data.EmbedUrl});
-        this.embedDashboard(response.data.EmbedUrl);
+        this.embedDashboard(JSON.parse(response.data.body).EmbedUrl);
     })
     .catch(error =>
     {
