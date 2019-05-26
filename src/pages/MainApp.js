@@ -88,7 +88,7 @@ class MainApp extends React.Component {
 
   }
 
-  async getQuicksightURL(session) {
+  async getQuicksightURL(idToken) {
     let apiRequest = { // OPTIONAL
       headers: {
         'Authorization': this.state.idToken,
@@ -97,8 +97,8 @@ class MainApp extends React.Component {
       response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
       queryStringParameters: {  // OPTIONAL
         dashboardId: 'd50c0576-71f2-4dc7-8f66-833091cb5584',
-        username: session.getIdToken().payload.email,
-        sessionName: session.getIdToken().payload.sub
+        username: idToken.payload.email,
+        sessionName: idToken.payload.sub
       }
     }
     API.get('EmbedURL', '', apiRequest)
