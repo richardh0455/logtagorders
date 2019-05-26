@@ -61,33 +61,9 @@ class SignIn extends React.Component {
   async onSubmitForm(e) {
     e.preventDefault();
     await this.performSignIn();
-    await this.getQuicksightURL();
 
   }
 
-  async getQuicksightURL() {
-    let apiRequest = { // OPTIONAL
-      headers: {}, // OPTIONAL
-      response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
-      queryStringParameters: {  // OPTIONAL
-        dashboardId: 'd50c0576-71f2-4dc7-8f66-833091cb5584',
-        username: this.state.email,
-        password: this.state.password
-      }
-    }
-    API.get('EmbedURL', '', apiRequest)
-    .then(response =>
-    {
-        console.log(response);
-        this.setState({QuickSightEmbedURL: response.data.EmbedUrl});
-        this.setRedirect();
-    })
-    .catch(error =>
-    {
-        console.log(error.response)
-    });
-
-  }
 
   async performSignIn() {
 	try {
@@ -107,6 +83,7 @@ class SignIn extends React.Component {
 
           //this.setState({ stage: 0, email: '', password: '', code: '' });
           //this.props.history.replace('/app');
+          this.setRedirect()
         }
     } catch (err) {
         alert(err.message);

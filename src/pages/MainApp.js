@@ -78,11 +78,42 @@ class MainApp extends React.Component {
 
   async componentDidMount() {
     const session = await Auth.currentSession();
+    console.log('ID Token:')
+    console.log(session.getIdToken());
     this.setState({ authToken: session.accessToken.jwtToken, idToken: session.idToken.jwtToken });
     this.getCustomers();
     this.getProducts();
     this.getCurrencies();
-    this.embedDashboard(this.props.location.state.QuickSightEmbedURL);
+    this.getQuicksightURL(session.getIdToken())
+
+  }
+
+  async getQuicksightURL(session) {
+    let apiRequest = { // OPTIONAL
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }, // OPTIONAL
+      response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
+      queryStringParameters: {  // OPTIONAL
+        dashboardId: 'd50c0576-71f2-4dc7-8f66-833091cb5584',
+        username: session.getIdToken().payload.email,
+        sessionName: session.getIdToken().payload.sub
+      }
+    }
+    API.get('EmbedURL', '', apiRequest)
+    .then(response =>
+    {
+        console.log('getDashboardURL returned successfully')
+        console.log(response);
+        //this.setState({QuickSightEmbedURL: response.data.EmbedUrl});
+        this.embedDashboard(response.data.EmbedUrl);
+    })
+    .catch(error =>
+    {
+        console.log(error)
+    });
+
   }
 
   async getProductConfig(id) {
