@@ -115,12 +115,6 @@ class SignIn extends React.Component {
 
   }
 
-
-
-
-
-
-
   async onSubmitVerification(e) {
     e.preventDefault();
     try {

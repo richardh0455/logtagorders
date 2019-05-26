@@ -29,11 +29,6 @@ import Accordian  from './Accordian';
 import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
-//import './quicksight-2018-04-01.min.json';
-import AWS from 'aws-sdk';
-import * as awsSignWeb from 'aws-sign-web';
-import * as QuickSight from "aws-sdk/clients/quicksight";
-const https = require('https');
  var QuickSightEmbedding = require("amazon-quicksight-embedding-sdk");
 
 
@@ -60,190 +55,7 @@ class MainApp extends React.Component {
       idToken: null,
       redirect: false
     };
-    /*var currentSession = Auth.currentSession().then(data => {
-      console.log("Session")
-      console.log(data.accessToken);
-      AWS.config.region = 'ap-southeast-2';
-      AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-             IdentityPoolId:"ap-southeast-2:687f1ba1-1242-4f22-8adf-da49297c8005",
-             Logins: {
-                 "cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_3e18SkGuR": data.getIdToken().getJwtToken()
-             }
-         });
-
-      var params = {
-              RoleArn: "arn:aws:iam::276219036989:role/Cognito_logtag_identity_poolAuth_Role",
-              RoleSessionName: "richardheald335@gmail.com"
-          };
-      var sts = new AWS.STS();
-      sts.assumeRole(params, (err, data) => {
-              if (err) console.log( err, err.stack); // an error occurred
-              else {
-                  console.log(data);
-                  AWS.config.update({
-                    credentials: new AWS.Credentials(data.Credentials.AccessKeyId, data.Credentials.SecretAccessKey, data.Credentials.SessionToken)});
-
-                  //this.quicksightRegisterUser()
-                  this.quicksightEmbedURL();
-              }
-            });
-    });*/
-
-
-
-
-
   }
-
-  quicksightEmbedURL3(data) {
-    var config = {
-        // AWS Region (default: 'eu-west-1')
-        region: 'ap-southeast-2',
-        // AWS service that is called (default: 'execute-api' -- AWS API Gateway)
-        service: 'quicksight',
-        // AWS IAM credentials, here some temporary credentials with a session token
-        accessKeyId: data.Credentials.AccessKeyId,
-        secretAccessKey: data.Credentials.SecretAccessKey,
-        sessionToken: data.Credentials.SessionToken
-    };
-    var signer = new awsSignWeb.AwsSigner(config);
-
-    var requestHeader = {
-        method: 'GET',
-        url: 'https://quicksight.ap-southeast-2.amazonaws.com/accounts/276219036989/dashboards/d50c0576-71f2-4dc7-8f66-833091cb5584/embed-url',
-        headers: {},
-        params: {
-          IdentityType: "IAM",
-          ResetDisabled: true,
-          SessionLifetimeInMinutes: 600,
-          UndoRedoDisabled: true
-        },
-
-        data: null
-    };
-    var signed = signer.sign(requestHeader);
-
-
-    var request = require('request');
-
-    signed.url = 'https://quicksight.ap-southeast-2.amazonaws.com/accounts/276219036989/dashboards/d50c0576-71f2-4dc7-8f66-833091cb5584/embed-url'
-    signed["Access-Control-Allow-Origin"] = 'localhost:3000'
-    console.log('Signed Request:')
-    console.log(signed)
-    request(signed, function (error, response, body) {
-      console.log('error:', error); // Print the error if one occurred
-    console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-    console.log('body:', body); // Print the HTML for the Google homepage.
-  });
-  }
-
-  quicksightEmbedURL2() {
-    console.log(AWS.config.credentials);
-    let apiName = 'EmbedURL';
-    let path = '';
-    let myInit = { // OPTIONAL
-      headers: {'Content-Type': 'text/plain',
-      'X-Amz-Security-Token': 'FQoGZXIvYXdzENv//////////wEaDKZragq/rsg33B01qiL9ATxQHFfbZgW6L4KJ8pvR9s2m5XxN11szkHr8Lj+AkY/nW1itWMpldt4onYSTjlKHCCZYI8mA3An0vhkvFWDlUH8JDSvLeOsCl97/FXWyxa7m/5fe6gwlhjmYmX31EnpYC9gRyeSuswYylFYd8GbtJT0HwcmZ73OSWN7VZMch7aR+GtvpDW+E+rnwlMY4aOOnjglme7AYWC4ODFzt9ttHdlsMZQLK8oxEnpWuAEoc6xOtEJjRjrRkfFCqIjRWShSRPMKsDBlT4nGszmsAdb5gckEOEA76K7IPno3waQ7lDDl09UPAiTpAfybrb0n6sKjbRpYWTDMRfrlDutYrZ0womvue5wU=',
-      Authorization: 'AWS4-HMAC-SHA256 Credential=ASIAUAT7QAU6RWAR26EL/20190524/ap-southeast-2/quicksight/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=69fe25ae5bebf576f70dc4f31592025a241d1cdb4ffba9da52f9118c5bc39c3c'}, // OPTIONAL
-      response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
-      queryStringParameters: {  // OPTIONAL
-        IdentityType: "IAM",
-        ResetDisabled: true,
-        SessionLifetimeInMinutes: 600,
-        UndoRedoDisabled: true
-    }
-  }
-  API.get(apiName, path, myInit).then(response => {
-    console.log(response);
-  }).catch(error => {
-    console.log(error.response)
-  });
-
-  }
-
-  quicksightListUser() {
-    var quicksight = new QuickSight();
-    quicksight.listUsers({
-    // Enter your actual AWS account ID
-    'AwsAccountId': '276219036989',
-    'Namespace': 'default',
-  }, function(err, data) {
-    console.log('---');
-    console.log('Errors: ');
-    console.log(err);
-    console.log('---');
-    console.log('Response: ');
-    console.log(data);
-  });
-
-
-  }
-
-  quicksightRegisterUser(data) {
-    var params = {
-                   AwsAccountId: '276219036989',
-                   Email: 'richardheald335@gmail.com',
-                   IdentityType: 'IAM' ,
-                   Namespace: 'default',
-                   UserRole: "READER",
-                   IamArn: 'arn:aws:iam::276219036989:role/Cognito_logtag_identity_poolAuth_Role',
-                   SessionName: 'richardheald335@gmail.com',
-                   UserName:'richardheald335@gmail.com'
-               };
-
-    console.log(AWS.config.credentials);
-    var quicksight = new QuickSight({credentials: AWS.config.credentials});
-    quicksight.registerUser(params, function (err, data1) {
-      if (err) {
-        console.log("err register user");
-        console.log(err);
-    } // an error occurred
-      else {
-          console.log("Register User1");
-          console.log(data1)
-      }
-    })
-  }
-
-
-
-  quicksightEmbedURL() {
-    console.log('Embed credentials are:');
-    console.log(AWS.config.credentials.accessKeyId);
-    //
-
-    var quicksight = new AWS.QuickSight({accessKeyId:AWS.config.credentials.accessKeyId, secretAccessKey:AWS.config.credentials.secretAccessKey, sessionToken:AWS.config.credentials.sessionToken, region:'ap-southeast-2'});
-
-    /*var quicksight = new AWS.Service({
-      apiConfig: require('./quicksight-2018-04-01.min.json'),
-      region: 'ap-southeast-2',
-      accessKeyId:AWS.config.credentials.accessKeyId,
-      secretAccessKey:AWS.config.credentials.secretAccessKey,
-      sessionToken:AWS.config.credentials.sessionToken,
-    });*/
-    var params = {
-    AwsAccountId: "276219036989",
-    DashboardId: "d50c0576-71f2-4dc7-8f66-833091cb5584",
-    IdentityType: "IAM",
-    ResetDisabled: true,
-    SessionLifetimeInMinutes: 600,
-    UndoRedoDisabled: true
-
-    }
-
-    quicksight.getDashboardEmbedUrl(params,
-                             function (err, data) {
-                               if (!err) {
-                                 console.log( data);
-                               } else {
-                                 console.log(err);
-                               }
-                             }
-                           );
-  }
-
-
-
 
   async signOut() {
     console.log("Sign Out")
@@ -270,10 +82,6 @@ class MainApp extends React.Component {
     this.getCustomers();
     this.getProducts();
     this.getCurrencies();
-
-    console.log('Embed URL:');
-    console.log(this.props.location.state.QuickSightEmbedURL);
-
     this.embedDashboard(this.props.location.state.QuickSightEmbedURL);
   }
 
