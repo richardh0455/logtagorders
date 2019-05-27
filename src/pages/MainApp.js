@@ -241,9 +241,9 @@ class MainApp extends React.Component {
                container: containerDiv,
                scrolling: "yes",
                height: "700px",
-               width: "1000px",
                parameters: {
-                        StartDate: "20190524"
+                        StartDate: "2019-05-01 00:00",
+                        EndDate: "2019-06-01 00:00"
                     }
            };
            var dashboard = QuickSightEmbedding.embedDashboard(params);
