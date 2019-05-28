@@ -97,7 +97,6 @@ class MainApp extends React.Component {
       }, // OPTIONAL
       response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
       queryStringParameters: {  // OPTIONAL
-        dashboardId: 'd50c0576-71f2-4dc7-8f66-833091cb5584',
         username: idToken.payload.email,
         sessionName: idToken.payload.sub
       }
