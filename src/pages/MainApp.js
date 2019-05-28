@@ -29,6 +29,7 @@ import Accordian  from './Accordian';
 import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
+import moment from 'moment'
  var QuickSightEmbedding = require("amazon-quicksight-embedding-sdk");
 
 
@@ -242,8 +243,8 @@ class MainApp extends React.Component {
                scrolling: "yes",
                height: "700px",
                parameters: {
-                        StartDate: "2019-05-01 00:00",
-                        EndDate: "2019-06-01 00:00"
+                        StartDate: moment(new Date()).subtract(1, 'month').format('YYYY-MM-DD hh:mm'),
+                        EndDate: moment(new Date()).format('YYYY-MM-DD hh:mm')
                     }
            };
            var dashboard = QuickSightEmbedding.embedDashboard(params);
