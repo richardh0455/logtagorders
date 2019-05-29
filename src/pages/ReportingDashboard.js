@@ -17,8 +17,15 @@ class ReportingDashboard extends React.Component{
     const session = await Auth.currentSession();
     this.setState({ authToken: session.accessToken.jwtToken });
     this.setState({ idToken: session.idToken.jwtToken });
+    console.log()
     if(this.props.url){
       this.embedDashboard(this.props.url)
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.url && this.props.url !== prevProps.url) {
+      this.embedDashboard(this.props.url);
     }
   }
 
