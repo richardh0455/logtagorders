@@ -1,11 +1,9 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import {NotificationManager} from 'react-notifications';
-import Select from 'react-select';
 import { Auth, API } from 'aws-amplify';
-import Accordian  from './Accordian';
-import DayPickerInput  from 'react-day-picker/DayPickerInput';
-import 'react-day-picker/lib/style.css';
+import moment from 'moment'
+ var QuickSightEmbedding = require("amazon-quicksight-embedding-sdk");
+
 
 import MomentLocaleUtils, {
   formatDate,
