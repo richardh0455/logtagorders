@@ -61,7 +61,6 @@ class MainApp extends React.Component {
   }
 
   async signOut() {
-    console.log("Sign Out")
     Auth.signOut()
         .then(data => console.log(data))
         .catch(err => console.log(err));
@@ -72,7 +71,6 @@ class MainApp extends React.Component {
   }
 
   renderRedirect() {
-    console.log(this.state.redirect)
     if(this.state.redirect) {
       return <Redirect to='/signin' />;
     }
@@ -81,8 +79,6 @@ class MainApp extends React.Component {
 
   async componentDidMount() {
     const session = await Auth.currentSession();
-    console.log('ID Token:')
-    console.log(session.getIdToken());
     this.setState({ authToken: session.accessToken.jwtToken, idToken: session.idToken.jwtToken });
     this.getCustomers();
     this.getProducts();
@@ -106,9 +102,6 @@ class MainApp extends React.Component {
     API.get('EmbedURL', '', apiRequest)
     .then(response =>
     {
-        console.log('getDashboardURL returned successfully')
-        console.log(response);
-        //this.setState({QuickSightEmbedURL: response.data.EmbedUrl});
         this.embedDashboard(JSON.parse(response.data.body).EmbedUrl);
     })
     .catch(error =>
