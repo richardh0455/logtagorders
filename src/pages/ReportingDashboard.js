@@ -2,17 +2,8 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import { Auth, API } from 'aws-amplify';
 import moment from 'moment'
- var QuickSightEmbedding = require("amazon-quicksight-embedding-sdk");
+var QuickSightEmbedding = require("amazon-quicksight-embedding-sdk");
 
-
-import MomentLocaleUtils, {
-  formatDate,
-  parseDate,
-} from 'react-day-picker/moment';
-
-
-const getAll = '/all';
-const ordersAPI = 'OrdersAPI';
 
 class ReportingDashboard extends React.Component{
 
