@@ -27,6 +27,7 @@ import CreateOrder  from './CreateOrder';
 import Variant  from './Variant';
 import ViewOrders  from './ViewOrders';
 import ViewCustomers  from './ViewCustomers';
+import ReportingDashboard  from './ReportingDashboard';
 import Accordian  from './Accordian';
 import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
@@ -102,7 +103,8 @@ class MainApp extends React.Component {
     API.get('EmbedURL', '', apiRequest)
     .then(response =>
     {
-        this.embedDashboard(JSON.parse(response.data.body).EmbedUrl);
+        this.setState({reportingURL: JSON.parse(response.data.body).EmbedUrl});
+        //this.embedDashboard();
     })
     .catch(error =>
     {
@@ -284,7 +286,7 @@ class MainApp extends React.Component {
           </Accordian>
         </TabPanel>
         <TabPanel>
-          <div id="dashboardContainer"></div>
+          <ReportingDashboard url={this.state.reportingURL} />
         </TabPanel>
       </Tabs>
     </div>
