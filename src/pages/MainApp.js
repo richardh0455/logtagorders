@@ -19,6 +19,7 @@ import awsConfig from '../amplify-config';
 import '../public/css/app.css';
 import '../public/css/gridforms.css';
 import logo from '../public/images/LTLogo.png';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Customer  from './Customer';
 import Product  from './Product';
 import CreateOrder  from './CreateOrder';
@@ -260,29 +261,38 @@ class MainApp extends React.Component {
          <button type="button" id="signout" onClick={this.signOut}>Sign Out</button>
          {this.renderRedirect()}
       </header>
-      <NotificationContainer/>
-      <Accordian>
-        <div label="Create Order" id="1">
-          <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} currencies = {this.parseCurrencies()} />
-        </div>
-        <div label="Create or Update Customer" id="2">
-          <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
-        </div>
-        <div label='Create or Update Product' id="3">
-          <Product get_all_products={this.getProducts.bind(this)} products={this.parseProducts()}  />
-        </div>
-        <div label='Create Variant' id="4">
-          <Variant customers={this.generateCustomerList()} products={this.parseProducts()} />
-        </div>
-        <div label='View Orders' id="5">
-          <ViewOrders customers={this.generateCustomerList()} products={this.parseProducts()}   />
-        </div>
-        <div label='View Customers' id="6">
-          <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
-        </div>
-      </Accordian>
-      <div id="dashboardContainer"></div>
-
+      <Tabs>
+        <TabList>
+          <Tab>Orders</Tab>
+          <Tab>Reports</Tab>
+        </TabList>
+        <TabPanel>
+          <NotificationContainer/>
+          <Accordian>
+            <div label="Create Order" id="1">
+              <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} currencies = {this.parseCurrencies()} />
+            </div>
+            <div label="Create or Update Customer" id="2">
+              <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
+            </div>
+            <div label='Create or Update Product' id="3">
+              <Product get_all_products={this.getProducts.bind(this)} products={this.parseProducts()}  />
+            </div>
+            <div label='Create Variant' id="4">
+              <Variant customers={this.generateCustomerList()} products={this.parseProducts()} />
+            </div>
+            <div label='View Orders' id="5">
+              <ViewOrders customers={this.generateCustomerList()} products={this.parseProducts()}   />
+            </div>
+            <div label='View Customers' id="6">
+              <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
+            </div>
+          </Accordian>
+        </TabPanel>
+        <TabPanel>
+          <div id="dashboardContainer"></div>
+        </TabPanel>
+      </Tabs>
     </div>
       );
   }
