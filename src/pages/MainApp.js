@@ -20,6 +20,7 @@ import '../public/css/app.css';
 import '../public/css/gridforms.css';
 import logo from '../public/images/LTLogo.png';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import "react-tabs/style/react-tabs.css";
 import Customer  from './Customer';
 import Product  from './Product';
 import CreateOrder  from './CreateOrder';
