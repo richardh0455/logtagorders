@@ -288,6 +288,12 @@ class Customer extends React.Component{
       this.state.courier_accounts.map(account => (
         this.createCourierAccount(customerID, account.AccountName)
       ))
+      this.state.hs_codes.map(
+        code  => {
+            this.createHSCode(customerID, code.HSCode)
+        }
+      )
+
       if(success)
       {
         NotificationManager.success('', 'Customer Successfully Created', 3000);
