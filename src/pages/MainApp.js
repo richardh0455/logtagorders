@@ -19,16 +19,21 @@ import awsConfig from '../amplify-config';
 import '../public/css/app.css';
 import '../public/css/gridforms.css';
 import logo from '../public/images/LTLogo.png';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import "react-tabs/style/react-tabs.css";
 import Customer  from './Customer';
 import Product  from './Product';
 import CreateOrder  from './CreateOrder';
 import Variant  from './Variant';
 import ViewOrders  from './ViewOrders';
 import ViewCustomers  from './ViewCustomers';
+import ReportingDashboard  from './ReportingDashboard';
 import Accordian  from './Accordian';
 import { withRouter, Link, Redirect } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
+import moment from 'moment'
+ var QuickSightEmbedding = require("amazon-quicksight-embedding-sdk");
 
 
 const customersAPI = 'CustomersAPI';
@@ -57,7 +62,6 @@ class MainApp extends React.Component {
   }
 
   async signOut() {
-    console.log("Sign Out")
     Auth.signOut()
         .then(data => console.log(data))
         .catch(err => console.log(err));
@@ -68,7 +72,6 @@ class MainApp extends React.Component {
   }
 
   renderRedirect() {
-    console.log(this.state.redirect)
     if(this.state.redirect) {
       return <Redirect to='/signin' />;
     }
@@ -81,6 +84,33 @@ class MainApp extends React.Component {
     this.getCustomers();
     this.getProducts();
     this.getCurrencies();
+    this.getQuicksightURL(session.getIdToken())
+
+  }
+
+  async getQuicksightURL(idToken) {
+    let apiRequest = { // OPTIONAL
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }, // OPTIONAL
+      response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
+      queryStringParameters: {  // OPTIONAL
+        username: idToken.payload.email,
+        sessionName: idToken.payload.sub
+      }
+    }
+    API.get('EmbedURL', '', apiRequest)
+    .then(response =>
+    {
+        this.setState({reportingURL: JSON.parse(response.data.body).EmbedUrl});
+        //this.embedDashboard();
+    })
+    .catch(error =>
+    {
+        console.log(error)
+    });
+
   }
 
   async getProductConfig(id) {
@@ -201,6 +231,23 @@ class MainApp extends React.Component {
 
   }
 
+  embedDashboard(url) {
+           var containerDiv = document.getElementById("dashboardContainer");
+           var params = {
+               url: url,
+               container: containerDiv,
+               scrolling: "yes",
+               height: "700px",
+               parameters: {
+                        StartDate: moment(new Date()).subtract(1, 'month').format('YYYY-MM-DD hh:mm'),
+                        EndDate: moment(new Date()).format('YYYY-MM-DD hh:mm')
+                    }
+           };
+           var dashboard = QuickSightEmbedding.embedDashboard(params);
+           dashboard.on('error', function() {});
+           dashboard.on('load', function() {});
+       }
+
 
   render() {
     return (
@@ -210,27 +257,38 @@ class MainApp extends React.Component {
          <button type="button" id="signout" onClick={this.signOut}>Sign Out</button>
          {this.renderRedirect()}
       </header>
-      <NotificationContainer/>
-      <Accordian>
-        <div label="Create Order" id="1">
-          <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} currencies = {this.parseCurrencies()} />
-        </div>
-        <div label="Create or Update Customer" id="2">
-          <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
-        </div>
-        <div label='Create or Update Product' id="3">
-          <Product get_all_products={this.getProducts.bind(this)} products={this.parseProducts()}  />
-        </div>
-        <div label='Create Variant' id="4">
-          <Variant customers={this.generateCustomerList()} products={this.parseProducts()} />
-        </div>
-        <div label='View Orders' id="5">
-          <ViewOrders customers={this.generateCustomerList()} products={this.parseProducts()}   />
-        </div>
-        <div label='View Customers' id="6">
-          <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
-        </div>
-      </Accordian>
+      <Tabs>
+        <TabList>
+          <Tab>Orders</Tab>
+          <Tab>Reports</Tab>
+        </TabList>
+        <TabPanel>
+          <NotificationContainer/>
+          <Accordian>
+            <div label="Create Order" id="1">
+              <CreateOrder customers={this.generateCustomerList()} products={this.parseProducts()} currencies = {this.parseCurrencies()} />
+            </div>
+            <div label="Create or Update Customer" id="2">
+              <Customer customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)}/>
+            </div>
+            <div label='Create or Update Product' id="3">
+              <Product get_all_products={this.getProducts.bind(this)} products={this.parseProducts()}  />
+            </div>
+            <div label='Create Variant' id="4">
+              <Variant customers={this.generateCustomerList()} products={this.parseProducts()} />
+            </div>
+            <div label='View Orders' id="5">
+              <ViewOrders customers={this.generateCustomerList()} products={this.parseProducts()}   />
+            </div>
+            <div label='View Customers' id="6">
+              <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
+            </div>
+          </Accordian>
+        </TabPanel>
+        <TabPanel>
+          <ReportingDashboard url={this.state.reportingURL} />
+        </TabPanel>
+      </Tabs>
     </div>
       );
   }
