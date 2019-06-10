@@ -57,9 +57,11 @@ class CreateOrder extends React.Component{
           'Authorization': this.state.idToken,
           'Content-Type': 'application/json'
         },
-        body: {"customerID": this.state.currentlySelectedCustomer.value, "invoiceLines": invoiceLines, "purchaseOrderNumber":this.state.purchaseOrderNumber, "currency":this.state.currentlySelectedCurrency.label}
+        body: {"CustomerID": this.state.currentlySelectedCustomer.value, "PurchaseOrderNumber":this.state.purchaseOrderNumber, "Currency":this.state.currentlySelectedCurrency.label}
       };
-      return await API.post(orderAPI, createPath, apiRequest)
+      API.post(orderAPI, '', apiRequest).then(response => {
+        console.log(response.body["InvoiceID"])
+      })
   }
 
   handleCustomerChange = (event) => {
