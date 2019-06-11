@@ -6,6 +6,8 @@ import { Auth, API } from 'aws-amplify';
 const variantsAPI = 'VariantsAPI';
 const getAllPath = '/all';
 
+const customerAPI = 'CustomersAPI';
+
 
 class OrderItem extends Component {
   constructor(props) {
@@ -16,7 +18,8 @@ class OrderItem extends Component {
 		variant_id: order_item ? order_item.variant_id : this.props.item.variant_id,
 		quantity: order_item ? order_item.quantity : this.props.item.quantity,
 		price: order_item ? order_item.price : this.props.item.price,
-		variants: []
+		variants: [],
+    priceList: []
 	};
 
   }
@@ -38,6 +41,7 @@ class OrderItem extends Component {
       if(this.state.currentlySelectedProduct && this.props.customer)
       {
         this.getVariants();
+        this.getPriceList();
       }
     })
   }
@@ -73,10 +77,49 @@ class OrderItem extends Component {
 	});
   }
 
+  getPriceList = () => {
+    var productID = this.state.currentlySelectedProduct.value;
+	  var customerID = this.props.customer.value;
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      queryStringParameters: {
+        'product-id': productID
+      }
+    };
+    //this.setState({currentlySelectedCustomerID:id})
+    API.get(customerAPI, '/'+customerID+'/price-list', apiRequest)
+    .then(response => {
+      this.setState({priceList: JSON.parse(response.body)
+        .map(item => {
+          return {'lower_range':item.Lower_Range, 'upper_range':item.Upper_Range, 'price':item.Price, 'ID':item.ID}})
+        .sort(function(a, b) {
+          return a.upper_range - b.upper_range;
+        })
+      })
+      //console.log(JSON.parse(response.body))
+    })
+  }
+
   handleQuantityChange = (event) => {
-	this.setState({quantity: event.target.value});
-  this.props.item.quantity = event.target.value;
-  this.props.update_item_handler(this.props.item.key, this.props.item)
+    var quantity = event.target.value;
+	   this.setState({quantity: quantity});
+     this.props.item.quantity = quantity;
+     this.props.update_item_handler(this.props.item.key, this.props.item)
+
+     var quantityInt = parseInt(quantity)
+     var minPrice = this.state.priceList.length > 0 && this.state.priceList.reduce(
+       (min, item) =>
+          quantityInt >= parseInt(item.lower_range)
+          && quantityInt <= parseInt(item.upper_range)
+          &&  parseFloat(item.price) < parseFloat(min.price)
+          ? item : min);
+     if(quantityInt >= parseInt(minPrice.lower_range) && quantityInt <= parseInt(minPrice.upper_range))
+     {
+       this.handlePriceChange({target:{value:minPrice.price}})
+     }
   }
 
   handlePriceChange = (event) => {
