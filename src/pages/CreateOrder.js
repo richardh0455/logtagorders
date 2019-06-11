@@ -89,6 +89,9 @@ class CreateOrder extends React.Component{
        this.setState({customer: response.body})
        this.handleShippingAddressChange(null);
        this.handleCourierAccountChange(null);
+       this.handleHSCodeChange(null);
+       this.handlePurchaseOrderNumberChange(null);
+       this.handleCurrencyChange(null);
      });
 
 
