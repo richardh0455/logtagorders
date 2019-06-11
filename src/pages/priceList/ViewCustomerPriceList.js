@@ -169,6 +169,7 @@ class ViewCustomers extends React.Component{
     this.state.priceList.map(item => {
         this.updatePriceItem(item);
     });
+    NotificationManager.success('', 'Price List Successfully Updated', 3000);
 
   }
 
