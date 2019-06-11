@@ -27,6 +27,7 @@ import CreateOrder  from './CreateOrder';
 import Variant  from './Variant';
 import ViewOrders  from './ViewOrders';
 import ViewCustomers  from './ViewCustomers';
+import ViewCustomerPriceList  from './priceList/ViewCustomerPriceList';
 import ReportingDashboard  from './ReportingDashboard';
 import Accordian  from './Accordian';
 import { withRouter, Link, Redirect } from 'react-router-dom';
@@ -282,6 +283,9 @@ class MainApp extends React.Component {
             </div>
             <div label='View Customers' id="6">
               <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
+            </div>
+            <div label='View Price Lists' id="7">
+              <ViewCustomerPriceList customers={this.generateCustomerList()} products={this.parseProducts()} />
             </div>
           </Accordian>
         </TabPanel>
