@@ -276,8 +276,7 @@ class OrderList extends Component {
 		 if (window.confirm('Are you sure?')) {
 	     this.props.create_invoice_handler(this.buildInvoiceBody())
 			 .then( response => {
-						var parsed_body = JSON.parse(JSON.parse(response.body))
-						var logtagInvoiceNumber = parsed_body["LogtagInvoiceNumber"];
+						var logtagInvoiceNumber = response["LogtagInvoiceNumber"];
 						this.generatePDF(logtagInvoiceNumber);
 						NotificationManager.success('', 'Order Successfully Created', 3000);
 					})

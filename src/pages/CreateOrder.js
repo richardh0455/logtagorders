@@ -52,16 +52,34 @@ class CreateOrder extends React.Component{
 
 
   async createInvoice(invoiceLines) {
-        const apiRequest = {
-        headers: {
-          'Authorization': this.state.idToken,
-          'Content-Type': 'application/json'
-        },
-        body: {"CustomerID": this.state.currentlySelectedCustomer.value, "PurchaseOrderNumber":this.state.purchaseOrderNumber, "Currency":this.state.currentlySelectedCurrency.label}
-      };
-      API.post(orderAPI, '', apiRequest).then(response => {
-        console.log(response.body["InvoiceID"])
-      })
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: {"CustomerID": this.state.currentlySelectedCustomer.value, "PurchaseOrderNumber":this.state.purchaseOrderNumber, "Currency":this.state.currentlySelectedCurrency.label}
+    };
+    return API.post(orderAPI, '', apiRequest).then(response => {
+      invoiceLines.map((line, key) =>
+        this.createInvoiceLine(response.body["InvoiceID"], line)
+      );
+      return response.body
+
+    })
+  }
+
+  async createInvoiceLine(invoiceID, invoiceLine) {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Price, "VariationID": invoiceLine.VariationID}
+    };
+    API.post(orderAPI, '/'+invoiceID+'/order-lines', apiRequest).then(response => {
+      console.log(response.body)
+    })
+
   }
 
   handleCustomerChange = (event) => {
