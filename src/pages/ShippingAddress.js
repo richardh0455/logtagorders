@@ -27,6 +27,15 @@ class ShippingAddress extends Component {
     //this.props.address3 = event.target.value
     this.props.update_address_handler(this.props.id, 'address4',event.target.value)
   }
+  handleStateChange = (event) => {
+    //this.props.address3 = event.target.value
+    this.props.update_address_handler(this.props.id, 'state',event.target.value)
+  }
+  handleCountryChange = (event) => {
+    //this.props.address3 = event.target.value
+    this.props.update_address_handler(this.props.id, 'country',event.target.value)
+  }
+
 
 
   //}
@@ -46,7 +55,7 @@ class ShippingAddress extends Component {
   render() {
     return (
       <div className onKeyPress={this.onKeyPress}>
-      <div data-row-span="7">
+      <div data-row-span="9">
 			<div data-field-span="2">
 				<label>Address Line 1</label>
 				<input type="text" value={this.props.address1} onChange={this.handleAddress1Change} />
@@ -58,6 +67,14 @@ class ShippingAddress extends Component {
       <div data-field-span="1">
 				<label>City</label>
 				<input type="text" value={this.props.address3}  onChange={this.handleAddress3Change}/>
+			</div>
+      <div data-field-span="1">
+				<label>State</label>
+				<input type="text" value={this.props.state}  onChange={this.handleStateChange}/>
+			</div>
+      <div data-field-span="1">
+				<label>Country</label>
+				<input type="text" value={this.props.country}  onChange={this.handleCountryChange}/>
 			</div>
       <div data-field-span="1">
 				<label>Postal Code</label>

@@ -24,8 +24,8 @@ class Customer extends React.Component{
       name: '',
       currentlySelectedRegion: {value:""},
       email: '',
-      billing_address:{ID:'0', address1:'',address2:'',address3:'',address4:'', created:true},
-      shipping_addresses:[{ID:'0', address1:'',address2:'',address3:'',address4:'', created:true}],
+      billing_address:{ID:'0', address1:'',address2:'',address3:'',address4:'', state:'', country:'', created:true},
+      shipping_addresses:[{ID:'0', address1:'',address2:'',address3:'',address4:'', state:'', country:'', created:true}],
       counter:'0',
       regions: [{value:"NA", label: "North America"},{value:"LATAM", label: "Latin America"},{value:"EMEA", label: "Europe, Middle East and Africa"},{value:"C", label: "Central"},{value:"A", label: "Asia"},{value:"OC", label: "Oceania"}],
       primary_contact_name:'',
@@ -88,6 +88,8 @@ class Customer extends React.Component{
       address2: addressSections[1] || '',
       address3: addressSections[2] || '',
       address4: addressSections[3] || '',
+      state: addressSections[4] || '',
+      country: addressSections[5] || '',
       ID: '1'
     }
   }
@@ -100,6 +102,8 @@ class Customer extends React.Component{
           address2: addressSections[1] || '',
           address3: addressSections[2] || '',
           address4: addressSections[3] || '',
+          state: addressSections[4] || '',
+          country: addressSections[5] || '',
           ID: address.ID
         }
     })
@@ -107,7 +111,7 @@ class Customer extends React.Component{
   }
 
   buildAddress(addressObject){
-    return addressObject.address1+', '+addressObject.address2+', '+addressObject.address3+', '+addressObject.address4
+    return addressObject.address1+', '+addressObject.address2+', '+addressObject.address3+', '+addressObject.state+', '+addressObject.country+', '+addressObject.address4
 
   }
 
@@ -797,14 +801,14 @@ class Customer extends React.Component{
      <fieldset>
      <div data-row-span="1">
         <label>Billing Address</label>
-        <ShippingAddress address1={this.state.billing_address.address1} address2={this.state.billing_address.address2} address3={this.state.billing_address.address3} address4={this.state.billing_address.address4} id='1' update_address_handler={this.handleBillingAddressChange} />
+        <ShippingAddress address1={this.state.billing_address.address1} address2={this.state.billing_address.address2} address3={this.state.billing_address.address3} address4={this.state.billing_address.address4} state={this.state.billing_address.state} country={this.state.billing_address.country} id='1' update_address_handler={this.handleBillingAddressChange} />
       </div>
      </fieldset>
 
      <fieldset>
        <label>Shipping Addresses</label>
        {this.state.shipping_addresses.map(address => (
-       <ShippingAddress address1={address.address1} address2={address.address2} address3={address.address3} address4={address.address4} id={address.ID} update_address_handler={this.shippingAddressUpdated} />
+       <ShippingAddress address1={address.address1} address2={address.address2} address3={address.address3} address4={address.address4} state={address.state} country={address.country} id={address.ID} update_address_handler={this.shippingAddressUpdated} />
        ))}
 
        <button onClick={this.addShippingAddress}>Add Shipping Address</button>
