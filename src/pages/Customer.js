@@ -61,7 +61,8 @@ class Customer extends React.Component{
         }
         else
         {
-          this.setState({shipping_addresses: response});
+          var parsed_addresses = response.map(address => {return {street:address.Street, suburb:address.Suburb, city: address.City, state:address.State, country: address.Country, post_code: address.PostCode}})
+          this.setState({shipping_addresses: parsed_addresses});
         }
        })
        var courierAccounts = parsed_customer.CourierAccounts.map(account => {return {AccountID:account.ID, AccountName : account.CourierAccount}})
