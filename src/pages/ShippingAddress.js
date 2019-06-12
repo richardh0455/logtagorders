@@ -11,21 +11,21 @@ class ShippingAddress extends Component {
   }
 
 
-  handleAddress1Change = (event) => {
+  handleStreetChange = (event) => {
 	   //this.props.address1 = event.target.value
-     this.props.update_address_handler(this.props.id, 'address1',event.target.value)
+     this.props.update_address_handler(this.props.id, 'street',event.target.value)
   }
-  handleAddress2Change = (event) => {
+  handleSuburbChange = (event) => {
 	   //this.props.address2 = event.target.value
-     this.props.update_address_handler(this.props.id, 'address2',event.target.value)
+     this.props.update_address_handler(this.props.id, 'suburb',event.target.value)
   }
-  handleAddress3Change = (event) => {
+  handleCityChange = (event) => {
     //this.props.address3 = event.target.value
-    this.props.update_address_handler(this.props.id, 'address3',event.target.value)
+    this.props.update_address_handler(this.props.id, 'city',event.target.value)
   }
-  handleAddress4Change = (event) => {
+  handlePostCodeChange = (event) => {
     //this.props.address3 = event.target.value
-    this.props.update_address_handler(this.props.id, 'address4',event.target.value)
+    this.props.update_address_handler(this.props.id, 'post_code',event.target.value)
   }
   handleStateChange = (event) => {
     //this.props.address3 = event.target.value
@@ -57,16 +57,16 @@ class ShippingAddress extends Component {
       <div className onKeyPress={this.onKeyPress}>
       <div data-row-span="9">
 			<div data-field-span="2">
-				<label>Address Line 1</label>
-				<input type="text" value={this.props.address1} onChange={this.handleAddress1Change} />
+				<label>Street</label>
+				<input type="text" value={this.props.street} onChange={this.handleStreetChange} />
 			</div>
       <div data-field-span="2">
-				<label>Address Line 2</label>
-				<input type="text" value={this.props.address2}  onChange={this.handleAddress2Change}/>
+				<label>Suburb</label>
+				<input type="text" value={this.props.suburb}  onChange={this.handleSuburbChange}/>
 			</div>
       <div data-field-span="1">
 				<label>City</label>
-				<input type="text" value={this.props.address3}  onChange={this.handleAddress3Change}/>
+				<input type="text" value={this.props.city}  onChange={this.handleCityChange}/>
 			</div>
       <div data-field-span="1">
 				<label>State</label>
@@ -78,7 +78,7 @@ class ShippingAddress extends Component {
 			</div>
       <div data-field-span="1">
 				<label>Postal Code</label>
-				<input type="text" value={this.props.address4} onChange={this.handleAddress4Change} />
+				<input type="text" value={this.props.post_code} onChange={this.handlePostCodeChange} />
 			</div>
 			<div data-field-span="1">
 				<button onClick={this.removeItem}  >Remove Item</button>

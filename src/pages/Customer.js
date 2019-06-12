@@ -24,8 +24,8 @@ class Customer extends React.Component{
       name: '',
       currentlySelectedRegion: {value:""},
       email: '',
-      billing_address:{ID:'0', address1:'',address2:'',address3:'',address4:'', state:'', country:'', created:true},
-      shipping_addresses:[{ID:'0', address1:'',address2:'',address3:'',address4:'', state:'', country:'', created:true}],
+      shipping_addresses:[{ID:'0', street:'',suburb:'',city:'',post_code:'', state:'',country:'', created:true}],
+      shipping_addresses:[{ID:'0', street:'',suburb:'',city:'',post_code:'', state:'',country:'', created:true}],
       counter:'0',
       regions: [{value:"NA", label: "North America"},{value:"LATAM", label: "Latin America"},{value:"EMEA", label: "Europe, Middle East and Africa"},{value:"C", label: "Central"},{value:"A", label: "Asia"},{value:"OC", label: "Oceania"}],
       primary_contact_name:'',
@@ -53,7 +53,9 @@ class Customer extends React.Component{
        if(!region){
          region = {value:""}
        }
-       var shippingAddresses = parsed_customer.ShippingAddresses
+       var shippingAddresses = this.getShippingAddresses(event.value).then(response => {
+         return response;
+       })
        if ( shippingAddresses === undefined || parsed_customer.ShippingAddresses.length == 0) {
          this.addShippingAddress(event);
        }
@@ -65,7 +67,7 @@ class Customer extends React.Component{
          currentlySelectedRegion: region,
          email: contactInfo.Contact_Email,
          billing_address: this.parseBillingAddress(contactInfo.Billing_Address),
-         shipping_addresses: this.parseShippingAddresses(parsed_customer.ShippingAddresses),
+         shipping_addresses: shippingAddresses,
          primary_contact_name: contactInfo.PrimaryContact.Name,
          primary_contact_phone: contactInfo.PrimaryContact.Phone,
          primary_contact_fax: contactInfo.PrimaryContact.Fax,
@@ -84,18 +86,18 @@ class Customer extends React.Component{
   parseBillingAddress(rawBillingAddress){
     var addressSections = rawBillingAddress.split(',').map(address => address.trim());
     return {
-      address1: addressSections[0] || '',
-      address2: addressSections[1] || '',
-      address3: addressSections[2] || '',
+      street: addressSections[0] || '',
+      suburb: addressSections[1] || '',
+      city: addressSections[2] || '',
       state: addressSections[3] || '',
       country: addressSections[4] || '',
-      address4: addressSections[5] || '',
+      post_code: addressSections[5] || '',
 
       ID: '1'
     }
   }
 
-  parseShippingAddresses(rawShippingAddresses){
+  /*parseShippingAddresses(rawShippingAddresses){
     return rawShippingAddresses.map(address => {
         var addressSections = address.ShippingAddress.split(',').map(address => address.trim());
         return {
@@ -109,7 +111,7 @@ class Customer extends React.Component{
         }
     })
 
-  }
+  }*/
 
   buildAddress(addressObject){
     return addressObject.address1+', '+addressObject.address2+', '+addressObject.address3+', '+addressObject.state+', '+addressObject.country+', '+addressObject.address4
@@ -317,10 +319,31 @@ class Customer extends React.Component{
     })
   }
 
+  async getShippingAddresses(customerID)
+  {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    const success = API.get(customersAPI, "/"+customerID+"/shipping-addresses", apiRequest)
+    .then(response =>
+    {
+      return JSON.parse(response.body);
+    })
+    .catch(err =>
+    {
+      NotificationManager.error('Address creation Failed', 'Error', 5000, () => {});
+      return false;
+    })
+    return success;
+  }
+
   async createShippingAddresses(customerID, shipping_addresses)
   {
     for(var index = 0; index < shipping_addresses.length; index++) {
-      var result = await this.createShippingAddress(customerID, this.buildAddress(shipping_addresses[index]));
+      var result = await this.createShippingAddress(customerID, shipping_addresses[index]);
       if(!result)
       {
         return false;
@@ -334,13 +357,13 @@ class Customer extends React.Component{
     for(var index = 0; index < shipping_addresses.length; index++) {
       if(shipping_addresses[index].created)
       {
-        var result = await this.createShippingAddress(customerID, this.buildAddress(shipping_addresses[index]));
+        var result = await this.createShippingAddress(customerID, shipping_addresses[index]);
         if(!result)
         {
           return false;
         }
       } else {
-        var result = await this.updateShippingAddress(customerID,shipping_addresses[index].ID, this.buildAddress(shipping_addresses[index]));
+        var result = await this.updateShippingAddress(customerID,shipping_addresses[index].ID, shipping_addresses[index]);
         if(!result)
         {
           return false;
@@ -360,9 +383,15 @@ class Customer extends React.Component{
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
-      body:{"ShippingAddress": shipping_address}
+      body:{"Street": shipping_address.street,
+        "Suburb" : shipping_address.suburb,
+        "City": shipping_address.city,
+        "State": shipping_address.state,
+        "Country": shipping_address.country,
+        "PostCode":shipping_address.post_code
+      }
     };
-    const success = API.post(customersAPI, "/"+customerID+"/shipping-addresses/create", apiRequest)
+    const success = API.post(customersAPI, "/"+customerID+"/shipping-addresses", apiRequest)
     .then(response =>
     {
       return true;
@@ -382,9 +411,15 @@ class Customer extends React.Component{
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
-      body:{"ShippingAddress": shipping_address}
+      body:{"Street": shipping_address.street,
+        "Suburb" : shipping_address.suburb,
+        "City": shipping_address.city,
+        "State": shipping_address.state,
+        "Country": shipping_address.country,
+        "PostCode":shipping_address.post_code
+      }
     };
-    const success = API.post(customersAPI, "/"+customerID+"/shipping-addresses/"+shipping_address_id+"/update", apiRequest)
+    const success = API.put(customersAPI, "/"+customerID+"/shipping-addresses/"+shipping_address_id, apiRequest)
     .then(response =>
     {
       return true;
@@ -409,7 +444,7 @@ class Customer extends React.Component{
         'Content-Type': 'application/json'
       }
     };
-    API.del(customersAPI, "/"+customerID+"/shipping-addresses/"+shipping_address_id+deletePath, apiRequest)
+    API.del(customersAPI, "/"+customerID+"/shipping-addresses/"+shipping_address_id, apiRequest)
     .then(response =>
     {
       var affectedRows = response.body["AffectedRows"];
@@ -425,7 +460,7 @@ class Customer extends React.Component{
     .catch(err =>
     {
       console.log(err);
-      NotificationManager.error('Deleting Shipping Addres', 'Error', 5000, () => {});
+      NotificationManager.error('Deleting Shipping Address', 'Error', 5000, () => {});
     })
   }
 
@@ -655,7 +690,7 @@ class Customer extends React.Component{
       //Some events have no default. Expected behavior
     }
     var key = Number(this.state.counter) + 1;
-    var default_item = {ID:'0', address1:'',address2:'',address3:'',address4:'', created:true};
+    var default_item = {ID:'0', street:'',suburb:'',city:'',post_code:'',state:'',country:'', created:true};
     var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
     cloneOfDefault.ID = key;
     var shipping_addresses = this.state.shipping_addresses;
@@ -716,8 +751,8 @@ class Customer extends React.Component{
       name: '',
       currentlySelectedRegion: {},
       email: '',
-      billing_address:{ID:'0', address1:'',address2:'',address3:'',address4:'', state:'',country:'', created:true},
-      shipping_addresses:[{ID:'0', address1:'',address2:'',address3:'',address4:'', state:'',country:'', created:true}],
+      billing_address:{ID:'0', street:'',suburb:'',city:'',post_code:'', state:'',country:'', created:true},
+      shipping_addresses:[{ID:'0', street:'',suburb:'',city:'',post_code:'', state:'',country:'', created:true}],
       primary_contact_name:'',
       primary_contact_phone:'',
       primary_contact_fax:'',
@@ -802,14 +837,14 @@ class Customer extends React.Component{
      <fieldset>
      <div data-row-span="1">
         <label>Billing Address</label>
-        <ShippingAddress address1={this.state.billing_address.address1} address2={this.state.billing_address.address2} address3={this.state.billing_address.address3} address4={this.state.billing_address.address4} state={this.state.billing_address.state} country={this.state.billing_address.country} id='1' update_address_handler={this.handleBillingAddressChange} />
+        <ShippingAddress street={this.state.billing_address.street} suburb={this.state.billing_address.suburb} city={this.state.billing_address.city} post_code={this.state.billing_address.post_code} state={this.state.billing_address.state} country={this.state.billing_address.country} id='1' update_address_handler={this.handleBillingAddressChange} />
       </div>
      </fieldset>
 
      <fieldset>
        <label>Shipping Addresses</label>
        {this.state.shipping_addresses.map(address => (
-       <ShippingAddress address1={address.address1} address2={address.address2} address3={address.address3} address4={address.address4} state={address.state} country={address.country} id={address.ID} update_address_handler={this.shippingAddressUpdated} />
+       <ShippingAddress street={address.street} suburb={address.suburb} city={address.city} post_code={address.post_code} state={address.state} country={address.country} id={address.ID} update_address_handler={this.shippingAddressUpdated} />
        ))}
 
        <button onClick={this.addShippingAddress}>Add Shipping Address</button>
