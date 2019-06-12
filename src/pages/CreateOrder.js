@@ -26,6 +26,7 @@ class CreateOrder extends React.Component{
       currentlySelectedShippingAddress: null,
       currentlySelectedCourierAccount: null,
       currentlySelectedHSCode: null,
+      currentlySelectedCurrency: null,
 	  customer: null,
     purchaseOrderNumber:''
     };
