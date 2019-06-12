@@ -110,7 +110,7 @@ class OrderList extends Component {
 		this.generateDate(doc, pageWidth, margin, initY);
 		this.generatePurchaseOrderNumber(doc,pageWidth, margin, initY);
 		this.generateShippingAccount(doc, margin, initY);
-		var postTableY = this.generateOrderTable(doc, margin, 125);
+		var postTableY = this.generateOrderTable(doc, margin, 148);
 		this.generateBankDetails(doc, margin, postTableY);
 		this.generateFooter(doc, pageWidth, margin, postTableY);
 
@@ -150,7 +150,7 @@ class OrderList extends Component {
 		 var shippingLines = this.props.shippingAddress.label.split(',').map(s => s.trim());
 		 var addressText= addressArray.concat(shippingLines);
 		 doc.text(addressText, margin+doc.getTextWidth(addressTitle), yCoord);
-		 yCoord += 28;
+		 yCoord += 42;
 		 doc.text("Tel: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Phone"], margin, yCoord);
 		 doc.text("Fax: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Fax"], margin, yCoord + 5);
 		 doc.text("Attn: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Name"], margin, yCoord + 15);
@@ -187,7 +187,7 @@ class OrderList extends Component {
 		 doc.setFontSize(12);
 		 var courierAccount = this.props.courierAccount.label || '';
 		 var shippingInfo = 'Ship Via:- '+courierAccount;
-		 doc.text(shippingInfo,  margin, initY+124);
+		 doc.text(shippingInfo,  margin, initY+148);
 	 }
 
 
