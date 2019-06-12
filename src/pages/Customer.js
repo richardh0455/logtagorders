@@ -54,6 +54,7 @@ class Customer extends React.Component{
          region = {value:""}
        }
        var shippingAddresses = this.getShippingAddresses(event.value).then(response => {
+         console.log(response);
          return response;
        })
        console.log('Shipping Addresses:')
