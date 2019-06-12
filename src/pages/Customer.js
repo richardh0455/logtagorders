@@ -53,15 +53,17 @@ class Customer extends React.Component{
        if(!region){
          region = {value:""}
        }
-       var shippingAddresses = this.getShippingAddresses(event.value).then(response => {
-         console.log(response);
-         return response;
+
+       this.getShippingAddresses(event.value).then(response => {
+        if(response === undefined || response.length == 0)
+        {
+          this.addShippingAddress(event);
+        }
+        else
+        {
+          this.setState({shipping_addresses: response});
+        }
        })
-       console.log('Shipping Addresses:')
-       console.log(shippingAddresses)
-       if ( shippingAddresses === undefined || shippingAddresses.length == 0) {
-         this.addShippingAddress(event);
-       }
        var courierAccounts = parsed_customer.CourierAccounts.map(account => {return {AccountID:account.ID, AccountName : account.CourierAccount}})
 
        var hsCodes = parsed_customer.HSCodes.map(code => {return {ID: code.ID, HSCode : code.HSCode}})
@@ -70,7 +72,6 @@ class Customer extends React.Component{
          currentlySelectedRegion: region,
          email: contactInfo.Contact_Email,
          billing_address: this.parseBillingAddress(contactInfo.Billing_Address),
-         shipping_addresses: shippingAddresses,
          primary_contact_name: contactInfo.PrimaryContact.Name,
          primary_contact_phone: contactInfo.PrimaryContact.Phone,
          primary_contact_fax: contactInfo.PrimaryContact.Fax,
