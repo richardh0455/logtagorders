@@ -56,7 +56,7 @@ class Customer extends React.Component{
        var shippingAddresses = this.getShippingAddresses(event.value).then(response => {
          return response;
        })
-       if ( shippingAddresses === undefined || parsed_customer.ShippingAddresses.length == 0) {
+       if ( shippingAddresses === undefined || shippingAddresses.length == 0) {
          this.addShippingAddress(event);
        }
        var courierAccounts = parsed_customer.CourierAccounts.map(account => {return {AccountID:account.ID, AccountName : account.CourierAccount}})
