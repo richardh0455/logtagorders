@@ -24,7 +24,7 @@ class Customer extends React.Component{
       name: '',
       currentlySelectedRegion: {value:""},
       email: '',
-      shipping_addresses:[{ID:'0', street:'',suburb:'',city:'',post_code:'', state:'',country:'', created:true}],
+      billing_address:[{ID:'0', street:'',suburb:'',city:'',post_code:'', state:'',country:'', created:true}],
       shipping_addresses:[{ID:'0', street:'',suburb:'',city:'',post_code:'', state:'',country:'', created:true}],
       counter:'0',
       regions: [{value:"NA", label: "North America"},{value:"LATAM", label: "Latin America"},{value:"EMEA", label: "Europe, Middle East and Africa"},{value:"C", label: "Central"},{value:"A", label: "Asia"},{value:"OC", label: "Oceania"}],
