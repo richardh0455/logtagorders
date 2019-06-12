@@ -87,9 +87,10 @@ class Customer extends React.Component{
       address1: addressSections[0] || '',
       address2: addressSections[1] || '',
       address3: addressSections[2] || '',
-      address4: addressSections[3] || '',
-      state: addressSections[4] || '',
-      country: addressSections[5] || '',
+      state: addressSections[3] || '',
+      country: addressSections[4] || '',
+      address4: addressSections[5] || '',
+
       ID: '1'
     }
   }
@@ -101,9 +102,9 @@ class Customer extends React.Component{
           address1: addressSections[0] || '',
           address2: addressSections[1] || '',
           address3: addressSections[2] || '',
-          address4: addressSections[3] || '',
-          state: addressSections[4] || '',
-          country: addressSections[5] || '',
+          state: addressSections[3] || '',
+          country: addressSections[4] || '',
+          address4: addressSections[5] || '',
           ID: address.ID
         }
     })
@@ -715,8 +716,8 @@ class Customer extends React.Component{
       name: '',
       currentlySelectedRegion: {},
       email: '',
-      billing_address:{ID:'0', address1:'',address2:'',address3:'',address4:'', created:true},
-      shipping_addresses:[{ID:'0', address1:'',address2:'',address3:'',address4:'', created:true}],
+      billing_address:{ID:'0', address1:'',address2:'',address3:'',address4:'', state:'',country:'', created:true},
+      shipping_addresses:[{ID:'0', address1:'',address2:'',address3:'',address4:'', state:'',country:'', created:true}],
       primary_contact_name:'',
       primary_contact_phone:'',
       primary_contact_fax:'',

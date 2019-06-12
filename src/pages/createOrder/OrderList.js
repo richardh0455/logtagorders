@@ -110,7 +110,7 @@ class OrderList extends Component {
 		this.generateDate(doc, pageWidth, margin, initY);
 		this.generatePurchaseOrderNumber(doc,pageWidth, margin, initY);
 		this.generateShippingAccount(doc, margin, initY);
-		var postTableY = this.generateOrderTable(doc, margin, 148);
+		var postTableY = this.generateOrderTable(doc, margin, 150);
 		this.generateBankDetails(doc, margin, postTableY);
 		this.generateFooter(doc, pageWidth, margin, postTableY);
 
@@ -187,7 +187,7 @@ class OrderList extends Component {
 		 doc.setFontSize(12);
 		 var courierAccount = this.props.courierAccount.label || '';
 		 var shippingInfo = 'Ship Via:- '+courierAccount;
-		 doc.text(shippingInfo,  margin, initY+148);
+		 doc.text(shippingInfo,  margin, initY+141);
 	 }
 
 
