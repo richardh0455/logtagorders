@@ -329,7 +329,7 @@ class Customer extends React.Component{
         'Content-Type': 'application/json'
       }
     };
-    const success = API.get(customersAPI, "/"+customerID+"/shipping-addresses", apiRequest)
+    return API.get(customersAPI, "/"+customerID+"/shipping-addresses", apiRequest)
     .then(response =>
     {
       return JSON.parse(response.body);
@@ -339,7 +339,6 @@ class Customer extends React.Component{
       NotificationManager.error('Address creation Failed', 'Error', 5000, () => {});
       return false;
     })
-    return success;
   }
 
   async createShippingAddresses(customerID, shipping_addresses)
