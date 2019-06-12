@@ -56,6 +56,8 @@ class Customer extends React.Component{
        var shippingAddresses = this.getShippingAddresses(event.value).then(response => {
          return response;
        })
+       console.log('Shipping Addresses:')
+       console.log(shippingAddresses)
        if ( shippingAddresses === undefined || shippingAddresses.length == 0) {
          this.addShippingAddress(event);
        }
