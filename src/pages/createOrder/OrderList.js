@@ -185,7 +185,8 @@ class OrderList extends Component {
 
 	 generateShippingAccount(doc, margin, initY) {
 		 doc.setFontSize(12);
-		 var shippingInfo = 'Ship Via:- '+this.props.courierAccount.label;
+		 var courierAccount = this.props.courierAccount.label || '';
+		 var shippingInfo = 'Ship Via:- '+courierAccount;
 		 doc.text(shippingInfo,  margin, initY+124);
 	 }
 

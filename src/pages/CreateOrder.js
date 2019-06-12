@@ -52,12 +52,13 @@ class CreateOrder extends React.Component{
 
 
   async createInvoice(invoiceLines) {
+    var currency = this.state.currentlySelectedCurrency.label || ''
     const apiRequest = {
       headers: {
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
-      body: {"CustomerID": this.state.currentlySelectedCustomer.value, "PurchaseOrderNumber":this.state.purchaseOrderNumber, "Currency":this.state.currentlySelectedCurrency.label}
+      body: {"CustomerID": this.state.currentlySelectedCustomer.value, "PurchaseOrderNumber":this.state.purchaseOrderNumber, "Currency":currency}
     };
     return API.post(orderAPI, '', apiRequest).then(response => {
       invoiceLines.map((line, key) =>
