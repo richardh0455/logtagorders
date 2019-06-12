@@ -277,11 +277,14 @@ class OrderList extends Component {
 	     this.props.create_invoice_handler(this.buildInvoiceBody())
 			 .then( response => {
 						var logtagInvoiceNumber = response["LogtagInvoiceNumber"];
+						console.log(response)
 						this.generatePDF(logtagInvoiceNumber);
 						NotificationManager.success('', 'Order Successfully Created', 3000);
 					})
 					.catch(err =>
 		      {
+						console.log('Create Order Error:')
+						console.log(err)
 		        NotificationManager.error('Order Creation Failed', 'Error', 5000, () => {});
 		        return false;
 		      })
