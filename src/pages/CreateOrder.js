@@ -90,7 +90,7 @@ class CreateOrder extends React.Component{
        this.handleShippingAddressChange(null);
        this.handleCourierAccountChange(null);
        this.handleHSCodeChange(null);
-       this.handlePurchaseOrderNumberChange(null);
+       this.handlePurchaseOrderNumberChange('');
        this.handleCurrencyChange(null);
      });
 
