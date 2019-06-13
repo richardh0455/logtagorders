@@ -91,41 +91,6 @@ class Customer extends React.Component{
 
   }
 
-  parseBillingAddress(rawBillingAddress){
-    var addressSections = rawBillingAddress.split(',').map(address => address.trim());
-    return {
-      street: addressSections[0] || '',
-      suburb: addressSections[1] || '',
-      city: addressSections[2] || '',
-      state: addressSections[3] || '',
-      country: addressSections[4] || '',
-      post_code: addressSections[5] || '',
-
-      ID: '1'
-    }
-  }
-
-  /*parseShippingAddresses(rawShippingAddresses){
-    return rawShippingAddresses.map(address => {
-        var addressSections = address.ShippingAddress.split(',').map(address => address.trim());
-        return {
-          address1: addressSections[0] || '',
-          address2: addressSections[1] || '',
-          address3: addressSections[2] || '',
-          state: addressSections[3] || '',
-          country: addressSections[4] || '',
-          address4: addressSections[5] || '',
-          ID: address.ID
-        }
-    })
-
-  }*/
-
-  buildAddress(addressObject){
-    return addressObject.address1+', '+addressObject.address2+', '+addressObject.address3+', '+addressObject.state+', '+addressObject.country+', '+addressObject.address4
-
-  }
-
   handleRegionChange = (event) => {
     this.setState({currentlySelectedRegion: event})
   }

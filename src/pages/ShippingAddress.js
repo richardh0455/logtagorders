@@ -42,7 +42,7 @@ class ShippingAddress extends Component {
 
   removeItem = (event) => {
 	event.preventDefault();
-	this.props.update_address_handler(this.props.id, null)
+	this.props.update_address_handler(this.props.id, 'deleted', event.target.value)
   }
 
   onKeyPress = (event) => {
