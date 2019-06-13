@@ -28,7 +28,8 @@ class CreateOrder extends React.Component{
       currentlySelectedHSCode: null,
       currentlySelectedCurrency: null,
 	  customer: null,
-    purchaseOrderNumber:''
+    purchaseOrderNumber:'',
+    shipping_addresses:[]
     };
   }
 
@@ -49,6 +50,16 @@ class CreateOrder extends React.Component{
       }
     };
     return await API.get(customersAPI, '/'+id, apiRequest)
+  }
+
+  async getShippingAddresses(id) {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    return await API.get(customersAPI, '/'+id+'/shipping-addresses', apiRequest)
   }
 
 
@@ -89,6 +100,7 @@ class CreateOrder extends React.Component{
      this.getCustomer(event.value)
      .then(response => {
        this.setState({customer: response.body})
+       this.getShippingAddresses(event.value).then(response => this.generateShippingAddressList(JSON.parse(response.body)))
        this.handleShippingAddressChange(null);
        this.handleCourierAccountChange(null);
        this.handleHSCodeChange(null);
@@ -98,6 +110,8 @@ class CreateOrder extends React.Component{
 
 
   }
+
+
 
   handleShippingAddressChange = (event) => {
 	   this.setState({currentlySelectedShippingAddress: event})
@@ -119,14 +133,10 @@ class CreateOrder extends React.Component{
     this.setState({currentlySelectedCurrency: event})
   }
 
-   generateShippingAddressList(customer) {
-    let shippingAddresses = [];
-    if(customer && "ShippingAddresses" in customer){
-        shippingAddresses = customer.ShippingAddresses.map((address) =>
-			{return {value:address.ShippingAddressID, label: address.ShippingAddress}}
-        );
-    }
-    return shippingAddresses;
+   generateShippingAddressList(shipping_addresses) {
+    var shippingAddresses =  shipping_addresses.map((address) =>
+			{return {value:address.ID, label: address.Street}});
+    this.setState({shipping_addresses: shippingAddresses});    
   }
 
   generateCourierAccountList(customer) {
@@ -172,7 +182,7 @@ class CreateOrder extends React.Component{
               </div>
               <div data-field-span="1" >
                 <label>Shipping Address</label>
-                <Select value={this.state.currentlySelectedShippingAddress} onChange={this.handleShippingAddressChange} options={this.generateShippingAddressList(JSON.parse(this.state.customer))} placeholder="Select a Shipping Address"/>
+                <Select value={this.state.currentlySelectedShippingAddress} onChange={this.handleShippingAddressChange} options={this.state.shipping_addresses} placeholder="Select a Shipping Address"/>
                 {this.required(this.state.currentlySelectedShippingAddress)}
               </div>
 
