@@ -45,7 +45,7 @@ class SignIn extends React.Component {
 
   renderRedirect = () => {
     if (this.state.redirect) {
-      return <Redirect to= {{pathname: '/app', state: { QuickSightEmbedURL: this.state.QuickSightEmbedURL }}} />
+      return <Redirect to= '/app' />
     }
   }
 

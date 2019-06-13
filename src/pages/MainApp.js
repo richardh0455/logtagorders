@@ -27,6 +27,7 @@ import CreateOrder  from './CreateOrder';
 import Variant  from './Variant';
 import ViewOrders  from './ViewOrders';
 import ViewCustomers  from './ViewCustomers';
+import ViewCustomerPriceList  from './priceList/ViewCustomerPriceList';
 import ReportingDashboard  from './ReportingDashboard';
 import Accordian  from './Accordian';
 import { withRouter, Link, Redirect } from 'react-router-dom';
@@ -141,6 +142,10 @@ class MainApp extends React.Component {
         if(!error.response || error.response.status == 401){
              alert('Please Sign In')
         }
+        else if(error.response.status == 504){
+            console.log('Gateway Timeout: Retrying...')
+            this.getCustomers()
+        }
     });
   }
 
@@ -155,6 +160,13 @@ class MainApp extends React.Component {
     .then(response =>
     {
         this.setState({products: response.body});
+    }).catch(error =>
+    {
+        console.log(error.response)
+        if(error.response.status == 504){
+            console.log('Gateway Timeout: Retrying...')
+            this.getProducts()
+        }
     });
   }
 
@@ -169,6 +181,13 @@ class MainApp extends React.Component {
     .then(response =>
     {
         this.setState({currencies: response.body});
+    }).catch(error =>
+    {
+        console.log(error.response)
+        if(error.response.status == 504){
+            console.log('Gateway Timeout: Retrying...')
+            this.getCurrencies()
+        }
     });
   }
 
@@ -282,6 +301,9 @@ class MainApp extends React.Component {
             </div>
             <div label='View Customers' id="6">
               <ViewCustomers customers={this.generateCustomerList()} get_all_customers={this.getCustomers.bind(this)} />
+            </div>
+            <div label='View Price Lists' id="7">
+              <ViewCustomerPriceList customers={this.generateCustomerList()} products={this.parseProducts()} />
             </div>
           </Accordian>
         </TabPanel>

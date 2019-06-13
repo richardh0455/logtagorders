@@ -110,12 +110,27 @@ class OrderList extends Component {
 		this.generateDate(doc, pageWidth, margin, initY);
 		this.generatePurchaseOrderNumber(doc,pageWidth, margin, initY);
 		this.generateShippingAccount(doc, margin, initY);
-		var postTableY = this.generateOrderTable(doc, margin, 125);
+		var postTableY = this.generateOrderTable(doc, margin, 150);
+		postTableY = this.checkPageHeight(doc, postTableY);
 		this.generateBankDetails(doc, margin, postTableY);
+		postTableY = this.checkPageHeight(doc, postTableY+10);
 		this.generateFooter(doc, pageWidth, margin, postTableY);
 
 
    }
+
+	 checkPageHeight(doc, currentY)
+	 {
+		 if (currentY >= doc.internal.pageSize.height)
+ 		 {
+   		doc.addPage();
+   		return 0; // Restart height position
+ 		 }
+		 else {
+		 	return currentY;
+		 }
+
+	 }
 
 	 generateHeader(doc,pageWidth, margin, initY) {
 		var imageWidth = 60;
@@ -147,14 +162,48 @@ class OrderList extends Component {
 		 var addressTitle = 'TO:  ';
 		 doc.text(addressTitle, margin, yCoord);
 		 var addressArray = new Array(this.props.customer.label);
-		 var shippingLines = this.props.shippingAddress.label.split(',').map(s => s.trim());
+		 var shippingLines = this.buildAddress(this.props.shippingAddress.address)
 		 var addressText= addressArray.concat(shippingLines);
 		 doc.text(addressText, margin+doc.getTextWidth(addressTitle), yCoord);
-		 yCoord += 28;
+		 yCoord += 42;
 		 doc.text("Tel: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Phone"], margin, yCoord);
 		 doc.text("Fax: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Fax"], margin, yCoord + 5);
 		 doc.text("Attn: "+this.props.customer["ContactInfo"]["PrimaryContact"]["Name"], margin, yCoord + 15);
 
+	 }
+
+	 buildAddress(address){
+		 var addressArray = [];
+		 if(this.fieldHasValidValue(address.Street))
+		 {
+			 addressArray.push(address.Street)
+		 }
+		 if(this.fieldHasValidValue(address.Suburb))
+		 {
+			 addressArray.push(address.Suburb)
+		 }
+		 if(this.fieldHasValidValue(address.City))
+		 {
+			 addressArray.push(address.City)
+		 }
+		 if(this.fieldHasValidValue(address.State))
+		 {
+			 addressArray.push(address.State)
+		 }
+		 if(this.fieldHasValidValue(address.Country))
+		 {
+			 addressArray.push(address.Country)
+		 }
+		 if(this.fieldHasValidValue(address.PostCode))
+		 {
+			 addressArray.push(address.PostCode)
+		 }
+		 return addressArray;
+	 }
+
+	 fieldHasValidValue(field)
+	 {
+		 return field && field.trim() !== "" && field.trim() !== "None"
 	 }
 
 	 generateInvoiceNumber(doc, pageWidth, margin, initY, logtagInvoiceNumber) {
@@ -185,8 +234,9 @@ class OrderList extends Component {
 
 	 generateShippingAccount(doc, margin, initY) {
 		 doc.setFontSize(12);
-		 var shippingInfo = 'Ship Via:- '+this.props.courierAccount.label;
-		 doc.text(shippingInfo,  margin, initY+124);
+		 var courierAccount = this.props.courierAccount.label || '';
+		 var shippingInfo = 'Ship Via:- '+courierAccount;
+		 doc.text(shippingInfo,  margin, initY+141);
 	 }
 
 
@@ -240,28 +290,38 @@ class OrderList extends Component {
 	 	doc.setFontSize(12);
 	 	var paymentInfo = ['HS Code # ' +this.props.hsCode.label,
 	 'Make Payment in advance to LogTag Recorders (HK) Ltd. Bank Account:-']
+	  initY = this.checkPageHeight(doc, initY);
 	 	doc.text(paymentInfo,  margin, initY +10);
+		initY= initY +10;
 	 	doc.setFontStyle("bold");
 	 	var bankAccount = ['HSBC','No.1, Queen\'s Road', 'Central, Hong Kong']
-	 	doc.text(bankAccount,  margin, initY +20);
+		initY = this.checkPageHeight(doc, initY);
+	 	doc.text(bankAccount,  margin, initY +10);
+		initY= initY +10;
 	 	var accountNumberTitle = 'Account Number:'
-	 	doc.text(accountNumberTitle,  margin, initY +35);
+		initY = this.checkPageHeight(doc, initY);
+	 	doc.text(accountNumberTitle,  margin, initY +15);
+		initY= initY +15;
 	 	doc.setTextColor(247,29,29)
 	 	var accountNumber ='652-144304-838'
-	 	doc.text(accountNumber,  margin+doc.getTextWidth(accountNumberTitle), initY +35);
-	 	doc.text('LogTag Recorders (HK) Limited',  margin, initY +40);
+		initY = this.checkPageHeight(doc, initY);
+	 	doc.text(accountNumber,  margin+doc.getTextWidth(accountNumberTitle), initY);
+	 	doc.text('LogTag Recorders (HK) Limited',  margin, initY +5);
+		initY= initY +5;
+		initY = this.checkPageHeight(doc, initY);
 	 	doc.setTextColor(0,0,0)
-	 	doc.text('SWIFT - HSBCHKHHHKH',  margin, initY +50);
+	 	doc.text('SWIFT - HSBCHKHHHKH',  margin, initY +10);
 
 	 }
 
 	 generateFooter(doc, pageWidth, margin, initY) {
+		 initY = this.checkPageHeight(doc, initY+10);
 		 var footerImageWidth = 62;
 		 var footerImageHeight = 18;
 		 var footerImage = new Image();
 		 footerImage.src = pdfEnd;
 		 footerImage.onload = function() {
-		 	doc.addImage(footerImage , 'PNG', (pageWidth-footerImageWidth-margin), initY +60, footerImageWidth, footerImageHeight);
+		 	doc.addImage(footerImage , 'PNG', (pageWidth-footerImageWidth-margin), initY+10, footerImageWidth, footerImageHeight);
 			doc.save('Order.pdf')
 	 	 }
 
@@ -276,13 +336,15 @@ class OrderList extends Component {
 		 if (window.confirm('Are you sure?')) {
 	     this.props.create_invoice_handler(this.buildInvoiceBody())
 			 .then( response => {
-						var parsed_body = JSON.parse(JSON.parse(response.body))
-						var logtagInvoiceNumber = parsed_body["LogtagInvoiceNumber"];
+						var logtagInvoiceNumber = response["LogtagInvoiceNumber"];
+						console.log(response)
 						this.generatePDF(logtagInvoiceNumber);
 						NotificationManager.success('', 'Order Successfully Created', 3000);
 					})
 					.catch(err =>
 		      {
+						console.log('Create Order Error:')
+						console.log(err)
 		        NotificationManager.error('Order Creation Failed', 'Error', 5000, () => {});
 		        return false;
 		      })

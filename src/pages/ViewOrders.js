@@ -44,10 +44,14 @@ class ViewOrders extends React.Component{
         headers: {
           'Authorization': this.state.idToken,
           'Content-Type': 'application/json'
+        },
+        queryStringParameters: {  // OPTIONAL
+          'customer-id': customerID
         }
       };
-      API.get(ordersAPI, '/'+customerID, apiRequest)
+      API.get(ordersAPI, '', apiRequest)
 	  .then(response => {
+      console.log(response.body)
       this.setState({orders: JSON.parse(response.body)});
 	  })
 	  .catch(err => {
@@ -62,11 +66,11 @@ class ViewOrders extends React.Component{
           'Content-Type': 'application/json'
         }
       };
-    API.get(ordersAPI, '/'+customerID+'/'+orderID, apiRequest)
+    API.get(ordersAPI, '/'+orderID+'/order-lines', apiRequest)
 	  .then(response => {
       var responseBody = JSON.parse(response.body);
       responseBody.ID = orderID;
-      this.setState({currentlySelectedOrder: responseBody})
+      this.setState({currentlySelectedOrder:{Order: this.state.currentlySelectedOrder.Order, OrderLines:responseBody} })
 
 	  })
 	  .catch(err => {
@@ -149,13 +153,13 @@ class ViewOrders extends React.Component{
           <Accordian onClick={this.getOrderDetails}>
             {this.state.orders.map((item) => (
               <div label={'ID: '+item.LogtagInvoiceNumber} id={item.InvoiceID} key={item.InvoiceID}>
-                <span>Invoice Number: {this.state.currentlySelectedOrder["Order"]["LogtagInvoiceNumber"]}</span>
+                <span>Invoice Number: {this.state.currentlySelectedOrder["LogtagInvoiceNumber"]}</span>
                 <br/>
                 <span>Payment Date:</span>
                 <DayPickerInput
                   formatDate={formatDate}
                   parseDate={parseDate}
-                  placeholder={`${formatDate(this.state.currentlySelectedOrder["Order"]["PaymentDate"])}`}
+                  placeholder={`${formatDate(this.state.currentlySelectedOrder["PaymentDate"])}`}
                   onDayChange ={this.paymentDateChanged}
                 />
                 <br/>
@@ -163,7 +167,7 @@ class ViewOrders extends React.Component{
                 <DayPickerInput
                   formatDate={formatDate}
                   parseDate={parseDate}
-                  placeholder={`${formatDate(this.state.currentlySelectedOrder["Order"]["ShippedDate"])}`}
+                  placeholder={`${formatDate(this.state.currentlySelectedOrder["ShippedDate"])}`}
                   onDayChange ={this.shipmentDateChanged}
                 />
                 <br/>

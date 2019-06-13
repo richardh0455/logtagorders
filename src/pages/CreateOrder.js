@@ -26,8 +26,10 @@ class CreateOrder extends React.Component{
       currentlySelectedShippingAddress: null,
       currentlySelectedCourierAccount: null,
       currentlySelectedHSCode: null,
+      currentlySelectedCurrency: null,
 	  customer: null,
-    purchaseOrderNumber:''
+    purchaseOrderNumber:'',
+    shipping_addresses:[]
     };
   }
 
@@ -50,16 +52,47 @@ class CreateOrder extends React.Component{
     return await API.get(customersAPI, '/'+id, apiRequest)
   }
 
+  async getShippingAddresses(id) {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    return await API.get(customersAPI, '/'+id+'/shipping-addresses', apiRequest)
+  }
+
 
   async createInvoice(invoiceLines) {
-        const apiRequest = {
-        headers: {
-          'Authorization': this.state.idToken,
-          'Content-Type': 'application/json'
-        },
-        body: {"customerID": this.state.currentlySelectedCustomer.value, "invoiceLines": invoiceLines, "purchaseOrderNumber":this.state.purchaseOrderNumber, "currency":this.state.currentlySelectedCurrency.label}
-      };
-      return await API.post(orderAPI, createPath, apiRequest)
+    var currency = this.state.currentlySelectedCurrency.label || ''
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: {"CustomerID": this.state.currentlySelectedCustomer.value, "PurchaseOrderNumber":this.state.purchaseOrderNumber, "Currency":currency}
+    };
+    return API.post(orderAPI, '', apiRequest).then(response => {
+      invoiceLines.map((line, key) =>
+        this.createInvoiceLine(response.body["InvoiceID"], line)
+      );
+      return response.body
+
+    })
+  }
+
+  async createInvoiceLine(invoiceID, invoiceLine) {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Price, "VariationID": invoiceLine.VariationID}
+    };
+    API.post(orderAPI, '/'+invoiceID+'/order-lines', apiRequest).then(response => {
+      console.log(response.body)
+    })
+
   }
 
   handleCustomerChange = (event) => {
@@ -67,12 +100,18 @@ class CreateOrder extends React.Component{
      this.getCustomer(event.value)
      .then(response => {
        this.setState({customer: response.body})
+       this.getShippingAddresses(event.value).then(response => this.generateShippingAddressList(JSON.parse(response.body)))
        this.handleShippingAddressChange(null);
        this.handleCourierAccountChange(null);
+       this.handleHSCodeChange(null);
+       this.handlePurchaseOrderNumberChange({target:{value:''}});
+       this.handleCurrencyChange(null);
      });
 
 
   }
+
+
 
   handleShippingAddressChange = (event) => {
 	   this.setState({currentlySelectedShippingAddress: event})
@@ -94,14 +133,47 @@ class CreateOrder extends React.Component{
     this.setState({currentlySelectedCurrency: event})
   }
 
-   generateShippingAddressList(customer) {
-    let shippingAddresses = [];
-    if(customer && "ShippingAddresses" in customer){
-        shippingAddresses = customer.ShippingAddresses.map((address) =>
-			{return {value:address.ShippingAddressID, label: address.ShippingAddress}}
-        );
+   generateShippingAddressList(shipping_addresses) {
+
+    var shippingAddresses =  shipping_addresses.map((address) =>
+			{
+        return {value:address.ID, label: this.buildAddress(address).join(', '), address:address}
+      });
+    this.setState({shipping_addresses: shippingAddresses});
+  }
+
+  buildAddress(address){
+    var addressArray = [];
+    if(this.fieldHasValidValue(address.Street))
+    {
+      addressArray.push(address.Street)
     }
-    return shippingAddresses;
+    if(this.fieldHasValidValue(address.Suburb))
+    {
+      addressArray.push(address.Suburb)
+    }
+    if(this.fieldHasValidValue(address.City))
+    {
+      addressArray.push(address.City)
+    }
+    if(this.fieldHasValidValue(address.State))
+    {
+      addressArray.push(address.State)
+    }
+    if(this.fieldHasValidValue(address.Country))
+    {
+      addressArray.push(address.Country)
+    }
+    if(this.fieldHasValidValue(address.PostCode))
+    {
+      addressArray.push(address.PostCode)
+    }
+    return addressArray;
+  }
+
+  fieldHasValidValue(field)
+  {
+    return field && field.trim() !== "" && field.trim() !== "None"
   }
 
   generateCourierAccountList(customer) {
@@ -147,7 +219,7 @@ class CreateOrder extends React.Component{
               </div>
               <div data-field-span="1" >
                 <label>Shipping Address</label>
-                <Select value={this.state.currentlySelectedShippingAddress} onChange={this.handleShippingAddressChange} options={this.generateShippingAddressList(JSON.parse(this.state.customer))} placeholder="Select a Shipping Address"/>
+                <Select value={this.state.currentlySelectedShippingAddress} onChange={this.handleShippingAddressChange} options={this.state.shipping_addresses} placeholder="Select a Shipping Address"/>
                 {this.required(this.state.currentlySelectedShippingAddress)}
               </div>
 
