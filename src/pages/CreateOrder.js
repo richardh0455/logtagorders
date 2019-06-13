@@ -104,7 +104,7 @@ class CreateOrder extends React.Component{
        this.handleShippingAddressChange(null);
        this.handleCourierAccountChange(null);
        this.handleHSCodeChange(null);
-       this.handlePurchaseOrderNumberChange('');
+       this.handlePurchaseOrderNumberChange({target:{value:''}});
        this.handleCurrencyChange(null);
      });
 
@@ -134,9 +134,46 @@ class CreateOrder extends React.Component{
   }
 
    generateShippingAddressList(shipping_addresses) {
+
     var shippingAddresses =  shipping_addresses.map((address) =>
-			{return {value:address.ID, label: address.Street}});
-    this.setState({shipping_addresses: shippingAddresses});    
+			{
+        return {value:address.ID, label: this.buildAddress(address).join(', '), address:address}
+      });
+    this.setState({shipping_addresses: shippingAddresses});
+  }
+
+  buildAddress(address){
+    var addressArray = [];
+    if(this.fieldHasValidValue(address.Street))
+    {
+      addressArray.push(address.Street)
+    }
+    if(this.fieldHasValidValue(address.Suburb))
+    {
+      addressArray.push(address.Suburb)
+    }
+    if(this.fieldHasValidValue(address.City))
+    {
+      addressArray.push(address.City)
+    }
+    if(this.fieldHasValidValue(address.State))
+    {
+      addressArray.push(address.State)
+    }
+    if(this.fieldHasValidValue(address.Country))
+    {
+      addressArray.push(address.Country)
+    }
+    if(this.fieldHasValidValue(address.PostCode))
+    {
+      addressArray.push(address.PostCode)
+    }
+    return addressArray;
+  }
+
+  fieldHasValidValue(field)
+  {
+    return field && field.trim() !== "" && field.trim() !== "None"
   }
 
   generateCourierAccountList(customer) {

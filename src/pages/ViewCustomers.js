@@ -81,9 +81,6 @@ class ViewCustomers extends React.Component{
             {this.props.customers.map((customer) => (
               <div label={customer.label} id={customer.value}>
                 <span>Name: {customer.label}</span>
-                <br/>
-                <span>Billing Address: {this.state.currentlySelectedCustomer["ContactInfo"]["Billing_Address"]} </span>
-                <br/>
                 <span>Contact Email: {this.state.currentlySelectedCustomer["ContactInfo"]["Contact_Email"]} </span>
                 <br/>
                 <span>Primary Contact: {this.state.currentlySelectedCustomer["ContactInfo"]["PrimaryContact"]["Name"]} </span>
@@ -93,14 +90,6 @@ class ViewCustomers extends React.Component{
                 <span>Phone: {this.state.currentlySelectedCustomer["ContactInfo"]["PrimaryContact"]["Phone"]} </span>
                 <br/>
                 <span>Region: {this.state.currentlySelectedCustomer["ContactInfo"]["Region"]} </span>
-                <br/>
-                <span>Shipping Addresses: </span>
-                <br/>
-                {this.state.currentlySelectedCustomer["ShippingAddresses"].map( (line) => (
-
-                    <span>{line.ShippingAddress} </span>
-                  ))
-                }
 
                 <button onClick={this.deleteCustomer} >Delete Customer</button>
               </div>
