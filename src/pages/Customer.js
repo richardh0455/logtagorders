@@ -55,22 +55,14 @@ class Customer extends React.Component{
        }
 
        this.getShippingAddresses(event.value).then(response => {
-        if(response === undefined || response.length == 0)
-        {
-          this.addShippingAddress(event);
-        }
-        else
-        {
+         if(response != undefined || response.length != 0)
+         {
           var parsed_addresses = response.map(address => {return {ID:address.ID, street:address.Street, suburb:address.Suburb, city: address.City, state:address.State, country: address.Country, post_code: address.PostCode}})
           this.setState({shipping_addresses: parsed_addresses});
         }
        })
        this.getBillingAddresses(event.value).then(response => {
-        if(response === undefined || response.length == 0)
-        {
-          this.addBillingAddress(event);
-        }
-        else
+        if(response != undefined || response.length != 0)
         {
           var parsed_addresses = response.map(address => {return {ID:address.ID, street:address.Street, suburb:address.Suburb, city: address.City, state:address.State, country: address.Country, post_code: address.PostCode}})
           this.setState({billing_addresses: parsed_addresses});
