@@ -196,7 +196,7 @@ class OrderList extends Component {
 		 }
 		 if(this.fieldHasValidValue(address.PostCode))
 		 {
-			 addressArray.push(address.PostCode)
+			 addressArray[addressArray.length-1].concat(", "+address.PostCode)
 		 }
 		 return addressArray;
 	 }
