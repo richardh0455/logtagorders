@@ -24,6 +24,7 @@ import "react-tabs/style/react-tabs.css";
 import Customer  from './Customer';
 import Product  from './Product';
 import CreateOrder  from './CreateOrder';
+import UpdateOrder  from './UpdateOrder';
 import Variant  from './Variant';
 import ViewOrders  from './ViewOrders';
 import ViewCustomers  from './ViewCustomers';
@@ -304,6 +305,9 @@ class MainApp extends React.Component {
             </div>
             <div label='View Price Lists' id="7">
               <ViewCustomerPriceList customers={this.generateCustomerList()} products={this.parseProducts()} />
+            </div>
+            <div label='Update Order' id="8">
+              <UpdateOrder customers={this.generateCustomerList()} products={this.parseProducts()} currencies = {this.parseCurrencies()} />
             </div>
           </Accordian>
         </TabPanel>

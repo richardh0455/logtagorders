@@ -14,14 +14,16 @@ class OrderList extends Component {
 	constructor(props) {
     super(props);
 		this.state = {
-			counter: '5',
-			order_items:  []
+			counter: '5'
 		};
 	}
 
   async componentDidMount() {
-	  if (this.state.order_items === undefined || this.state.order_items.length == 0)
+		console.log("ComponentDidMount")
+		console.log(this.props.order_items)
+		if (this.props.order_items === undefined )
 	  {
+			this.props.order_items=[]
 			this.addOrderLine()
 	  }
   }
@@ -31,7 +33,7 @@ class OrderList extends Component {
 
 	buildInvoiceBody() {
 		var lines =[]
-		var items = this.state.order_items;
+		var items = this.props.order_items;
 		for(var i = 0; i < items.length; i++) {
 			var item = items[i];
 			var variant_id = 0;
@@ -45,13 +47,13 @@ class OrderList extends Component {
 	}
 
    removeItem = (key) => {
-	  var items = this.state.order_items;
+	  var items = this.props.order_items;
 	  for(var i = 0; i < items.length; i++) {
 		if(items[i].key === key) {
 			items.splice(i, 1);
 		}
 	  }
-	  this.saveState({order_items: items});
+	  this.props.order_items= items;
    }
 
   addItem = (event) => {
@@ -64,9 +66,8 @@ class OrderList extends Component {
  	  var default_item = {key:'0', product_name:'Select a Product', product_id:"-1", variant:'No Variant', variant_id:'0', quantity:'0', price:'0'};
 	  var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
 	  cloneOfDefault.key = key;
-	  var items = this.state.order_items;
-	  items.push(cloneOfDefault);
-	  this.saveState({counter: key, order_items: items });
+	  this.props.order_items.push(cloneOfDefault);
+	  this.saveState({counter: key});
   }
 
 
@@ -74,17 +75,17 @@ class OrderList extends Component {
 	this.setState(state)
    }
 
-   calculateTotal(subtotals) {
-	  var items = this.state.order_items;
-	  var total = 0;
+   calculateTotal() {
+	  var items = this.props.order_items;
+	  var total = 0.0;
 	  for(var i = 0; i < items.length; i++) {
-		total += items[i].quantity * items[i].price;
+		total += parseInt(items[i].Quantity) * parseFloat(items[i].Pricing);
 	  }
 	  return total;
    }
 
    orderItemUpdated = (key, item) => {
-	   var items = this.state.order_items;
+	   var items = this.props.order_items;
 	   for(var i = 0; i < items.length; i++) {
 		if(items[i].key === key) {
 			if(item == null){
@@ -94,7 +95,7 @@ class OrderList extends Component {
 			}
 		}
 	  }
-	  this.saveState({order_items: items});
+	  this.props.order_items = items;
    }
 
 
@@ -244,7 +245,7 @@ class OrderList extends Component {
 	 generateOrderTable(doc, margin,initY ) {
 		var data = [];
 	 	var headers = [['Description','Qty','Unit Price','Currency','Subtotal']];
-	 	var items = this.state.order_items;
+	 	var items = this.props.order_items;
 		var currency = 'Not Specified';
 		if(this.props.currency && this.props.currency.label) {
 			currency = this.props.currency.label;
@@ -327,6 +328,15 @@ class OrderList extends Component {
 
 	 }
 
+	 findMatchingElementByID(value, list) {
+		 		console.log('Finding Product')
+				console.log(value)
+       var result = list.find(element => element.value===value);
+			 console.log(result);
+			 return result;
+
+   }
+
    saveOrderAndGeneratePDF = (event) => {
 	   event.preventDefault();
 		 if(this.props.shippingAddress === null) {
@@ -357,20 +367,23 @@ class OrderList extends Component {
 	<div className = "OrderList">
 
       <fieldset>
-		{this.state.order_items.map(item => (
+		{this.props.order_items.map(item => (
 			<OrderItem
-				key={item.key}
-				item={item}
+				key={item.LineID}
+				product={this.findMatchingElementByID(item.ProductID,this.props.products)}
+				variant_id={item.VariationID}
 				products={this.props.products}
 				update_item_handler={this.orderItemUpdated}
 				customer={this.props.customer}
+				price={item.Pricing}
+				quantity={item.Quantity}
 			/>
 		))}
 
 
 	  </fieldset>
 
-	  <button onClick={this.addItem}>Add Product</button>
+	  <button onClick={this.props.create_invoice_line_handler}>Add Product</button>
 
 	  <div>
 		<strong>Total: {this.calculateTotal()}</strong>
