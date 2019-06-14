@@ -22,14 +22,17 @@ class CreateOrder extends React.Component{
 
 
 	this.state = {
+    isUpdate:false,
       currentlySelectedCustomer: null,
       currentlySelectedShippingAddress: null,
       currentlySelectedCourierAccount: null,
       currentlySelectedHSCode: null,
       currentlySelectedCurrency: null,
+      currenltySelectedOrder: null,
 	  customer: null,
     purchaseOrderNumber:'',
-    shipping_addresses:[]
+    shipping_addresses:[],
+    orders:[]
     };
   }
 
@@ -60,6 +63,29 @@ class CreateOrder extends React.Component{
       }
     };
     return await API.get(customersAPI, '/'+id+'/shipping-addresses', apiRequest)
+  }
+
+  async getOrders(id) {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      queryStringParameters: {
+        'customer-id': id
+      }
+    };
+    return await API.get(orderAPI, '', apiRequest)
+  }
+
+  async getOrderLines(orderID) {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    return await API.get(orderAPI, '/'+orderID+'/order-lines', apiRequest)
   }
 
 
@@ -101,14 +127,22 @@ class CreateOrder extends React.Component{
      .then(response => {
        this.setState({customer: response.body})
        this.getShippingAddresses(event.value).then(response => this.generateShippingAddressList(JSON.parse(response.body)))
+       this.getOrders(event.value).then(response => this.setState({orders: JSON.parse(response.body)}))
        this.handleShippingAddressChange(null);
        this.handleCourierAccountChange(null);
        this.handleHSCodeChange(null);
        this.handlePurchaseOrderNumberChange({target:{value:''}});
        this.handleCurrencyChange(null);
      });
+  }
 
-
+  handleOrderChange = (event) => {
+     this.getOrderLines(event.value)
+     .then(response => {
+       console.log('Getting Order Lines:')
+       console.log(response.body)
+       this.setState({currentlySelectedOrder: response.body})
+     });
   }
 
 
@@ -204,11 +238,55 @@ class CreateOrder extends React.Component{
 
  }
 
+ createOrderChangeHandler = () => {
+   this.resetInputFields();
+   this.setState({isUpdate:false})
+ }
+
+ updateOrderChangeHandler = () => {
+   this.resetInputFields();
+   this.setState({isUpdate:true})
+
+ }
+
+ createOrUpdate() {
+   if(this.state.isUpdate){
+     return (
+       <div data-row-span="2" >
+       <div data-field-span="1" >
+         <label>Customer</label>
+         <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
+     </div>
+     <div data-field-span="1" >
+       <label>Order</label>
+       <Select value={this.state.currentlySelectedOrder} onChange={this.handleOrderChange} options={this.state.orders.map(order => {return {value:order.InvoiceID, label: order.LogtagInvoiceNumber, order: order})} isSearchable="true" placeholder="Select an Order"/>
+      </div>
+      </div>
+
+
+   );
+   }
+ }
+
   render() {
     return (
       <div >
       <section>
         <form className="grid-form">
+        <div data-row-span="2">
+          <div className="radio">
+            <label>
+              <input type="radio" checked={!this.state.isUpdate} onChange={this.createOrderChangeHandler} />
+              Create Order
+            </label>
+
+            <label style={{marginLeft: 20 + 'px'}}>
+              <input type="radio" checked={this.state.isUpdate} onChange={this.updateOrderChangeHandler} />
+              Update Order
+            </label>
+          </div>
+          {this.createOrUpdate()}
+        </div>
           <fieldset>
             <h2>Customer</h2>
             <div data-row-span="2">
