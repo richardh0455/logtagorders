@@ -260,7 +260,7 @@ class CreateOrder extends React.Component{
      </div>
      <div data-field-span="1" >
        <label>Order</label>
-       <Select value={this.state.currentlySelectedOrder} onChange={this.handleOrderChange} options={this.state.orders.map(order => {return {value:order.InvoiceID, label: order.LogtagInvoiceNumber, order: order}}) isSearchable="true" placeholder="Select an Order"/>
+       <Select value={this.state.currentlySelectedOrder} onChange={this.handleOrderChange} options={this.state.orders.filter(order => {return !this.fieldHasValidValue(order.ShippedDate)}).map(order => {return {value:order.InvoiceID, label: order.LogtagInvoiceNumber, order: order}}) isSearchable="true" placeholder="Select an Order"/>
       </div>
       </div>
 
