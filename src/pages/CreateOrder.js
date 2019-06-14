@@ -259,7 +259,7 @@ class CreateOrder extends React.Component{
      </div>
      <div data-field-span="1" >
        <label>Order</label>
-       <Select value={this.state.currentlySelectedOrder} onChange={this.handleOrderChange} options={this.state.orders.map(order => {return {value:order.InvoiceID, label: order.LogtagInvoiceNumber, order: order})} isSearchable="true" placeholder="Select an Order"/>
+       <Select value={this.state.currentlySelectedOrder} onChange={this.handleOrderChange} options={this.state.orders.map(order => {return {value:order.InvoiceID, label: order.LogtagInvoiceNumber, order: order}}) isSearchable="true" placeholder="Select an Order"/>
       </div>
       </div>
 
@@ -268,7 +268,34 @@ class CreateOrder extends React.Component{
    }
  }
 
-  render() {
+ createOrderChoice = () => {
+   this.setState({firstChoiceMade: true})
+ }
+
+ updateOrderChoice = () => {
+   this.setState({firstChoiceMade: true, isUpdate: true})
+ }
+
+ renderOperationChoices() {
+   if(!this.state.firstChoiceMade){
+     return (
+       <div>
+         <button onClick={this.createOrderChoice}>Create Order</button>
+         <button onClick={this.updateOrderChoice}>Update Order</button>
+       </div>
+       )
+   } else {
+     return (
+       <div>
+         {this.renderDetailFields()}
+       </div>
+     )
+
+   }
+
+ }
+
+  renderDetailFields() {
     return (
       <div >
       <section>
@@ -342,6 +369,18 @@ class CreateOrder extends React.Component{
 
 
       </div>
+    );
+  }
+
+  render() {
+    return (
+      <div>
+        <section>
+          <form className="grid-form">
+              {this.renderOperationChoices()}
+         </form>
+       </section>
+     </div>
     );
   }
 }
