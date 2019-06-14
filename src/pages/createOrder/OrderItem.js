@@ -103,8 +103,6 @@ class OrderItem extends Component {
 
   handleQuantityChange = (event) => {
     event.preventDefault();
-    console.log('Quantity Changed')
-    console.log(event.target.value);
     var quantity = event.target.value;
      this.props.update_item_handler(this.props.id, 'Quantity', quantity)
      var quantityInt = parseInt(quantity)
