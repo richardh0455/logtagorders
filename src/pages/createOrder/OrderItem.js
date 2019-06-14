@@ -21,23 +21,22 @@ class OrderItem extends Component {
     priceList: []
 	};
 
+
   }
 
   async componentDidMount() {
+
     const session = await Auth.currentSession();
     this.setState({ authToken: session.accessToken.jwtToken });
     this.setState({ idToken: session.idToken.jwtToken });
-
-
-  }
-
-  async componentDidUpdate() {
-    if(this.props.variant_id && this.props.variant_id!='0' && this.state.variants.length == 0)
+    if(this.props.product && this.props.customer)
     {
       this.getVariants();
       this.getPriceList();
     }
+
   }
+
 
   handleProductChange = (event) => {
     this.props.update_item_handler(this.props.id, 'ProductID', event.value)
