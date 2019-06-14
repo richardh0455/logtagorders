@@ -23,6 +23,7 @@ class CreateOrder extends React.Component{
 
 	this.state = {
     isUpdate:false,
+    firstChoiceMade:false,
       currentlySelectedCustomer: null,
       currentlySelectedShippingAddress: null,
       currentlySelectedCourierAccount: null,
