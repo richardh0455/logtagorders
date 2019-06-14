@@ -12,7 +12,6 @@ const customerAPI = 'CustomersAPI';
 class OrderItem extends Component {
   constructor(props) {
     super(props);
-	//var product = ;
     this.state = {
 		//variant: product ? product.variant : this.props.item.variant,
 		//variant_id: this.props.item.variant_id,
@@ -41,25 +40,17 @@ class OrderItem extends Component {
   }
 
   handleProductChange = (event) => {
-    this.props.item.product_id = event.value;
-    this.props.item.product_name = event.label;
-    this.props.update_item_handler(this.props.item.key, this.props.item)
-    this.setState({currentlySelectedProduct: event}, () =>
+    this.props.update_item_handler(this.props.id, 'ProductID', event.value)
+    if(this.props.product && this.props.customer)
     {
-      if(this.props.product && this.props.customer)
-      {
-        this.getVariants();
-        this.getPriceList();
-      }
-    })
+      this.getVariants();
+      this.getPriceList();
+    }
   }
 
 
   handleVariantChange = (event) => {
-	  this.setState({currentlySelectedVariant: event});
-    this.handlePriceChange({target: {value: event.price}})
-    this.props.variant_id = event.value;
-    this.props.update_item_handler(this.props.item.key, this.props.item)
+	  this.props.update_item_handler(this.props.id, 'VariationID', event.value)
   }
 
   async getVariants() {
@@ -111,10 +102,11 @@ class OrderItem extends Component {
   }
 
   handleQuantityChange = (event) => {
+    event.preventDefault();
+    console.log('Quantity Changed')
+    console.log(event.target.value);
     var quantity = event.target.value;
-     this.props.quantity = quantity;
-     this.props.update_item_handler(this.props.key, this.props.quantity)
-
+     this.props.update_item_handler(this.props.id, 'Quantity', quantity)
      var quantityInt = parseInt(quantity)
      var minPrice = this.state.priceList.length > 0 && this.state.priceList.reduce(
        (min, item) =>
@@ -130,16 +122,12 @@ class OrderItem extends Component {
 
   handlePriceChange = (event) => {
     var price = event.target.value.replace('$', '').trim()
-    this.props.price = price;
-    this.props.update_item_handler(this.props.key, this.props.price)
+    this.props.update_item_handler(this.props.id, 'Pricing', price)
   }
 
 
   findMatchingElementByID(value, list) {
-       console.log('Finding Variant')
-       console.log(value)
       var result = list.find(element => element.value===value);
-      console.log(result);
       return result;
 
   }

@@ -113,10 +113,16 @@ class UpdateOrder extends React.Component{
       }
     };
     return API.put(orderAPI, '/'+this.state.currentlySelectedOrder.value, apiRequest).then(response => {
-      console.log(response)
+      this.state.order_items.map(item => {
+        this.updateInvoiceLine(this.state.currentlySelectedOrder.value, item).catch(err =>
+          NotificationManager.error('Updating Order Failed', 'Error', 5000, () => {})
+        )
+      })
       return {LogtagInvoiceNumber:this.state.currentlySelectedOrder.label}
 
-    })
+    }).catch(err =>
+      NotificationManager.error('Updating Order Failed', 'Error', 5000, () => {})
+    )
   }
   async updateInvoiceLine(invoiceID, invoiceLine) {
     const apiRequest = {
@@ -124,9 +130,9 @@ class UpdateOrder extends React.Component{
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
-      body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Price, "VariationID": invoiceLine.VariationID}
+      body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Pricing, "VariationID": invoiceLine.VariationID}
     };
-    API.post(orderAPI, '/'+invoiceID+'/order-lines', apiRequest).then(response => {
+    API.put(orderAPI, '/'+invoiceID+'/order-lines/'+invoiceLine.LineID, apiRequest).then(response => {
       console.log(response.body)
     })
 
@@ -134,7 +140,7 @@ class UpdateOrder extends React.Component{
 
   async createInvoiceLineHandler(event) {
     event.preventDefault();
-    this.createInvoiceLine(this.state.currentlySelectedOrder.value, {Quantity:"0",ProductID:"0",Price:"0", VariationID:"0"})
+    this.createInvoiceLine(this.state.currentlySelectedOrder.value, {Quantity:"0",ProductID:"0",Pricing:"0", VariationID:"0"})
 
   }
 
@@ -144,7 +150,7 @@ class UpdateOrder extends React.Component{
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
-      body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Price, "VariationID": invoiceLine.VariationID}
+      body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Pricing, "VariationID": invoiceLine.VariationID}
     };
     API.post(orderAPI, '/'+invoiceID+'/order-lines', apiRequest).then(response => {
       this.getOrderLines(invoiceID)
@@ -155,11 +161,15 @@ class UpdateOrder extends React.Component{
 
   }
 
+  orderItemUpdated = (items) => {
+   this.setState({order_items: items});
+  }
+
   handleCustomerChange = (event) => {
 	   this.setState({currentlySelectedCustomer: event})
      this.getCustomer(event.value)
      .then(response => {
-       this.setState({customer: response.body})
+       this.setState({customer: response.body, currentlySelectedOrder:null, order_items:[] })
        this.generateHSCodeList(JSON.parse(response.body))
        this.generateCourierAccountList(JSON.parse(response.body))
        this.getShippingAddresses(event.value).then(response => this.generateShippingAddressList(JSON.parse(response.body)))
@@ -176,22 +186,17 @@ class UpdateOrder extends React.Component{
   }
 
   handleOrderChange = (event) => {
-    console.log('Order Changed')
-    console.log(event)
-    console.log(this.state.hs_codes)
      this.setState({currentlySelectedOrder: event,
        currentlySelectedCurrency: this.findMatchingElementByValue(event.details.Currency, this.props.currencies),
        currentlySelectedCourierAccount: this.findMatchingElementByID(event.details.CourierAccountID, this.state.courier_accounts),
        currentlySelectedShippingAddress: this.findMatchingElementByID(event.details.ShippingAddressID, this.state.shipping_addresses),
        currentlySelectedHSCode: this.findMatchingElementByID(event.details.HSCodeID, this.state.hs_codes),
-       purchaseOrderNumber: event.details.PurchaseOrderNumber,
+       purchaseOrderNumber: event.details.PurchaseOrderNumber || '',
 
 
      })
      this.getOrderLines(event.value)
      .then(response => {
-       console.log('Getting Order Lines:')
-       console.log(JSON.parse(response.body))
        this.setState({order_items:JSON.parse(response.body)})
      });
   }
@@ -361,6 +366,7 @@ class UpdateOrder extends React.Component{
                   customer={{...this.state.currentlySelectedCustomer,...JSON.parse(this.state.customer)}}
                   currency = {this.state.currentlySelectedCurrency}
                   order_items = {this.state.order_items}
+                  order_item_updated = {this.orderItemUpdated.bind(this)}
                   />
             </div>
         </fieldset>
