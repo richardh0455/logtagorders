@@ -7,6 +7,9 @@ import pdfEnd from '../../public/images/ncombskhir.png';
 import logo from '../../public/images/LTLogoInvoice.png';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'jspdf-autotable';
+import { Auth, API } from 'aws-amplify';
+
+const variantsAPI = 'VariantsAPI';
 
 
 
@@ -14,14 +17,17 @@ class OrderList extends Component {
 	constructor(props) {
     super(props);
 		this.state = {
-			counter: '5',
-			order_items:  []
+			counter: '5'
 		};
 	}
 
   async componentDidMount() {
-	  if (this.state.order_items === undefined || this.state.order_items.length == 0)
+		const session = await Auth.currentSession();
+    this.setState({ authToken: session.accessToken.jwtToken });
+    this.setState({ idToken: session.idToken.jwtToken });
+		if (this.props.order_items === undefined )
 	  {
+			this.props.order_items=[]
 			this.addOrderLine()
 	  }
   }
@@ -31,7 +37,7 @@ class OrderList extends Component {
 
 	buildInvoiceBody() {
 		var lines =[]
-		var items = this.state.order_items;
+		var items = this.props.order_items;
 		for(var i = 0; i < items.length; i++) {
 			var item = items[i];
 			var variant_id = 0;
@@ -45,13 +51,13 @@ class OrderList extends Component {
 	}
 
    removeItem = (key) => {
-	  var items = this.state.order_items;
+	  var items = this.props.order_items;
 	  for(var i = 0; i < items.length; i++) {
 		if(items[i].key === key) {
 			items.splice(i, 1);
 		}
 	  }
-	  this.saveState({order_items: items});
+	  this.props.order_items= items;
    }
 
   addItem = (event) => {
@@ -64,9 +70,8 @@ class OrderList extends Component {
  	  var default_item = {key:'0', product_name:'Select a Product', product_id:"-1", variant:'No Variant', variant_id:'0', quantity:'0', price:'0'};
 	  var cloneOfDefault = JSON.parse(JSON.stringify(default_item));
 	  cloneOfDefault.key = key;
-	  var items = this.state.order_items;
-	  items.push(cloneOfDefault);
-	  this.saveState({counter: key, order_items: items });
+	  this.props.order_items.push(cloneOfDefault);
+	  this.saveState({counter: key});
   }
 
 
@@ -74,47 +79,46 @@ class OrderList extends Component {
 	this.setState(state)
    }
 
-   calculateTotal(subtotals) {
-	  var items = this.state.order_items;
-	  var total = 0;
+   calculateTotal() {
+	  var items = this.props.order_items;
+	  var total = 0.0;
 	  for(var i = 0; i < items.length; i++) {
-		total += items[i].quantity * items[i].price;
+		total += parseInt(items[i].Quantity) * parseFloat(items[i].Pricing);
 	  }
 	  return total;
    }
 
-   orderItemUpdated = (key, item) => {
-	   var items = this.state.order_items;
-	   for(var i = 0; i < items.length; i++) {
-		if(items[i].key === key) {
-			if(item == null){
-				items.splice(i, 1);
-			}else {
-				items[i] = {...items[i], ...item}
-			}
-		}
-	  }
-	  this.saveState({order_items: items});
-   }
+	 orderItemUpdated = (key, field, event) => {
+	 	var items = this.props.order_items;
+		for(var i = 0; i < items.length; i++) {
+	 		if(items[i].LineID === key) {
+		 		items[i][field] = event;
+	 		}
+	 		this.props.order_item_updated(items);
+	 	}
+ 	}
 
+	generatePDF = (logtagInvoiceNumber) => {
+		this.generatePDFAsync(logtagInvoiceNumber)
+	}
 
-  generatePDF = (logtagInvoiceNumber) => {
+  async generatePDFAsync(logtagInvoiceNumber){
 		var pageWidth = 210;
 		var margin = 20;
 		var doc = new jsPDF({orientation:'p', unit:'mm', format:'a4'});
 		var initX = 15;
 		var initY = 0;
-		this.generateHeader(doc, pageWidth, margin, initY);
-		this.generateShippingAddress(doc, margin, initY);
-		this.generateInvoiceNumber(doc, pageWidth, margin, initY, logtagInvoiceNumber);
-		this.generateDate(doc, pageWidth, margin, initY);
-		this.generatePurchaseOrderNumber(doc,pageWidth, margin, initY);
-		this.generateShippingAccount(doc, margin, initY);
-		var postTableY = this.generateOrderTable(doc, margin, 150);
+		await this.generateHeader(doc, pageWidth, margin, initY);
+		await this.generateShippingAddress(doc, margin, initY);
+		await this.generateInvoiceNumber(doc, pageWidth, margin, initY, logtagInvoiceNumber);
+		await this.generateDate(doc, pageWidth, margin, initY);
+		await this.generatePurchaseOrderNumber(doc,pageWidth, margin, initY);
+		await this.generateShippingAccount(doc, margin, initY);
+		var postTableY = await this.generateOrderTable(doc, margin, 150);
 		postTableY = this.checkPageHeight(doc, postTableY);
-		this.generateBankDetails(doc, margin, postTableY);
+		await this.generateBankDetails(doc, margin, postTableY);
 		postTableY = this.checkPageHeight(doc, postTableY+10);
-		this.generateFooter(doc, pageWidth, margin, postTableY);
+		await this.generateFooter(doc, pageWidth, margin, postTableY);
 
 
    }
@@ -196,7 +200,7 @@ class OrderList extends Component {
 		 }
 		 if(this.fieldHasValidValue(address.PostCode))
 		 {
-			 addressArray.push(address.PostCode)
+			 addressArray[addressArray.length-1].concat(", "+address.PostCode)
 		 }
 		 return addressArray;
 	 }
@@ -241,21 +245,28 @@ class OrderList extends Component {
 
 
 
-	 generateOrderTable(doc, margin,initY ) {
+	 async generateOrderTable(doc, margin,initY ) {
 		var data = [];
 	 	var headers = [['Description','Qty','Unit Price','Currency','Subtotal']];
-	 	var items = this.state.order_items;
+	 	var items = this.props.order_items;
 		var currency = 'Not Specified';
 		if(this.props.currency && this.props.currency.label) {
 			currency = this.props.currency.label;
 		}
 	 	for(var i = 0; i < items.length; i++) {
-	 		var variant = '';
-	 		if(items[i].variant.replace(',',', \n') != 'No Variant') {
-	 			variant = ' - '+items[i].variant.replace(',',', \n');
-	 		}
-	 		var line = [ items[i].product_name+variant, items[i].quantity,items[i].price, currency, items[i].quantity*items[i].price+'' ];
-	 		data.push(line);
+	 		var variant = await this.getVariantDescription(items[i].VariationID)
+			console.log('Variant Description')
+			console.log(variant)
+			if(variant.trim() != 'No Variant' && variant.trim() != 'None'  && variant.trim() != '') {
+				variant = ' - '+variant
+
+			}
+			if(this.findMatchingElementByID(items[i].ProductID,this.props.products)) {
+				var line = [ this.findMatchingElementByID(items[i].ProductID,this.props.products).label+variant, items[i].Quantity,items[i].Pricing, currency, items[i].Quantity*items[i].Pricing+'' ];
+				data.push(line);
+			}
+			//console.log(this.findMatchingElementByID(items[i].ProductID,this.props.products))
+
 
 	 	}
 	 	var footer = [['Total','','',this.calculateTotal()]]
@@ -283,6 +294,37 @@ class OrderList extends Component {
 	     },
 	 		});
 	 		return initY + tableHeight;
+	 }
+
+	 async getVariantDescription (id) {
+		if(!id)
+		{
+			return '';
+		}
+		const apiRequest = {
+         headers: {
+           'Authorization': this.state.idToken,
+           'Content-Type': 'application/json'
+         }
+       };
+
+		var response = await API.get(variantsAPI, '/'+id, apiRequest)
+		return JSON.parse(response.body).Description || '';
+
+
+		/*
+		.then(response => {
+					console.log('Retrieved Variant')
+					if(response && response.body){
+						return JSON.parse(response.body).Description;
+					}
+					else {
+						return '';
+					}
+
+ 	  }).catch(error => {
+ 		    console.log(error)
+ 	});*/
 	 }
 
 	 generateBankDetails(doc, margin, initY) {
@@ -327,6 +369,12 @@ class OrderList extends Component {
 
 	 }
 
+	 findMatchingElementByID(value, list) {
+       var result = list.find(element => element.value===value);
+			 return result;
+
+   }
+
    saveOrderAndGeneratePDF = (event) => {
 	   event.preventDefault();
 		 if(this.props.shippingAddress === null) {
@@ -357,20 +405,24 @@ class OrderList extends Component {
 	<div className = "OrderList">
 
       <fieldset>
-		{this.state.order_items.map(item => (
+		{this.props.order_items.map(item => (
 			<OrderItem
-				key={item.key}
-				item={item}
+				key={item.LineID}
+				id={item.LineID}
+				product={this.findMatchingElementByID(item.ProductID,this.props.products)}
+				variant_id={item.VariationID}
 				products={this.props.products}
-				update_item_handler={this.orderItemUpdated}
+				update_item_handler={this.orderItemUpdated.bind(this)}
 				customer={this.props.customer}
+				price={item.Pricing}
+				quantity={item.Quantity}
 			/>
 		))}
 
 
 	  </fieldset>
 
-	  <button onClick={this.addItem}>Add Product</button>
+	  <button onClick={this.props.create_invoice_line_handler}>Add Product</button>
 
 	  <div>
 		<strong>Total: {this.calculateTotal()}</strong>

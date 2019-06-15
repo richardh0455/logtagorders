@@ -3,7 +3,7 @@ import Amplify from 'aws-amplify';
 import { Auth, API } from 'aws-amplify';
 import { withRouter } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
-import OrderList from './createOrder/OrderList';
+import OrderList from './updateOrder/OrderList';
 import Select from 'react-select';
 
 const customersAPI = 'CustomersAPI';
