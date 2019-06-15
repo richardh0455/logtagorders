@@ -149,7 +149,11 @@ class ViewCustomers extends React.Component{
     API.post(customerAPI, '/'+this.state.currentlySelectedCustomerID+'/price-list', apiRequest)
     .then(response => {
       priceItem.ID = response.body.ID
-      this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, this.state.currentlySelectedProductID);
+      //this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, this.state.currentlySelectedProductID);
+      var array = this.state.priceList;
+      array.push({'lower_range':priceItem.Lower_Range, 'upper_range':priceItem.Upper_Range, 'price':priceItem.Price, 'ID':priceItem.ID})
+      //console.log();
+      this.setState({priceList: array})
     })
   }
 
@@ -166,9 +170,10 @@ class ViewCustomers extends React.Component{
 
   savePriceItems = (event) => {
     event.preventDefault();
-    this.state.priceList.map(item => {
+    /*this.state.priceList.map(item => {
         this.updatePriceItem(item);
-    });
+    });*/
+    this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, this.state.currentlySelectedProductID);
     NotificationManager.success('', 'Price List Successfully Updated', 3000);
 
   }
