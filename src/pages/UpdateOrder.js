@@ -5,6 +5,12 @@ import { withRouter } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import OrderList from './updateOrder/OrderList';
 import Select from 'react-select';
+import DayPickerInput  from 'react-day-picker/DayPickerInput';
+import 'react-day-picker/lib/style.css';
+import MomentLocaleUtils, {
+  formatDate,
+  parseDate,
+} from 'react-day-picker/moment';
 
 const customersAPI = 'CustomersAPI';
 const getAllPath = '/all';
@@ -35,7 +41,9 @@ class UpdateOrder extends React.Component{
     orders:[],
     hs_codes:[],
     courier_accounts:[],
-    order_items:[]
+    order_items:[],
+    shipping_date: null,
+    payment_date: null
     };
   }
 
@@ -106,8 +114,8 @@ class UpdateOrder extends React.Component{
       "HSCodeID":this.state.currentlySelectedHSCode.value,
       "ShippingAddressID":this.state.currentlySelectedShippingAddress.value,
       "BillingAddressID":"", //::TODO::Add Billing Addresses in later.
-      //"ShippingDate":"",//::TODO::Add Shipping Date in later.
-      //"PaymentDate":""//::TODO::Add Payment Date in later.
+      "ShippingDate":this.state.shipping_date === "None" ? null : this.state.shipping_date,//::TODO::Add Shipping Date in later.
+      "PaymentDate":this.state.payment_date === "None" ? null : this.state.shipping_date //::TODO::Add Payment Date in later.
       }
     };
     return API.put(orderAPI, '/'+this.state.currentlySelectedOrder.value, apiRequest).then(response => {
@@ -150,10 +158,9 @@ class UpdateOrder extends React.Component{
       body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Pricing, "VariationID": invoiceLine.VariationID}
     };
     API.post(orderAPI, '/'+invoiceID+'/order-lines', apiRequest).then(response => {
-      this.getOrderLines(invoiceID)
-      .then(response => {
-        this.setState({order_items:JSON.parse(response.body)})
-      });
+      var invoice_lines = this.state.order_items;
+      invoice_lines.push(invoiceLine)
+      this.setState({order_items:invoice_lines});
     })
 
   }
@@ -208,6 +215,8 @@ class UpdateOrder extends React.Component{
        currentlySelectedShippingAddress: this.findMatchingElementByID(event.details.ShippingAddressID, this.state.shipping_addresses),
        currentlySelectedHSCode: this.findMatchingElementByID(event.details.HSCodeID, this.state.hs_codes),
        purchaseOrderNumber: event.details.PurchaseOrderNumber || '',
+       shipping_date: event.details.ShippedDate,
+       payment_date: event.details.PaymentDate,
 
 
      })
@@ -247,6 +256,14 @@ class UpdateOrder extends React.Component{
 
   handleCurrencyChange = (event) => {
     this.setState({currentlySelectedCurrency: event})
+  }
+
+  handleShippingDateChange = (event) => {
+    this.setState({shipping_date: event})
+  }
+
+  handlePaymentDateChange = (event) => {
+    this.setState({payment_date: event})
   }
 
    generateShippingAddressList(shipping_addresses) {
@@ -345,6 +362,16 @@ class UpdateOrder extends React.Component{
                 <label>Shipping Address</label>
                 <Select value={this.state.currentlySelectedShippingAddress} onChange={this.handleShippingAddressChange} options={this.state.shipping_addresses} placeholder="Select a Shipping Address"/>
                 {this.required(this.state.currentlySelectedShippingAddress)}
+              </div>
+
+              <div data-field-span="1">
+                <label>Shipping Date</label>
+                <DayPickerInput
+                  formatDate={formatDate}
+                  parseDate={parseDate}
+                  placeholder={`Shipping Date`}
+                  onDayChange ={this.handleShippingDateChange}
+                />
               </div>
 
             </div>

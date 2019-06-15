@@ -265,9 +265,6 @@ class OrderList extends Component {
 				var line = [ this.findMatchingElementByID(items[i].ProductID,this.props.products).label+variant, items[i].Quantity,items[i].Pricing, currency, items[i].Quantity*items[i].Pricing+'' ];
 				data.push(line);
 			}
-			//console.log(this.findMatchingElementByID(items[i].ProductID,this.props.products))
-
-
 	 	}
 	 	var footer = [['Total','','',this.calculateTotal()]]
 	 	var tableHeight = 0;
@@ -310,21 +307,6 @@ class OrderList extends Component {
 
 		var response = await API.get(variantsAPI, '/'+id, apiRequest)
 		return JSON.parse(response.body).Description || '';
-
-
-		/*
-		.then(response => {
-					console.log('Retrieved Variant')
-					if(response && response.body){
-						return JSON.parse(response.body).Description;
-					}
-					else {
-						return '';
-					}
-
- 	  }).catch(error => {
- 		    console.log(error)
- 	});*/
 	 }
 
 	 generateBankDetails(doc, margin, initY) {
@@ -398,6 +380,21 @@ class OrderList extends Component {
 	   }
    }
 
+	 saveOrder = (event) => {
+		 event.preventDefault();
+		 this.props.create_invoice_handler(this.buildInvoiceBody())
+		 .then( response => {
+			 NotificationManager.success('', 'Order Successfully Saved', 3000);
+		 })
+		 .catch(err =>
+		 {
+			 console.log('Order Saving Error:')
+			 console.log(err)
+			 NotificationManager.error('Order Saving Failed', 'Error', 5000, () => {});
+			 return false;
+		 })
+	 }
+
 
    render() {
     return (
@@ -430,7 +427,9 @@ class OrderList extends Component {
 
 	  <div>
 		<button onClick={this.saveOrderAndGeneratePDF}>Generate PDF</button>
+		<button onClick={this.saveOrder}>Save Order</button>
 	  </div>
+
 	</div>
 
     );
