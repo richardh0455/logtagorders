@@ -93,8 +93,6 @@ class UpdateOrder extends React.Component{
 
 
   async updateInvoice(invoiceLines) {
-    console.log('Updating Invoice')
-    console.log(this.state.currentlySelectedOrder)
     var currency = this.state.currentlySelectedCurrency.label || ''
     const apiRequest = {
       headers: {
@@ -133,7 +131,6 @@ class UpdateOrder extends React.Component{
       body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Pricing, "VariationID": invoiceLine.VariationID}
     };
     API.put(orderAPI, '/'+invoiceID+'/order-lines/'+invoiceLine.LineID, apiRequest).then(response => {
-      console.log(response.body)
     })
 
   }
@@ -174,8 +171,6 @@ class UpdateOrder extends React.Component{
        this.generateCourierAccountList(JSON.parse(response.body))
        this.getShippingAddresses(event.value).then(response => this.generateShippingAddressList(JSON.parse(response.body)))
        this.getOrders(event.value).then(response => {
-         console.log('GetOrdersResponse');
-         console.log(response);
          this.setState({orders: JSON.parse(response.body)})})
        this.handleShippingAddressChange(null);
        this.handleCourierAccountChange(null);
