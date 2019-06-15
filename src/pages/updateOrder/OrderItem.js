@@ -32,7 +32,7 @@ class OrderItem extends Component {
     if(this.props.product && this.props.customer)
     {
       this.getVariants();
-      this.getPriceList();
+      this.getPriceList(this.props.product.value);
     }
 
   }
@@ -40,11 +40,8 @@ class OrderItem extends Component {
 
   handleProductChange = (event) => {
     this.props.update_item_handler(this.props.id, 'ProductID', event.value)
-    if(this.props.product && this.props.customer)
-    {
-      this.getVariants();
-      this.getPriceList();
-    }
+    this.getVariants();
+    this.getPriceList(event.value);
   }
 
 
@@ -74,8 +71,11 @@ class OrderItem extends Component {
 	});
   }
 
-  getPriceList = () => {
-    var productID = this.props.product.value;
+  async getPriceList(productID) {
+    if(!productID)
+    {
+      return;
+    }
 	  var customerID = this.props.customer.value;
     const apiRequest = {
       headers: {

@@ -110,9 +110,9 @@ class UpdateOrder extends React.Component{
       body: {
       "PurchaseOrderNumber":this.state.purchaseOrderNumber,
       "Currency":currency,
-      "CourierAccountID":this.state.currentlySelectedCourierAccount.value,
-      "HSCodeID":this.state.currentlySelectedHSCode.value,
-      "ShippingAddressID":this.state.currentlySelectedShippingAddress.value,
+      "CourierAccountID":this.state.currentlySelectedCourierAccount ? this.state.currentlySelectedCourierAccount.value : null,
+      "HSCodeID":this.state.currentlySelectedHSCode ? this.state.currentlySelectedHSCode.value : null,
+      "ShippingAddressID":this.state.currentlySelectedShippingAddress ? this.state.currentlySelectedShippingAddress.value : null,
       "BillingAddressID":"", //::TODO::Add Billing Addresses in later.
       "ShippingDate":this.state.shipping_date === "None" ? null : this.state.shipping_date,//::TODO::Add Shipping Date in later.
       "PaymentDate":this.state.payment_date === "None" ? null : this.state.shipping_date //::TODO::Add Payment Date in later.
