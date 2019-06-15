@@ -131,8 +131,8 @@ class OrderItem extends Component {
 
 
   removeItem = (event) => {
-	event.preventDefault();
-	this.props.update_item_handler(this.props.item.key, null)
+	   event.preventDefault();
+	    this.props.delete_item_handler(this.props.id)
   }
 
   onKeyPress = (event) => {

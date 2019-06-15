@@ -158,6 +158,27 @@ class UpdateOrder extends React.Component{
 
   }
 
+  async deleteInvoiceLineHandler(lineID) {
+    this.deleteInvoiceLine(this.state.currentlySelectedOrder.value, lineID)
+
+  }
+
+  async deleteInvoiceLine(invoiceID, lineID) {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    API.del(orderAPI, '/'+invoiceID+'/order-lines/'+lineID, apiRequest).then(response => {
+      this.getOrderLines(invoiceID)
+      .then(response => {
+        this.setState({order_items:JSON.parse(response.body)})
+      });
+    })
+
+  }
+
   orderItemUpdated = (items) => {
    this.setState({order_items: items});
   }
@@ -353,6 +374,7 @@ class UpdateOrder extends React.Component{
                 <OrderList
                   create_invoice_handler={this.updateInvoice.bind(this)}
                   create_invoice_line_handler={this.createInvoiceLineHandler.bind(this)}
+                  delete_invoice_line_handler={this.deleteInvoiceLineHandler.bind(this)}
                   products={this.props.products}
                   shippingAddress ={this.state.currentlySelectedShippingAddress}
                   courierAccount ={this.state.currentlySelectedCourierAccount}

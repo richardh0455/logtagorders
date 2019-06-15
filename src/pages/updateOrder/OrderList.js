@@ -413,6 +413,7 @@ class OrderList extends Component {
 				variant_id={item.VariationID}
 				products={this.props.products}
 				update_item_handler={this.orderItemUpdated.bind(this)}
+				delete_item_handler={this.props.delete_invoice_line_handler.bind(this)}
 				customer={this.props.customer}
 				price={item.Pricing}
 				quantity={item.Quantity}
