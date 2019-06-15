@@ -3,7 +3,7 @@ import Amplify from 'aws-amplify';
 import { Auth, API } from 'aws-amplify';
 import { withRouter } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
-import OrderList from './createOrder/OrderList';
+import OrderList from './updateOrder/OrderList';
 import Select from 'react-select';
 
 const customersAPI = 'CustomersAPI';
@@ -11,10 +11,9 @@ const getAllPath = '/all';
 
 const productsAPI = 'ProductsAPI';
 
-const createPath = '/create';
 const orderAPI = 'OrdersAPI';
 
-class CreateOrder extends React.Component{
+class UpdateOrder extends React.Component{
 
   constructor(props) {
     super(props);
@@ -29,11 +28,14 @@ class CreateOrder extends React.Component{
       currentlySelectedCourierAccount: null,
       currentlySelectedHSCode: null,
       currentlySelectedCurrency: null,
-      currenltySelectedOrder: null,
+      currentlySelectedOrder: null,
 	  customer: null,
     purchaseOrderNumber:'',
     shipping_addresses:[],
-    orders:[]
+    orders:[],
+    hs_codes:[],
+    courier_accounts:[],
+    order_items:[]
     };
   }
 
@@ -90,7 +92,7 @@ class CreateOrder extends React.Component{
   }
 
 
-  async createInvoice(invoiceLines) {
+  async updateInvoice(invoiceLines) {
     var currency = this.state.currentlySelectedCurrency.label || ''
     const apiRequest = {
       headers: {
@@ -98,22 +100,45 @@ class CreateOrder extends React.Component{
         'Content-Type': 'application/json'
       },
       body: {
-      "CustomerID": this.state.currentlySelectedCustomer.value,
       "PurchaseOrderNumber":this.state.purchaseOrderNumber,
       "Currency":currency,
       "CourierAccountID":this.state.currentlySelectedCourierAccount.value,
       "HSCodeID":this.state.currentlySelectedHSCode.value,
       "ShippingAddressID":this.state.currentlySelectedShippingAddress.value,
-      "BillingAddressID":"" //::TODO::Add Billing Addresses in later.
+      "BillingAddressID":"", //::TODO::Add Billing Addresses in later.
+      //"ShippingDate":"",//::TODO::Add Shipping Date in later.
+      //"PaymentDate":""//::TODO::Add Payment Date in later.
       }
     };
-    return API.post(orderAPI, '', apiRequest).then(response => {
-      invoiceLines.map((line, key) =>
-        this.createInvoiceLine(response.body["InvoiceID"], line)
-      );
-      return response.body
+    return API.put(orderAPI, '/'+this.state.currentlySelectedOrder.value, apiRequest).then(response => {
+      this.state.order_items.map(item => {
+        this.updateInvoiceLine(this.state.currentlySelectedOrder.value, item).catch(err =>
+          NotificationManager.error('Updating Order Failed', 'Error', 5000, () => {})
+        )
+      })
+      return {LogtagInvoiceNumber:this.state.currentlySelectedOrder.label}
 
+    }).catch(err =>
+      NotificationManager.error('Updating Order Failed', 'Error', 5000, () => {})
+    )
+  }
+  async updateInvoiceLine(invoiceID, invoiceLine) {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      },
+      body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Pricing, "VariationID": invoiceLine.VariationID}
+    };
+    API.put(orderAPI, '/'+invoiceID+'/order-lines/'+invoiceLine.LineID, apiRequest).then(response => {
     })
+
+  }
+
+  async createInvoiceLineHandler(event) {
+    event.preventDefault();
+    this.createInvoiceLine(this.state.currentlySelectedOrder.value, {Quantity:"0",ProductID:"0",Pricing:"0", VariationID:"0"})
+
   }
 
   async createInvoiceLine(invoiceID, invoiceLine) {
@@ -122,21 +147,52 @@ class CreateOrder extends React.Component{
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
-      body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Price, "VariationID": invoiceLine.VariationID}
+      body: {"Quantity": invoiceLine.Quantity, "ProductID": invoiceLine.ProductID, "Price": invoiceLine.Pricing, "VariationID": invoiceLine.VariationID}
     };
     API.post(orderAPI, '/'+invoiceID+'/order-lines', apiRequest).then(response => {
-      console.log(response.body)
+      this.getOrderLines(invoiceID)
+      .then(response => {
+        this.setState({order_items:JSON.parse(response.body)})
+      });
     })
 
+  }
+
+  async deleteInvoiceLineHandler(lineID) {
+    this.deleteInvoiceLine(this.state.currentlySelectedOrder.value, lineID)
+
+  }
+
+  async deleteInvoiceLine(invoiceID, lineID) {
+    const apiRequest = {
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    API.del(orderAPI, '/'+invoiceID+'/order-lines/'+lineID, apiRequest).then(response => {
+      this.getOrderLines(invoiceID)
+      .then(response => {
+        this.setState({order_items:JSON.parse(response.body)})
+      });
+    })
+
+  }
+
+  orderItemUpdated = (items) => {
+   this.setState({order_items: items});
   }
 
   handleCustomerChange = (event) => {
 	   this.setState({currentlySelectedCustomer: event})
      this.getCustomer(event.value)
      .then(response => {
-       this.setState({customer: response.body})
+       this.setState({customer: response.body, currentlySelectedOrder:null, order_items:[] })
+       this.generateHSCodeList(JSON.parse(response.body))
+       this.generateCourierAccountList(JSON.parse(response.body))
        this.getShippingAddresses(event.value).then(response => this.generateShippingAddressList(JSON.parse(response.body)))
-       this.getOrders(event.value).then(response => this.setState({orders: JSON.parse(response.body)}))
+       this.getOrders(event.value).then(response => {
+         this.setState({orders: JSON.parse(response.body)})})
        this.handleShippingAddressChange(null);
        this.handleCourierAccountChange(null);
        this.handleHSCodeChange(null);
@@ -146,12 +202,29 @@ class CreateOrder extends React.Component{
   }
 
   handleOrderChange = (event) => {
+     this.setState({currentlySelectedOrder: event,
+       currentlySelectedCurrency: this.findMatchingElementByValue(event.details.Currency, this.props.currencies),
+       currentlySelectedCourierAccount: this.findMatchingElementByID(event.details.CourierAccountID, this.state.courier_accounts),
+       currentlySelectedShippingAddress: this.findMatchingElementByID(event.details.ShippingAddressID, this.state.shipping_addresses),
+       currentlySelectedHSCode: this.findMatchingElementByID(event.details.HSCodeID, this.state.hs_codes),
+       purchaseOrderNumber: event.details.PurchaseOrderNumber || '',
+
+
+     })
      this.getOrderLines(event.value)
      .then(response => {
-       console.log('Getting Order Lines:')
-       console.log(response.body)
-       this.setState({currentlySelectedOrder: response.body})
+       this.setState({order_items:JSON.parse(response.body)})
      });
+  }
+
+  findMatchingElementByValue(value, list) {
+      return list.find(element => element.label===value);
+
+  }
+
+  findMatchingElementByID(value, list) {
+      return list.find(element => element.value===value);
+
   }
 
 
@@ -226,7 +299,7 @@ class CreateOrder extends React.Component{
      {return {value:account.ID, label: account.CourierAccount}}
        );
    }
-   return courierAccounts;
+   this.setState({courier_accounts: courierAccounts})
  }
 
  generateHSCodeList(customer) {
@@ -236,7 +309,7 @@ class CreateOrder extends React.Component{
     {return {value:code.ID, label: code.HSCode}}
       );
   }
-  return hsCodes;
+  this.setState({hs_codes: hsCodes})
 }
 
  required(field) {
@@ -246,19 +319,28 @@ class CreateOrder extends React.Component{
    }
 
  }
+
   render() {
     return (
       <div >
+
       <section>
         <form className="grid-form">
+        <div data-row-span="2" >
+        <div data-field-span="1" >
+          <label>Customer</label>
+          <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
+      </div>
+      <div data-field-span="1" >
+        <label>Order</label>
+        <Select value={this.state.currentlySelectedOrder} onChange={this.handleOrderChange} options={
+          this.state.orders.filter(order => {return !this.fieldHasValidValue(order.ShippedDate)}).map(order => {return {value:order.InvoiceID, label: order.LogtagInvoiceNumber, details:order}})} isSearchable="true" placeholder="Select an Order"/>
+       </div>
+       </div>
           <fieldset>
             <h2>Customer</h2>
             <div data-row-span="2">
-              <div data-field-span="1" >
-                <label>Customer</label>
-                <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
-                {this.required(this.state.currentlySelectedCustomer)}
-              </div>
+
               <div data-field-span="1" >
                 <label>Shipping Address</label>
                 <Select value={this.state.currentlySelectedShippingAddress} onChange={this.handleShippingAddressChange} options={this.state.shipping_addresses} placeholder="Select a Shipping Address"/>
@@ -278,19 +360,21 @@ class CreateOrder extends React.Component{
               </div>
               <div data-field-span="1" >
                 <label>Courier Account</label>
-                <Select value={this.state.currentlySelectedCourierAccount} onChange={this.handleCourierAccountChange} options={this.generateCourierAccountList(JSON.parse(this.state.customer))} placeholder="Select a Courier Account"/>
+                <Select value={this.state.currentlySelectedCourierAccount} onChange={this.handleCourierAccountChange} options={this.state.courier_accounts} placeholder="Select a Courier Account"/>
                 {this.required(this.state.currentlySelectedCourierAccount)}
               </div>
               <div data-field-span="1" >
                 <label>HS Code</label>
-                <Select value={this.state.currentlySelectedHSCode} onChange={this.handleHSCodeChange} options={this.generateHSCodeList(JSON.parse(this.state.customer))} placeholder="Select a HS Code"/>
+                <Select value={this.state.currentlySelectedHSCode} onChange={this.handleHSCodeChange} options={this.state.hs_codes} placeholder="Select a HS Code"/>
                 {this.required(this.state.currentlySelectedHSCode)}
               </div>
             </div>
             <div className="OrderList" style={{marginTop: 50 + 'px'}}>
 				      <h2>Product</h2>
                 <OrderList
-                  create_invoice_handler={this.createInvoice.bind(this)}
+                  create_invoice_handler={this.updateInvoice.bind(this)}
+                  create_invoice_line_handler={this.createInvoiceLineHandler.bind(this)}
+                  delete_invoice_line_handler={this.deleteInvoiceLineHandler.bind(this)}
                   products={this.props.products}
                   shippingAddress ={this.state.currentlySelectedShippingAddress}
                   courierAccount ={this.state.currentlySelectedCourierAccount}
@@ -298,6 +382,8 @@ class CreateOrder extends React.Component{
                   purchaseOrderNumber={this.state.purchaseOrderNumber}
                   customer={{...this.state.currentlySelectedCustomer,...JSON.parse(this.state.customer)}}
                   currency = {this.state.currentlySelectedCurrency}
+                  order_items = {this.state.order_items}
+                  order_item_updated = {this.orderItemUpdated.bind(this)}
                   />
             </div>
         </fieldset>
@@ -309,7 +395,6 @@ class CreateOrder extends React.Component{
     );
   }
 
-
 }
 
-export default withRouter(CreateOrder);
+export default withRouter(UpdateOrder);
