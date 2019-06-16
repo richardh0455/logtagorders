@@ -158,6 +158,7 @@ class UpdateOrder extends React.Component{
     };
     API.post(orderAPI, '/'+invoiceID+'/order-lines', apiRequest).then(response => {
       var invoice_lines = this.state.order_items;
+      invoiceLine.LineID = response.body.ID
       invoice_lines.push(invoiceLine)
       this.setState({order_items:invoice_lines});
     })
