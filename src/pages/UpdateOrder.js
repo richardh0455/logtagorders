@@ -101,7 +101,6 @@ class UpdateOrder extends React.Component{
 
 
   async updateInvoice(invoiceLines) {
-    var currency = this.state.currentlySelectedCurrency.label || ''
     const apiRequest = {
       headers: {
         'Authorization': this.state.idToken,
@@ -109,7 +108,7 @@ class UpdateOrder extends React.Component{
       },
       body: {
       "PurchaseOrderNumber":this.state.purchaseOrderNumber,
-      "Currency":currency,
+      "Currency":this.state.currentlySelectedCurrency ? this.state.currentlySelectedCurrency.label : '',
       "CourierAccountID":this.state.currentlySelectedCourierAccount ? this.state.currentlySelectedCourierAccount.value : null,
       "HSCodeID":this.state.currentlySelectedHSCode ? this.state.currentlySelectedHSCode.value : null,
       "ShippingAddressID":this.state.currentlySelectedShippingAddress ? this.state.currentlySelectedShippingAddress.value : null,

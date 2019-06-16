@@ -31,7 +31,7 @@ class OrderItem extends Component {
     this.setState({ idToken: session.idToken.jwtToken });
     if(this.props.product && this.props.customer)
     {
-      this.getVariants();
+      this.getVariants(this.props.product.value);
       this.getPriceList(this.props.product.value);
     }
 
@@ -40,7 +40,7 @@ class OrderItem extends Component {
 
   handleProductChange = (event) => {
     this.props.update_item_handler(this.props.id, 'ProductID', event.value)
-    this.getVariants();
+    this.getVariants(event.value);
     this.getPriceList(event.value);
   }
 
@@ -49,8 +49,7 @@ class OrderItem extends Component {
 	  this.props.update_item_handler(this.props.id, 'VariationID', event.value)
   }
 
-  async getVariants() {
-	  var productID = this.props.product.value;
+  async getVariants(productID) {
 	  var customerID = this.props.customer.value;
 	  const apiRequest = {
         headers: {
