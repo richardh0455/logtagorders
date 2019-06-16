@@ -238,7 +238,7 @@ class OrderList extends Component {
 
 	 generateShippingAccount(doc, margin, initY) {
 		 doc.setFontSize(12);
-		 var courierAccount = this.props.courierAccount.label || '';
+		 var courierAccount = this.props.courierAccount ? this.props.courierAccount.label : '';
 		 var shippingInfo = 'Ship Via:- '+courierAccount;
 		 doc.text(shippingInfo,  margin, initY+141);
 	 }
@@ -312,7 +312,8 @@ class OrderList extends Component {
 	 generateBankDetails(doc, margin, initY) {
 		doc.setFontStyle("");
 	 	doc.setFontSize(12);
-	 	var paymentInfo = ['HS Code # ' +this.props.hsCode.label,
+		var hsCode = this.props.hsCode ? this.props.hsCode.label : '';
+	 	var paymentInfo = ['HS Code # ' + hsCode,
 	 'Make Payment in advance to LogTag Recorders (HK) Ltd. Bank Account:-']
 	  initY = this.checkPageHeight(doc, initY);
 	 	doc.text(paymentInfo,  margin, initY +10);
