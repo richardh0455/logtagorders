@@ -29,7 +29,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
     {...rest}
     render={props => (
-    isAuthenticated() === true
+    Amplify.Auth.currentAuthenticatedUser() !== null
       ? <Component {...props} />
       : <Redirect to='/signin' />
   )} />
