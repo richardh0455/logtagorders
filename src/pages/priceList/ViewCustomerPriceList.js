@@ -16,8 +16,10 @@ class ViewCustomers extends React.Component{
     this.state = {
         currentlySelectedProductID:"",
         currentlySelectedCustomerID:"",
+        currentlySelectedVariationID:"",
         priceList:[],
-        counter:0
+        counter:0,
+        variations: []
       };
   }
 
@@ -29,14 +31,21 @@ class ViewCustomers extends React.Component{
 
   handleCustomerChange = (event) => {
     this.setState({currentlySelectedCustomerID: event.value})
-    if(this.state.currentlySelectedProductID)
-      this.getCustomerPriceLists(event.value, this.state.currentlySelectedProductID)
+    if(this.state.currentlySelectedProductID && this.state.currentlySelectedVariationID)
+      this.getCustomerPriceLists(event.value, this.state.currentlySelectedProductID, this.state.currentlySelectedVariationID)
   }
 
   handleProductChange = (event) => {
     this.setState({currentlySelectedProductID: event.value})
-    if(this.state.currentlySelectedCustomerID)
-      this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, event.value)
+    if(this.state.currentlySelectedCustomerID && this.state.currentlySelectedVariationID)
+      this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, event.value, this.state.currentlySelectedVariationID)
+
+  }
+
+  handleVariationChange = (event) => {
+    this.setState({currentlySelectedVariationID: event.value})
+    if(this.state.currentlySelectedCustomerID && this.state.currentlySelectedProductID)
+      this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, this.state.currentlySelectedProductID, event.value)
 
   }
 
@@ -52,17 +61,18 @@ class ViewCustomers extends React.Component{
       }
    }
    this.setState({priceList: items});
-   this.updatePriceItem(item);
+   //this.updatePriceItem(item);
   }
 
-  getCustomerPriceLists = (customerID, productID) => {
+  getCustomerPriceLists = (customerID, productID, variationID) => {
     const apiRequest = {
       headers: {
         'Authorization': this.state.idToken,
         'Content-Type': 'application/json'
       },
       queryStringParameters: {
-        'product-id': productID
+        'product-id': productID,
+        'variation-id': variationID
       }
     };
     //this.setState({currentlySelectedCustomerID:id})
@@ -80,7 +90,6 @@ class ViewCustomers extends React.Component{
   }
 
   deletePriceItem = (id) => {
-    if (window.confirm('Are you sure?')) {
       const apiRequest = {
         headers: {
           'Authorization': this.state.idToken,
@@ -102,8 +111,6 @@ class ViewCustomers extends React.Component{
           NotificationManager.error('Failed to Deleted Price Item', 'Error', 5000, () => {});
         }
       })
-    }
-
   }
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -137,7 +144,8 @@ class ViewCustomers extends React.Component{
         'Content-Type': 'application/json'
       },
       queryStringParameters: {
-        'product-id': this.state.currentlySelectedProductID
+        'product-id': this.state.currentlySelectedProductID,
+        'variation-id': this.state.currentlySelectedVariationID
       },
       body: {
         'Price': priceItem.price,
@@ -170,10 +178,10 @@ class ViewCustomers extends React.Component{
 
   savePriceItems = (event) => {
     event.preventDefault();
-    /*this.state.priceList.map(item => {
+    this.state.priceList.map(item => {
         this.updatePriceItem(item);
-    });*/
-    this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, this.state.currentlySelectedProductID);
+    });
+    //this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, this.state.currentlySelectedProductID);
     NotificationManager.success('', 'Price List Successfully Updated', 3000);
 
   }
@@ -184,7 +192,7 @@ class ViewCustomers extends React.Component{
       <section>
         <form className="grid-form">
           <fieldset>
-            <div data-row-span="2">
+            <div data-row-span="3">
               <div data-field-span="1">
                 <label>Customer</label>
                 <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
@@ -192,6 +200,10 @@ class ViewCustomers extends React.Component{
               <div data-field-span="1">
                 <label>Product</label>
                 <Select value={this.state.currentlySelectedProduct} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
+              </div>
+              <div data-field-span="1">
+                <label>Variant</label>
+                <Select value={this.state.currentlySelectedVariation} onChange={this.handleVariationChange} options={this.state.variations} isSearchable="true" placeholder="Select a Variant"/>
               </div>
             </div>
           </fieldset>
