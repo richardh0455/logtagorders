@@ -8,6 +8,8 @@ import PriceItem  from './PriceItem';
 
 
 const customerAPI = 'CustomersAPI';
+const variantsAPI = 'VariantsAPI';
+const getAllPath = '/all';
 
 class ViewCustomers extends React.Component{
 
@@ -31,22 +33,39 @@ class ViewCustomers extends React.Component{
 
   handleCustomerChange = (event) => {
     this.setState({currentlySelectedCustomerID: event.value})
-    if(this.state.currentlySelectedProductID && this.state.currentlySelectedVariationID)
-      this.getCustomerPriceLists(event.value, this.state.currentlySelectedProductID, this.state.currentlySelectedVariationID)
+    if(this.state.currentlySelectedProductID)
+      this.getVariations(event.value, this.state.currentlySelectedProductID)
   }
 
   handleProductChange = (event) => {
     this.setState({currentlySelectedProductID: event.value})
-    if(this.state.currentlySelectedCustomerID && this.state.currentlySelectedVariationID)
-      this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, event.value, this.state.currentlySelectedVariationID)
-
+    if(this.state.currentlySelectedCustomerID)
+      this.getVariations(this.state.currentlySelectedCustomerID, event.value)
   }
 
   handleVariationChange = (event) => {
     this.setState({currentlySelectedVariationID: event.value})
-    if(this.state.currentlySelectedCustomerID && this.state.currentlySelectedProductID)
-      this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, this.state.currentlySelectedProductID, event.value)
+    this.getCustomerPriceLists(this.state.currentlySelectedCustomerID, this.state.currentlySelectedProductID, event.value)
+  }
 
+  async getVariations(customerID, productID) {
+	  const apiRequest = {
+        headers: {
+          'Authorization': this.state.idToken,
+          'Content-Type': 'application/json'
+        },
+		    queryStringParameters: {"CustomerID": customerID, "ProductID": productID}
+      };
+	  API.get(variantsAPI, getAllPath, apiRequest).then(response => {
+        var variants = JSON.parse(response.body).map(
+          function(variant, index){
+            return {"value":variant.VariantID, "label":variant.Description, "price":variant.Price};
+          }
+        );
+		    this.setState({variations: variants});
+	  }).catch(error => {
+		    console.log(error)
+	});
   }
 
   priceItemUpdated = (key, item) => {
