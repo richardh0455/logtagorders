@@ -18,7 +18,8 @@ class OrderItem extends Component {
 		//quantity: this.props.item.quantity,
 		//price: this.props.item.price,
 		variants: [],
-    priceList: []
+    priceList: [],
+    inputHeight:'38px'
 	};
 
 
