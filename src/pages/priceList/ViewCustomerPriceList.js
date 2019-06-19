@@ -178,7 +178,7 @@ class ViewCustomers extends React.Component{
     };
     if(this.state.currentlySelectedVariationID)
     {
-      apiRequest.queryStringParameters['variation-id']=variationID
+      apiRequest.queryStringParameters['variation-id']=this.state.currentlySelectedVariationID
     }
     //this.setState({currentlySelectedCustomerID:id})
     API.post(customerAPI, '/'+this.state.currentlySelectedCustomerID+'/price-list', apiRequest)
