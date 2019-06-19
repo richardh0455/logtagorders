@@ -41,12 +41,13 @@ class OrderItem extends Component {
   handleProductChange = (event) => {
     this.props.update_item_handler(this.props.id, 'ProductID', event.value)
     this.getVariants(event.value);
-    this.getPriceList(event.value);
+    this.getPriceList(event.value, null);
   }
 
 
   handleVariantChange = (event) => {
 	  this.props.update_item_handler(this.props.id, 'VariationID', event.value)
+    this.getPriceList(this.props.product.value, event.value);
   }
 
   async getVariants(productID) {
@@ -70,10 +71,14 @@ class OrderItem extends Component {
 	});
   }
 
-  async getPriceList(productID) {
+  async getPriceList(productID, variantID) {
     if(!productID)
     {
       return;
+    }
+    if(!variantID)
+    {
+      variantID = ''
     }
 	  var customerID = this.props.customer.value;
     const apiRequest = {
@@ -82,7 +87,8 @@ class OrderItem extends Component {
         'Content-Type': 'application/json'
       },
       queryStringParameters: {
-        'product-id': productID
+        'product-id': productID,
+        'variant-id': variantID
       }
     };
     //this.setState({currentlySelectedCustomerID:id})

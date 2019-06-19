@@ -86,7 +86,8 @@ class OrderItem extends Component {
         'Content-Type': 'application/json'
       },
       queryStringParameters: {
-        'product-id': productID
+        'product-id': productID,
+        'variant-id': this.state.currentlySelectedVariant ? this.state.currentlySelectedVariant.value : ''
       }
     };
     //this.setState({currentlySelectedCustomerID:id})
