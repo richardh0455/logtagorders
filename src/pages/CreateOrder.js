@@ -33,7 +33,8 @@ class CreateOrder extends React.Component{
 	  customer: null,
     purchaseOrderNumber:'',
     shipping_addresses:[],
-    orders:[]
+    orders:[],
+    inputHeight:'56px'
     };
   }
 
@@ -241,7 +242,7 @@ class CreateOrder extends React.Component{
 
  required(field) {
    if(field  === null) {
-    return <span style={{'font-size': '12px', 'color':'#ba090c'}}>Please Select a Value</span>
+    return <span style={{'fontSize': '12px', 'color':'#ba090c'}}>Please Select a Value</span>
 
    }
 
@@ -267,9 +268,9 @@ class CreateOrder extends React.Component{
 
             </div>
             <div data-row-span="4">
-              <div data-field-span="1" >
+              <div data-field-span="1">
                 <label>Purchase Order Number</label>
-                <input type="text" value={this.state.purchaseOrderNumber}  onChange={this.handlePurchaseOrderNumberChange} />
+                <input type="text" value={this.state.purchaseOrderNumber} style={{'height': this.state.inputHeight}} onChange={this.handlePurchaseOrderNumberChange} />
               </div>
               <div data-field-span="1">
         				<label>Currency</label>

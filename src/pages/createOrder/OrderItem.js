@@ -19,7 +19,8 @@ class OrderItem extends Component {
 		quantity: order_item ? order_item.quantity : this.props.item.quantity,
 		price: order_item ? order_item.price : this.props.item.price,
 		variants: [],
-    priceList: []
+    priceList: [],
+    inputHeight: '38px'
 	};
 
   }
@@ -86,7 +87,8 @@ class OrderItem extends Component {
         'Content-Type': 'application/json'
       },
       queryStringParameters: {
-        'product-id': productID
+        'product-id': productID,
+        'variant-id': this.state.currentlySelectedVariant ? this.state.currentlySelectedVariant.value : ''
       }
     };
     //this.setState({currentlySelectedCustomerID:id})
@@ -144,30 +146,31 @@ class OrderItem extends Component {
 
   render() {
     return (
-      <div className onKeyPress={this.onKeyPress}>
-        <div data-row-span="6">
-			<div data-field-span="1">
-				<label>Product</label>
-				<Select value={this.state.currentlySelectedProduct} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
-			</div>
-			<div data-field-span="1">
-				<label>Variant</label>
-				<Select value={this.state.currentlySelectedVariant} onChange={this.handleVariantChange} options={this.state.variants} isSearchable="true" placeholder="Select a Variant"/>
-			</div>
+      <div onKeyPress={this.onKeyPress}>
+      <div data-row-span="6">
+      <div data-field-span="1">
+        <label>Product</label>
+        <Select value={this.state.currentlySelectedProduct} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
+      </div>
+      <div data-field-span="1">
+        <label>Variant</label>
+        <Select value={this.state.currentlySelectedVariant} onChange={this.handleVariantChange} options={this.state.variants} isSearchable="true" placeholder="Select a Variant"/>
+      </div>
+
 			<div data-field-span="1">
 				<label>Quantity</label>
-				<input type="text" value={this.state.quantity} onChange={this.handleQuantityChange} />
+				<input type="text" value={this.state.quantity} style={{'height': this.state.inputHeight}} onChange={this.handleQuantityChange} />
 			</div>
 			<div data-field-span="1">
 				<label>Pricing</label>
-				<input type="text" value={this.state.price} onChange={this.handlePriceChange} />
+				<input type="text" value={this.state.price} style={{'height': this.state.inputHeight}} onChange={this.handlePriceChange} />
 			</div>
 
 			<div data-field-span="1">
 				<label>Subtotal</label>
-				{this.state.quantity * this.state.price}
+				<span style={{'height': this.state.inputHeight, 'fontSize':'18px'}}> {this.state.quantity * this.state.price} </span>
 			</div>
-			<div data-field-span="1">
+			<div data-field-span="1" >
 				<button onClick={this.removeItem}  >Remove Item</button>
 			</div>
 

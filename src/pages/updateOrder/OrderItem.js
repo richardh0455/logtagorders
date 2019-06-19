@@ -18,7 +18,8 @@ class OrderItem extends Component {
 		//quantity: this.props.item.quantity,
 		//price: this.props.item.price,
 		variants: [],
-    priceList: []
+    priceList: [],
+    inputHeight:'38px'
 	};
 
 
@@ -41,12 +42,13 @@ class OrderItem extends Component {
   handleProductChange = (event) => {
     this.props.update_item_handler(this.props.id, 'ProductID', event.value)
     this.getVariants(event.value);
-    this.getPriceList(event.value);
+    this.getPriceList(event.value, null);
   }
 
 
   handleVariantChange = (event) => {
 	  this.props.update_item_handler(this.props.id, 'VariationID', event.value)
+    this.getPriceList(this.props.product.value, event.value);
   }
 
   async getVariants(productID) {
@@ -70,10 +72,14 @@ class OrderItem extends Component {
 	});
   }
 
-  async getPriceList(productID) {
+  async getPriceList(productID, variantID) {
     if(!productID)
     {
       return;
+    }
+    if(!variantID)
+    {
+      variantID = ''
     }
 	  var customerID = this.props.customer.value;
     const apiRequest = {
@@ -82,7 +88,8 @@ class OrderItem extends Component {
         'Content-Type': 'application/json'
       },
       queryStringParameters: {
-        'product-id': productID
+        'product-id': productID,
+        'variant-id': variantID
       }
     };
     //this.setState({currentlySelectedCustomerID:id})
@@ -142,23 +149,24 @@ class OrderItem extends Component {
 
   render() {
     return (
-      <div className onKeyPress={this.onKeyPress}>
-        <div data-row-span="6">
-			<div data-field-span="1">
-				<label>Product</label>
-				<Select value={this.props.product} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
-			</div>
-			<div data-field-span="1">
-				<label>Variant</label>
-				<Select value={this.findMatchingElementByID(this.props.variant_id, this.state.variants)} onChange={this.handleVariantChange} options={this.state.variants} isSearchable="true" placeholder="Select a Variant"/>
-			</div>
+      <div onKeyPress={this.onKeyPress}>
+      <div data-row-span="6">
+        <div data-field-span="1">
+          <label>Product</label>
+          <Select value={this.props.product} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
+          </div>
+        <div data-field-span="1">
+          <label>Variant</label>
+          <Select value={this.findMatchingElementByID(this.props.variant_id, this.state.variants)} onChange={this.handleVariantChange} options={this.state.variants} isSearchable="true" placeholder="Select a Variant"/>
+        </div>
+
 			<div data-field-span="1">
 				<label>Quantity</label>
-				<input type="text" value={this.props.quantity} onChange={this.handleQuantityChange} />
+				<input type="text" value={this.props.quantity} style={{'height': this.state.inputHeight}} onChange={this.handleQuantityChange} />
 			</div>
 			<div data-field-span="1">
 				<label>Pricing</label>
-				<input type="text" value={this.props.price} onChange={this.handlePriceChange} />
+				<input type="text" value={this.props.price} style={{'height': this.state.inputHeight}} onChange={this.handlePriceChange} />
 			</div>
 
 			<div data-field-span="1">
