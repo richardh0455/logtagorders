@@ -166,7 +166,12 @@ class OrderList extends Component {
 		 var addressTitle = 'TO:  ';
 		 doc.text(addressTitle, margin, yCoord);
 		 var addressArray = new Array(this.props.customer.label);
-		 var shippingLines = this.buildAddress(this.props.shippingAddress.address)
+		 var shippingLines = []
+		 if(this.props.shippingAddress)
+		 {
+			 shippingLines = this.buildAddress(this.props.shippingAddress.address)
+		 }
+
 		 var addressText= addressArray.concat(shippingLines);
 		 doc.text(addressText, margin+doc.getTextWidth(addressTitle), yCoord);
 		 yCoord += 42;
