@@ -148,23 +148,26 @@ class OrderItem extends Component {
 
   render() {
     return (
-      <div className onKeyPress={this.onKeyPress}>
-        <div data-row-span="6">
-			<div data-field-span="1">
-				<label>Product</label>
-				<Select value={this.props.product} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
-			</div>
-			<div data-field-span="1">
-				<label>Variant</label>
-				<Select value={this.findMatchingElementByID(this.props.variant_id, this.state.variants)} onChange={this.handleVariantChange} options={this.state.variants} isSearchable="true" placeholder="Select a Variant"/>
-			</div>
+      <div onKeyPress={this.onKeyPress}>
+      <div data-row-span="2">
+        <div data-field-span="1">
+          <label>Product</label>
+          <Select value={this.props.product} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
+          </div>
+        <div data-field-span="1">
+          <label>Variant</label>
+          <Select value={this.findMatchingElementByID(this.props.variant_id, this.state.variants)} onChange={this.handleVariantChange} options={this.state.variants} isSearchable="true" placeholder="Select a Variant"/>
+        </div>
+      </div>
+        <div data-row-span="4">
+
 			<div data-field-span="1">
 				<label>Quantity</label>
-				<input type="text" value={this.props.quantity} onChange={this.handleQuantityChange} />
+				<input type="text" value={this.props.quantity} style={{'height': this.props.inputHeight}} onChange={this.handleQuantityChange} />
 			</div>
 			<div data-field-span="1">
 				<label>Pricing</label>
-				<input type="text" value={this.props.price} onChange={this.handlePriceChange} />
+				<input type="text" value={this.props.price} style={{'height': this.props.inputHeight}} onChange={this.handlePriceChange} />
 			</div>
 
 			<div data-field-span="1">
