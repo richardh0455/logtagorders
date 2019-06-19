@@ -162,11 +162,11 @@ class OrderItem extends Component {
 
 			<div data-field-span="1">
 				<label>Quantity</label>
-				<input type="text" value={this.props.quantity} style={{'height': this.props.inputHeight}} onChange={this.handleQuantityChange} />
+				<input type="text" value={this.props.quantity} style={{'height': this.state.inputHeight}} onChange={this.handleQuantityChange} />
 			</div>
 			<div data-field-span="1">
 				<label>Pricing</label>
-				<input type="text" value={this.props.price} style={{'height': this.props.inputHeight}} onChange={this.handlePriceChange} />
+				<input type="text" value={this.props.price} style={{'height': this.state.inputHeight}} onChange={this.handlePriceChange} />
 			</div>
 
 			<div data-field-span="1">
