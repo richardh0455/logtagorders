@@ -35,12 +35,14 @@ class ViewCustomers extends React.Component{
     this.setState({currentlySelectedCustomerID: event.value})
     if(this.state.currentlySelectedProductID)
       this.getVariations(event.value, this.state.currentlySelectedProductID)
+      this.getCustomerPriceLists(event.value, this.state.currentlySelectedProductID, null)
   }
 
   handleProductChange = (event) => {
     this.setState({currentlySelectedProductID: event.value})
     if(this.state.currentlySelectedCustomerID)
       this.getVariations(this.state.currentlySelectedCustomerID, event.value)
+      this.getCustomerPriceLists(this.state.currentlySelectedCustomerID,  event.value, null)
   }
 
   handleVariationChange = (event) => {
@@ -90,10 +92,13 @@ class ViewCustomers extends React.Component{
         'Content-Type': 'application/json'
       },
       queryStringParameters: {
-        'product-id': productID,
-        'variation-id': variationID
+        'product-id': productID
       }
     };
+    if(variationID)
+    {
+      apiRequest.queryStringParameters['variation-id']=variationID
+    }
     //this.setState({currentlySelectedCustomerID:id})
     API.get(customerAPI, '/'+customerID+'/price-list', apiRequest)
     .then(response => {
@@ -163,8 +168,7 @@ class ViewCustomers extends React.Component{
         'Content-Type': 'application/json'
       },
       queryStringParameters: {
-        'product-id': this.state.currentlySelectedProductID,
-        'variation-id': this.state.currentlySelectedVariationID
+        'product-id': this.state.currentlySelectedProductID
       },
       body: {
         'Price': priceItem.price,
@@ -172,6 +176,10 @@ class ViewCustomers extends React.Component{
         'Upper_Range': priceItem.upper_range
       }
     };
+    if(this.state.currentlySelectedVariationID)
+    {
+      apiRequest.queryStringParameters['variation-id']=variationID
+    }
     //this.setState({currentlySelectedCustomerID:id})
     API.post(customerAPI, '/'+this.state.currentlySelectedCustomerID+'/price-list', apiRequest)
     .then(response => {
