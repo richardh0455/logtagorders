@@ -149,7 +149,7 @@ class OrderItem extends Component {
   render() {
     return (
       <div onKeyPress={this.onKeyPress}>
-      <div data-row-span="2">
+      <div data-row-span="6">
         <div data-field-span="1">
           <label>Product</label>
           <Select value={this.props.product} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
@@ -158,8 +158,6 @@ class OrderItem extends Component {
           <label>Variant</label>
           <Select value={this.findMatchingElementByID(this.props.variant_id, this.state.variants)} onChange={this.handleVariantChange} options={this.state.variants} isSearchable="true" placeholder="Select a Variant"/>
         </div>
-      </div>
-        <div data-row-span="4">
 
 			<div data-field-span="1">
 				<label>Quantity</label>
