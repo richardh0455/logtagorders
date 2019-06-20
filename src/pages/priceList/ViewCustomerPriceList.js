@@ -34,15 +34,19 @@ class ViewCustomers extends React.Component{
   handleCustomerChange = (event) => {
     this.setState({currentlySelectedCustomerID: event.value})
     if(this.state.currentlySelectedProductID && this.state.currentlySelectedProductID !== '')
+    {
       this.getVariations(event.value, this.state.currentlySelectedProductID)
       this.getCustomerPriceLists(event.value, this.state.currentlySelectedProductID, null)
+    }
   }
 
   handleProductChange = (event) => {
     this.setState({currentlySelectedProductID: event.value})
     if(this.state.currentlySelectedCustomerID && this.state.currentlySelectedCustomerID !== '')
+    {
       this.getVariations(this.state.currentlySelectedCustomerID, event.value)
       this.getCustomerPriceLists(this.state.currentlySelectedCustomerID,  event.value, null)
+    }
   }
 
   handleVariationChange = (event) => {
