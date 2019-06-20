@@ -33,16 +33,20 @@ class ViewCustomers extends React.Component{
 
   handleCustomerChange = (event) => {
     this.setState({currentlySelectedCustomerID: event.value})
-    if(this.state.currentlySelectedProductID)
+    if(this.state.currentlySelectedProductID && this.state.currentlySelectedProductID !== '')
+    {
       this.getVariations(event.value, this.state.currentlySelectedProductID)
       this.getCustomerPriceLists(event.value, this.state.currentlySelectedProductID, null)
+    }
   }
 
   handleProductChange = (event) => {
     this.setState({currentlySelectedProductID: event.value})
-    if(this.state.currentlySelectedCustomerID)
+    if(this.state.currentlySelectedCustomerID && this.state.currentlySelectedCustomerID !== '')
+    {
       this.getVariations(this.state.currentlySelectedCustomerID, event.value)
       this.getCustomerPriceLists(this.state.currentlySelectedCustomerID,  event.value, null)
+    }
   }
 
   handleVariationChange = (event) => {
@@ -95,7 +99,7 @@ class ViewCustomers extends React.Component{
         'product-id': productID
       }
     };
-    if(variationID)
+    if(variationID && variationID !== '' && variationID !== 'None')
     {
       apiRequest.queryStringParameters['variation-id']=variationID
     }
@@ -176,7 +180,7 @@ class ViewCustomers extends React.Component{
         'Upper_Range': priceItem.upper_range
       }
     };
-    if(this.state.currentlySelectedVariationID)
+    if(this.state.currentlySelectedVariationID && this.state.currentlySelectedVariationID !== '' && this.state.currentlySelectedVariationID !== 'None')
     {
       apiRequest.queryStringParameters['variation-id']=this.state.currentlySelectedVariationID
     }
