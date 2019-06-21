@@ -118,13 +118,17 @@ class OrderItem extends Component {
   }
 
   findNewPrice = (quantity) => {
+    if(!quantity || !Number.isInteger(quantity))
+    {
+      return;
+    }
     var minPrice = this.state.priceList.length > 0 && this.state.priceList.reduce(
       (min, item) =>
-         quantityInt >= parseInt(item.lower_range)
-         && quantityInt <= parseInt(item.upper_range)
+         quantity >= parseInt(item.lower_range)
+         && quantity <= parseInt(item.upper_range)
          &&  parseFloat(item.price) < parseFloat(min.price)
          ? item : min);
-    if(quantityInt >= parseInt(minPrice.lower_range) && quantityInt <= parseInt(minPrice.upper_range))
+    if(quantity >= parseInt(minPrice.lower_range) && quantity <= parseInt(minPrice.upper_range))
     {
       this.handlePriceChange({target:{value:minPrice.price}})
     }
