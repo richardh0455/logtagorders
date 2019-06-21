@@ -80,7 +80,7 @@ class OrderList extends Component {
 	  for(var i = 0; i < items.length; i++) {
 		total += items[i].quantity * items[i].price;
 	  }
-	  return total;
+	  return (total).toFixed(2);
    }
 
    orderItemUpdated = (key, item) => {

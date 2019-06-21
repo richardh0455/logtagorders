@@ -168,7 +168,7 @@ class OrderItem extends Component {
 
 			<div data-field-span="1">
 				<label>Subtotal</label>
-				<span style={{'height': this.state.inputHeight, 'fontSize':'18px'}}> {this.state.quantity * this.state.price} </span>
+				<span style={{'height': this.state.inputHeight, 'fontSize':'18px'}}> {(this.state.quantity * this.state.price).toFixed(2)} </span>
 			</div>
 			<div data-field-span="1" >
 				<button onClick={this.removeItem}  >Remove Item</button>

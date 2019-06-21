@@ -85,7 +85,7 @@ class OrderList extends Component {
 	  for(var i = 0; i < items.length; i++) {
 		total += parseInt(items[i].Quantity) * parseFloat(items[i].Pricing);
 	  }
-	  return total;
+	  return (total).toFixed(2);
    }
 
 	 orderItemUpdated = (key, field, event) => {
