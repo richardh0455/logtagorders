@@ -113,7 +113,7 @@ class OrderItem extends Component {
     var quantity = event.target.value;
      this.props.update_item_handler(this.props.id, 'Quantity', quantity)
      var quantityInt = parseInt(quantity)
-     tihs.findNewPrice(quantityInt);
+     this.findNewPrice(quantityInt);
 
   }
 
