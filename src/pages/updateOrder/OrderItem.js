@@ -104,7 +104,7 @@ class OrderItem extends Component {
         })
       })
       //console.log(JSON.parse(response.body))
-      this.findNewPrice(this.props.quantity);
+      this.findNewPrice(parseInt(this.props.quantity));
     })
   }
 
