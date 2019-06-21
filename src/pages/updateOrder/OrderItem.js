@@ -183,7 +183,7 @@ class OrderItem extends Component {
 
 			<div data-field-span="1">
 				<label>Subtotal</label>
-				{this.props.quantity * this.props.price}
+				{(this.props.quantity * this.props.price).toFixed(2)}
 			</div>
 			<div data-field-span="1">
 				<button onClick={this.removeItem}  >Remove Item</button>
