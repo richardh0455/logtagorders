@@ -201,16 +201,20 @@ class Customer extends React.Component{
           var accountID = account.AccountID;
           if(account.created) {
             this.createCourierAccount(customer.customer_id, account.AccountName)
+            account.created=false;
           } else {
             this.updateCourierAccount(accountID, customer.customer_id, account.AccountName)
           }
+
         }
       )
+
 
       this.state.hs_codes.map(
         code  => {
           if(code.created) {
             this.createHSCode(customer.customer_id, code.HSCode)
+            code.created = false;
           } else {
             this.updateHSCode(code.ID, customer.customer_id, code.HSCode)
           }
@@ -359,6 +363,7 @@ class Customer extends React.Component{
         {
           return false;
         }
+        shipping_addresses[index].created = false;
       } else {
         var result = await this.updateShippingAddress(customerID,shipping_addresses[index].ID, shipping_addresses[index]);
         if(!result)
@@ -383,6 +388,7 @@ class Customer extends React.Component{
         {
           return false;
         }
+        billing_addresses[index].created = false;
       } else {
         var result = await this.updateBillingAddress(customerID,billing_addresses[index].ID, billing_addresses[index]);
         if(!result)
