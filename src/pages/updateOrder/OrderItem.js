@@ -43,6 +43,7 @@ class OrderItem extends Component {
     this.props.update_item_handler(this.props.id, 'ProductID', event.value)
     this.getVariants(event.value);
     this.getPriceList(event.value, null);
+
   }
 
 
@@ -103,6 +104,7 @@ class OrderItem extends Component {
         })
       })
       //console.log(JSON.parse(response.body))
+      this.findNewPrice(this.props.quantity);
     })
   }
 
@@ -111,16 +113,22 @@ class OrderItem extends Component {
     var quantity = event.target.value;
      this.props.update_item_handler(this.props.id, 'Quantity', quantity)
      var quantityInt = parseInt(quantity)
-     var minPrice = this.state.priceList.length > 0 && this.state.priceList.reduce(
-       (min, item) =>
-          quantityInt >= parseInt(item.lower_range)
-          && quantityInt <= parseInt(item.upper_range)
-          &&  parseFloat(item.price) < parseFloat(min.price)
-          ? item : min);
-     if(quantityInt >= parseInt(minPrice.lower_range) && quantityInt <= parseInt(minPrice.upper_range))
-     {
-       this.handlePriceChange({target:{value:minPrice.price}})
-     }
+     tihs.findNewPrice(quantityInt);
+
+  }
+
+  findNewPrice = (quantity) => {
+    var minPrice = this.state.priceList.length > 0 && this.state.priceList.reduce(
+      (min, item) =>
+         quantityInt >= parseInt(item.lower_range)
+         && quantityInt <= parseInt(item.upper_range)
+         &&  parseFloat(item.price) < parseFloat(min.price)
+         ? item : min);
+    if(quantityInt >= parseInt(minPrice.lower_range) && quantityInt <= parseInt(minPrice.upper_range))
+    {
+      this.handlePriceChange({target:{value:minPrice.price}})
+    }
+
   }
 
   handlePriceChange = (event) => {
