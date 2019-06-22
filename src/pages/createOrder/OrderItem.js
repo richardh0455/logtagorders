@@ -37,14 +37,12 @@ class OrderItem extends Component {
     this.props.item.product_id = event.value;
     this.props.item.product_name = event.label;
     this.props.update_item_handler(this.props.item.key, this.props.item)
-    this.setState({currentlySelectedProduct: event}, () =>
+    this.setState({currentlySelectedProduct: event})
+    if(this.state.currentlySelectedProduct && this.props.customer)
     {
-      if(this.state.currentlySelectedProduct && this.props.customer)
-      {
-        this.getVariants();
-        this.getPriceList();
-      }
-    })
+      this.getVariants(event, this.props.customer);
+      this.getPriceList(event, this.props.customer);
+    }
   }
 
 
@@ -56,9 +54,13 @@ class OrderItem extends Component {
     this.props.update_item_handler(this.props.item.key, this.props.item)
   }
 
-  async getVariants() {
-	  var productID = this.state.currentlySelectedProduct.value;
-	  var customerID = this.props.customer.value;
+  async getVariants(product, customer) {
+	  var productID = product.value;
+	  var customerID = customer.value;
+    if(!productID || !customerID)
+    {
+      return;
+    }
 	  const apiRequest = {
         headers: {
           'Authorization': this.state.idToken,
@@ -78,9 +80,13 @@ class OrderItem extends Component {
 	});
   }
 
-  getPriceList = () => {
-    var productID = this.state.currentlySelectedProduct.value;
-	  var customerID = this.props.customer.value;
+  getPriceList = (product, customer) => {
+    var productID = product.value;
+	  var customerID = customer.value;
+    if(!productID || !customerID)
+    {
+      return;
+    }
     const apiRequest = {
       headers: {
         'Authorization': this.state.idToken,

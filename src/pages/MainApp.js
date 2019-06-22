@@ -157,14 +157,14 @@ class MainApp extends React.Component {
         'Content-Type': 'application/json'
       }
     };
-    API.get(productsAPI, getAllPath, apiRequest)
+    API.get(productsAPI, '', apiRequest)
     .then(response =>
     {
         this.setState({products: response.body});
     }).catch(error =>
     {
         console.log(error.response)
-        if(error.response.status == 504){
+        if(error.response && error.response.status == 504){
             console.log('Gateway Timeout: Retrying...')
             this.getProducts()
         }
@@ -222,7 +222,7 @@ class MainApp extends React.Component {
       try{
         productOptions = products.map((product) =>
         {
-          return {value:product.ID, label: product.Name, product:product}
+          return {value:product.ProductID, label: product.Name, product:product}
         });
       } catch(err)
       {
