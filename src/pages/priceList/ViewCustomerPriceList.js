@@ -68,6 +68,7 @@ class ViewCustomers extends React.Component{
             return {"value":variant.VariantID, "label":variant.Description, "price":variant.Price};
           }
         );
+        variants.push({"value":'None', "label":'None'})
 		    this.setState({variations: variants});
 	  }).catch(error => {
 		    console.log(error)
