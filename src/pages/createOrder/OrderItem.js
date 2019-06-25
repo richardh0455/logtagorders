@@ -34,11 +34,12 @@ class OrderItem extends Component {
   }
 
   handleProductChange = (event) => {
+    console.log('Handling Product Change')
     this.props.item.product_id = event.value;
     this.props.item.product_name = event.label;
     this.props.update_item_handler(this.props.item.key, this.props.item)
     this.setState({currentlySelectedProduct: event})
-    if(this.state.currentlySelectedProduct && this.props.customer)
+    if(this.props.customer)
     {
       this.getVariants(event, this.props.customer);
       this.getPriceList(event, this.props.customer);
