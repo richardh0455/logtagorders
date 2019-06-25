@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import '../../public/css/gridforms.css';
 import Select from 'react-select';
 import { Auth, API } from 'aws-amplify';
+import '../../public/css/loader.css'
 
+const Loader = () => <div className="loader">Loading...</div>
 const variantsAPI = 'VariantsAPI';
 const getAllPath = '/all';
 
@@ -34,7 +36,6 @@ class OrderItem extends Component {
   }
 
   handleProductChange = (event) => {
-    console.log('Handling Product Change')
     this.props.item.product_id = event.value;
     this.props.item.product_name = event.label;
     this.props.update_item_handler(this.props.item.key, this.props.item)
@@ -152,12 +153,19 @@ class OrderItem extends Component {
   }
 
   render() {
+    let productSelect;
+    if(this.props.products && this.props.products.length > 0){
+      productSelect = <Select value={this.state.currentlySelectedProduct} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
+    }else{
+      productSelect = <Loader/>
+    }
+
     return (
       <div onKeyPress={this.onKeyPress}>
       <div data-row-span="6">
       <div data-field-span="1">
         <label>Product</label>
-        <Select value={this.state.currentlySelectedProduct} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
+        {productSelect}
       </div>
       <div data-field-span="1">
         <label>Variant</label>
