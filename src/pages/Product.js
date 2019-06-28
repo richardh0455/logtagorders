@@ -5,8 +5,6 @@ import {NotificationContainer, NotificationManager} from 'react-notifications';
 import { Auth, API } from 'aws-amplify';
 import Select from 'react-select';
 
-const createPath = '/create';
-const updatePath = '/update';
 const productsAPI = 'ProductsAPI';
 
 class Product extends React.Component{
@@ -71,7 +69,7 @@ class Product extends React.Component{
         },
         body: {"Name": product.name, "Description": product.description, "CostPrice":cost_price}
       };
-      API.post(productsAPI, createPath, apiRequest)
+      API.post(productsAPI, '', apiRequest)
 	  .then(response => {
       if(response.statusCode === "200"){
         NotificationManager.success('', 'Product Successfully Created', 3000);
@@ -101,7 +99,7 @@ class Product extends React.Component{
         },
         body: {"Name": product.name, "Description": product.description, "CostPrice":cost_price}
       };
-      API.post(productsAPI, "/"+product.ID+updatePath, apiRequest)
+      API.put(productsAPI, "/"+product.ID, apiRequest)
 	  .then(response => {
       if(response.statusCode === "200"){
         NotificationManager.success('', 'Product Successfully Updated', 3000);

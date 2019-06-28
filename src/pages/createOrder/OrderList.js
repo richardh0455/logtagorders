@@ -80,7 +80,7 @@ class OrderList extends Component {
 	  for(var i = 0; i < items.length; i++) {
 		total += items[i].quantity * items[i].price;
 	  }
-	  return total;
+	  return (total).toFixed(2);
    }
 
    orderItemUpdated = (key, item) => {
@@ -254,10 +254,10 @@ class OrderList extends Component {
 	 		if(items[i].variant.replace(',',', \n') != 'No Variant') {
 	 			variant = ' - '+items[i].variant.replace(',',', \n');
 	 		}
-	 		var line = [ items[i].product_name+variant, items[i].quantity,items[i].price, currency, items[i].quantity*items[i].price+'' ];
+	 		var line = [ items[i].product_name+variant, items[i].quantity, '$'+items[i].price, currency, (items[i].quantity*items[i].price).toFixed(2)+'' ];
 	 		data.push(line);
-
 	 	}
+
 	 	var footer = [['Total','','',this.calculateTotal()]]
 	 	var tableHeight = 0;
 	 	doc.autoTable({

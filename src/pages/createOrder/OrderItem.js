@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import '../../public/css/gridforms.css';
 import Select from 'react-select';
 import { Auth, API } from 'aws-amplify';
+import '../../public/css/loader.css'
 
+const Loader = () => <div className="loader">Loading...</div>
 const variantsAPI = 'VariantsAPI';
 const getAllPath = '/all';
 
@@ -37,14 +39,12 @@ class OrderItem extends Component {
     this.props.item.product_id = event.value;
     this.props.item.product_name = event.label;
     this.props.update_item_handler(this.props.item.key, this.props.item)
-    this.setState({currentlySelectedProduct: event}, () =>
+    this.setState({currentlySelectedProduct: event})
+    if(this.props.customer)
     {
-      if(this.state.currentlySelectedProduct && this.props.customer)
-      {
-        this.getVariants();
-        this.getPriceList();
-      }
-    })
+      this.getVariants(event, this.props.customer);
+      this.getPriceList(event, this.props.customer);
+    }
   }
 
 
@@ -56,9 +56,13 @@ class OrderItem extends Component {
     this.props.update_item_handler(this.props.item.key, this.props.item)
   }
 
-  async getVariants() {
-	  var productID = this.state.currentlySelectedProduct.value;
-	  var customerID = this.props.customer.value;
+  async getVariants(product, customer) {
+	  var productID = product.value;
+	  var customerID = customer.value;
+    if(!productID || !customerID)
+    {
+      return;
+    }
 	  const apiRequest = {
         headers: {
           'Authorization': this.state.idToken,
@@ -78,9 +82,13 @@ class OrderItem extends Component {
 	});
   }
 
-  getPriceList = () => {
-    var productID = this.state.currentlySelectedProduct.value;
-	  var customerID = this.props.customer.value;
+  getPriceList = (product, customer) => {
+    var productID = product.value;
+	  var customerID = customer.value;
+    if(!productID || !customerID)
+    {
+      return;
+    }
     const apiRequest = {
       headers: {
         'Authorization': this.state.idToken,
@@ -145,12 +153,19 @@ class OrderItem extends Component {
   }
 
   render() {
+    let productSelect;
+    if(this.props.products && this.props.products.length > 0){
+      productSelect = <Select value={this.state.currentlySelectedProduct} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
+    }else{
+      productSelect = <Loader/>
+    }
+
     return (
       <div onKeyPress={this.onKeyPress}>
       <div data-row-span="6">
       <div data-field-span="1">
         <label>Product</label>
-        <Select value={this.state.currentlySelectedProduct} onChange={this.handleProductChange} options={this.props.products} isSearchable="true" placeholder="Select a Product"/>
+        {productSelect}
       </div>
       <div data-field-span="1">
         <label>Variant</label>
@@ -168,7 +183,7 @@ class OrderItem extends Component {
 
 			<div data-field-span="1">
 				<label>Subtotal</label>
-				<span style={{'height': this.state.inputHeight, 'fontSize':'18px'}}> {this.state.quantity * this.state.price} </span>
+				<span style={{'height': this.state.inputHeight, 'fontSize':'18px'}}> {(this.state.quantity * this.state.price).toFixed(2)} </span>
 			</div>
 			<div data-field-span="1" >
 				<button onClick={this.removeItem}  >Remove Item</button>

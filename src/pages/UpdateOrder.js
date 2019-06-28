@@ -12,6 +12,10 @@ import MomentLocaleUtils, {
   parseDate,
 } from 'react-day-picker/moment';
 
+import '../../public/css/loader.css'
+
+const Loader = () => <div className="loader">Loading...</div>
+
 const customersAPI = 'CustomersAPI';
 const getAllPath = '/all';
 
@@ -338,6 +342,42 @@ class UpdateOrder extends React.Component{
  }
 
   render() {
+    let customerSelect;
+    let orderSelect;
+    let currencySelect;
+    let hsCodeSelect;
+    let courierAccountSelect;
+    if(this.props.customers && this.props.customers.length > 0){
+      customerSelect = <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
+    }else{
+      customerSelect = <Loader/>
+    }
+
+    if(this.state.orders && this.state.orders.length > 0){
+      orderSelect = <Select value={this.state.currentlySelectedOrder} onChange={this.handleOrderChange} options={
+        this.state.orders.filter(order => {return !this.fieldHasValidValue(order.ShippedDate)}).map(order => {return {value:order.InvoiceID, label: order.LogtagInvoiceNumber, details:order}})} isSearchable="true" placeholder="Select an Order"/>
+    }else{
+      orderSelect = <Loader/>
+    }
+
+    if(this.props.currencies && this.props.currencies.length > 0){
+      currencySelect = <Select value={this.state.currentlySelectedCurrency} onChange={this.handleCurrencyChange} options={this.props.currencies} isSearchable="true" placeholder="Select a Currency"/>
+    }else{
+      currencySelect = <Loader/>
+    }
+
+    if(this.state.hs_codes && this.state.hs_codes.length > 0){
+      hsCodeSelect = <Select value={this.state.currentlySelectedHSCode} onChange={this.handleHSCodeChange} options={this.state.hs_codes} placeholder="Select a HS Code"/>
+    }else{
+      hsCodeSelect = <Loader/>
+    }
+
+    if(this.state.courier_accounts && this.state.courier_accounts.length > 0){
+      courierAccountSelect = <Select value={this.state.currentlySelectedCourierAccount} onChange={this.handleCourierAccountChange} options={this.state.courier_accounts} placeholder="Select a Courier Account"/>
+    }else{
+      courierAccountSelect = <Loader/>
+    }
+
     return (
       <div >
 
@@ -346,12 +386,11 @@ class UpdateOrder extends React.Component{
         <div data-row-span="2" >
         <div data-field-span="1" >
           <label>Customer</label>
-          <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
+          {customerSelect}
       </div>
       <div data-field-span="1" >
         <label>Order</label>
-        <Select value={this.state.currentlySelectedOrder} onChange={this.handleOrderChange} options={
-          this.state.orders.filter(order => {return !this.fieldHasValidValue(order.ShippedDate)}).map(order => {return {value:order.InvoiceID, label: order.LogtagInvoiceNumber, details:order}})} isSearchable="true" placeholder="Select an Order"/>
+        {orderSelect}
        </div>
        </div>
           <fieldset>
@@ -382,17 +421,17 @@ class UpdateOrder extends React.Component{
               </div>
               <div data-field-span="1">
         				<label>Currency</label>
-        				<Select value={this.state.currentlySelectedCurrency} onChange={this.handleCurrencyChange} options={this.props.currencies} isSearchable="true" placeholder="Select a Currency"/>
+        				{currencySelect}
                 {this.required(this.state.currentlySelectedCurrency)}
               </div>
               <div data-field-span="1" >
                 <label>Courier Account</label>
-                <Select value={this.state.currentlySelectedCourierAccount} onChange={this.handleCourierAccountChange} options={this.state.courier_accounts} placeholder="Select a Courier Account"/>
+                {courierAccountSelect}
                 {this.required(this.state.currentlySelectedCourierAccount)}
               </div>
               <div data-field-span="1" >
                 <label>HS Code</label>
-                <Select value={this.state.currentlySelectedHSCode} onChange={this.handleHSCodeChange} options={this.state.hs_codes} placeholder="Select a HS Code"/>
+                {hsCodeSelect}
                 {this.required(this.state.currentlySelectedHSCode)}
               </div>
             </div>

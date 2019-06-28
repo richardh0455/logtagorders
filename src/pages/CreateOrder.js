@@ -5,6 +5,7 @@ import { withRouter } from 'react-router-dom';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import OrderList from './createOrder/OrderList';
 import Select from 'react-select';
+import '../public/css/loader.css'
 
 const customersAPI = 'CustomersAPI';
 const getAllPath = '/all';
@@ -13,6 +14,8 @@ const productsAPI = 'ProductsAPI';
 
 const createPath = '/create';
 const orderAPI = 'OrdersAPI';
+
+const Loader = () => <div className="loader">Loading...</div>
 
 class CreateOrder extends React.Component{
 
@@ -34,6 +37,8 @@ class CreateOrder extends React.Component{
     purchaseOrderNumber:'',
     shipping_addresses:[],
     orders:[],
+    courier_accounts:[],
+    hs_codes:[],
     inputHeight:'56px'
     };
   }
@@ -138,6 +143,8 @@ class CreateOrder extends React.Component{
        this.setState({customer: response.body})
        this.getShippingAddresses(event.value).then(response => this.generateShippingAddressList(JSON.parse(response.body)))
        this.getOrders(event.value).then(response => this.setState({orders: JSON.parse(response.body)}))
+       this.setState({courier_accounts: this.generateCourierAccountList(JSON.parse(response.body))})
+       this.setState({hs_codes: this.generateHSCodeList(JSON.parse(response.body))})
        this.handleShippingAddressChange(null);
        this.handleCourierAccountChange(null);
        this.handleHSCodeChange(null);
@@ -241,6 +248,10 @@ class CreateOrder extends React.Component{
 }
 
  required(field) {
+   if(!this.state.customer)
+   {
+     return <span style={{'fontSize': '12px', 'color':'#ba090c'}}>Please Select a Customer</span>
+   }
    if(field  === null) {
     return <span style={{'fontSize': '12px', 'color':'#ba090c'}}>Please Select a Value</span>
 
@@ -248,6 +259,41 @@ class CreateOrder extends React.Component{
 
  }
   render() {
+    let customerSelect;
+    let shippingAddressSelect;
+    let currencySelect;
+    let courierSelect;
+    let hsCodeSelect;
+    if(this.props.customers && this.props.customers.length > 0){
+      customerSelect = <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Please Select a Customer"/>
+    }else{
+      customerSelect = <Loader/>
+    }
+
+    if(this.state.shipping_addresses && this.state.shipping_addresses.length > 0){
+      shippingAddressSelect = <Select value={this.state.currentlySelectedShippingAddress} onChange={this.handleShippingAddressChange} options={this.state.shipping_addresses} placeholder="Select a Shipping Address"/>
+    }else{
+      shippingAddressSelect = <Loader/>
+    }
+
+    if(this.props.currencies && this.props.currencies.length > 0){
+      currencySelect = <Select value={this.state.currentlySelectedCurrency} onChange={this.handleCurrencyChange} options={this.props.currencies} isSearchable="true" placeholder="Select a Currency"/>
+    }else{
+      currencySelect = <Loader/>
+    }
+
+    if(this.state.courier_accounts && this.state.courier_accounts.length > 0){
+      courierSelect = <Select value={this.state.currentlySelectedCourierAccount} onChange={this.handleCourierAccountChange} options={this.state.courier_accounts} placeholder="Select a Courier Account"/>
+    }else{
+      courierSelect = <Loader/>
+    }
+
+    if(this.state.hs_codes && this.state.hs_codes.length > 0){
+      hsCodeSelect = <Select value={this.state.currentlySelectedHSCode} onChange={this.handleHSCodeChange} options={this.generateHSCodeList(JSON.parse(this.state.customer))} placeholder="Select a HS Code"/>
+    }else{
+      hsCodeSelect = <Loader/>
+    }
+
     return (
       <div >
       <section>
@@ -257,12 +303,12 @@ class CreateOrder extends React.Component{
             <div data-row-span="2">
               <div data-field-span="1" >
                 <label>Customer</label>
-                <Select value={this.state.currentlySelectedCustomer} onChange={this.handleCustomerChange} options={this.props.customers} isSearchable="true" placeholder="Select a Customer"/>
+                {customerSelect}
                 {this.required(this.state.currentlySelectedCustomer)}
               </div>
               <div data-field-span="1" >
                 <label>Shipping Address</label>
-                <Select value={this.state.currentlySelectedShippingAddress} onChange={this.handleShippingAddressChange} options={this.state.shipping_addresses} placeholder="Select a Shipping Address"/>
+                {shippingAddressSelect}
                 {this.required(this.state.currentlySelectedShippingAddress)}
               </div>
 
@@ -274,17 +320,17 @@ class CreateOrder extends React.Component{
               </div>
               <div data-field-span="1">
         				<label>Currency</label>
-        				<Select value={this.state.currentlySelectedCurrency} onChange={this.handleCurrencyChange} options={this.props.currencies} isSearchable="true" placeholder="Select a Currency"/>
+                {currencySelect}
                 {this.required(this.state.currentlySelectedCurrency)}
               </div>
               <div data-field-span="1" >
                 <label>Courier Account</label>
-                <Select value={this.state.currentlySelectedCourierAccount} onChange={this.handleCourierAccountChange} options={this.generateCourierAccountList(JSON.parse(this.state.customer))} placeholder="Select a Courier Account"/>
+                {courierSelect}
                 {this.required(this.state.currentlySelectedCourierAccount)}
               </div>
               <div data-field-span="1" >
                 <label>HS Code</label>
-                <Select value={this.state.currentlySelectedHSCode} onChange={this.handleHSCodeChange} options={this.generateHSCodeList(JSON.parse(this.state.customer))} placeholder="Select a HS Code"/>
+                {hsCodeSelect}
                 {this.required(this.state.currentlySelectedHSCode)}
               </div>
             </div>
