@@ -12,7 +12,7 @@ import MomentLocaleUtils, {
   parseDate,
 } from 'react-day-picker/moment';
 
-import '../../public/css/loader.css'
+import '../public/css/loader.css'
 
 const Loader = () => <div className="loader">Loading...</div>
 
