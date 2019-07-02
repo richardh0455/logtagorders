@@ -39,7 +39,9 @@ class OrderItem extends Component {
     this.props.item.product_id = event.value;
     this.props.item.product_name = event.label;
     this.props.update_item_handler(this.props.item.key, this.props.item)
-    this.setState({currentlySelectedProduct: event})
+    this.setState({currentlySelectedProduct: event,
+      currentlySelectedVariant: null
+    })
     if(this.props.customer)
     {
       this.getVariants(event, this.props.customer);

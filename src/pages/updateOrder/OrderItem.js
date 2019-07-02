@@ -43,6 +43,7 @@ class OrderItem extends Component {
 
   handleProductChange = (event) => {
     this.props.update_item_handler(this.props.id, 'ProductID', event.value)
+    this.handleVariantChange({value:null})
     this.getVariants(event.value);
     this.getPriceList(event.value, null);
 
@@ -144,6 +145,9 @@ class OrderItem extends Component {
 
 
   findMatchingElementByID(value, list) {
+      if(value === null){
+        return null;
+      }
       var result = list.find(element => element.value===value);
       return result;
 
