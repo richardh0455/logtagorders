@@ -103,11 +103,6 @@ class Product extends React.Component{
 	  .then(response => {
       if(response.statusCode === "200"){
         NotificationManager.success('', 'Product Successfully Updated', 3000);
-        this.setState({
-          name:'',
-          description:'',
-          cost_price:'0'
-        })
         this.props.get_all_products();
       } else {
         NotificationManager.error('Product Updating Failed', 'Error', 5000, () => {});
