@@ -52,7 +52,10 @@ class OrderItem extends Component {
 
   handleVariantChange = (event) => {
 	  this.setState({currentlySelectedVariant: event});
-    this.handlePriceChange({target: {value: event.price}})
+    if(event.price)
+    {
+      this.handlePriceChange({target: {value: event.price}})
+    }
     this.props.item.variant_id = event.value;
     this.props.item.variant = event.label;
     this.props.update_item_handler(this.props.item.key, this.props.item)
@@ -78,6 +81,7 @@ class OrderItem extends Component {
             return {"value":variant.VariantID, "label":variant.Description, "price":variant.Price};
           }
         );
+        variants.push({"value":'None', "label":'None'})
 		    this.setState({variants: variants});
 	  }).catch(error => {
 		    console.log(error)
