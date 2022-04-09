@@ -13,7 +13,7 @@
     "esri-loader": "^2.2.0",
     "jspdf": "^1.5.3",
     "jspdf-autotable": "^3.1.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "normalize.css": "^8.0.0",
     "react": "^16.2.0",
     "react-day-picker": "^7.3.0",
